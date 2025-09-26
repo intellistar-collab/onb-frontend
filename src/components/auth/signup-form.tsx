@@ -43,7 +43,7 @@ export function SignupForm() {
       email: data.email,
       password: data.password,
       username: data.username,
-      name: ""
+      name: "Arup Basak"
     });
   };
 

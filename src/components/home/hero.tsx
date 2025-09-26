@@ -28,7 +28,7 @@ const Titles = ({ title }: { title: string }) => {
 
 const Hero = () => {
   return (
-    <section className="h-[25vh] md:h-[50vh] lg:h-[72vh] w-full relative overflow-hidden">
+    <section className="h-[25vh] md:h-[50vh] lg:h-[85vh] w-full relative overflow-hidden">
       <div
         className="mask-subtract h-full"
         style={{
