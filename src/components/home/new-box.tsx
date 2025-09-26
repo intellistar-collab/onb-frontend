@@ -2,6 +2,7 @@ import React from "react";
 import Image from "next/image";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
+import DarkBackground from "../common/dark-background";
 
 const NewBox = () => {
   return (
@@ -11,17 +12,17 @@ const NewBox = () => {
           src="/box/new-box.webp"
           alt="New Box"
           fill
-          className="object-cover object-center -z-10 opacity-35"
+          className="object-cover object-center -z-10"
         />
-        <div className="absolute top-0 left-0 flex gap-4  md:gap-36 p-8">
+        <DarkBackground className="absolute top-0 left-0 flex flex-col gap-4 p-8 max-w-md">
           <h1 className="text-4xl font-oswald">NEW BOX LAUNCH!</h1>
           <p>
-            Add your email to stay updated with our new box launches! You won’t
+            Add your email to stay updated with our new box launches! You won't
             want to miss what we have in store for the future drops! Small price
             - Big Experience.
           </p>
 
-          <div className="mt-4">
+          <div className="mt-4 flex gap-2">
             <Input
               type="email"
               placeholder="Enter your email address"
@@ -31,7 +32,7 @@ const NewBox = () => {
               Subscribe
             </Button>
           </div>
-        </div>
+        </DarkBackground>
       </div>
     </section>
   );

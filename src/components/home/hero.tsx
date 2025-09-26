@@ -40,13 +40,13 @@ const Hero = () => {
         }}
       />
 
-      {/* <Image
+      <Image
         src={"/hot-chick.webp"}
         alt="hot-chick"
-        height={600}
-        width={600}
-        className="absolute top-0 right-0"
-      /> */}
+        height={450}
+        width={450}
+        className="absolute top-1/2 -translate-y-1/2 right-0"
+      />
 
       <Image
         src={"/hero/hero-title.svg"}

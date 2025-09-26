@@ -13,7 +13,7 @@ const BoxHero = () => {
   return (
     <section className="relative">
       {/* Background Image */}
-      <div className="absolute inset-0 z-0">
+      {/* <div className="absolute inset-0 z-0">
         <Image
           src="/hot-chick.webp"
           alt="Hero Background"
@@ -22,7 +22,7 @@ const BoxHero = () => {
           priority
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-black/80"></div>
-      </div>
+      </div> */}
 
       {/* Content */}
       <div className="relative z-10 py-8">
