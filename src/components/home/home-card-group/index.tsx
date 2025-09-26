@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/carousel";
 import Image from "next/image";
 import RoundedShape from "@/components/common/rounded-shape";
+import { cn } from "@/lib/utils";
 
 interface HomeCardGroupProps {
   title: string;
@@ -14,6 +15,7 @@ interface HomeCardGroupProps {
   banner: string;
   type: "carousel" | "grid";
   side: "left" | "right";
+  className?: string;
 }
 
 const HomeCardGroup = ({
@@ -22,6 +24,7 @@ const HomeCardGroup = ({
   banner,
   type = "carousel",
   side = "right",
+  className
 }: HomeCardGroupProps) => {
   const clipPath = side === "left" ? "polygon(0% 0%, calc(100% - 20px) 0%, 100% 100%, 0% 100%)" : "polygon(20px 0%, 100% 0%, 100% 100%, 0% 100%)";
   return (
@@ -40,7 +43,7 @@ const HomeCardGroup = ({
         </h1>
       </div>
       {type === "carousel" && (
-        <div className="relative">
+        <div className={cn("relative", className)}>
           <Carousel className="w-full">
             <CarouselContent className="-ml-2 md:-ml-4">
               {cards.map((card) => (
@@ -57,7 +60,7 @@ const HomeCardGroup = ({
       )}
 
       {type === "grid" && (
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <div className={cn("grid grid-cols-2 md:grid-cols-3 gap-4", className)}>
           {cards.map((card) => (
             <HomeCard {...card} key={card.title} />
           ))}

@@ -4,7 +4,7 @@ import { SignupForm } from "@/components/auth/signup-form";
 
 export default function SignupPage() {
   return (
-    <main className="min-h-screen grid grid-cols-2 w-full">
+    <main className="min-h-screen min-w-screen grid grid-cols-2 w-full">
       <div className="relative bg-gray-900">
         <Image
           src="/signup.webp"

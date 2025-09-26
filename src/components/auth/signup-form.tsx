@@ -39,10 +39,12 @@ export function SignupForm() {
   const acceptTerms = watch("acceptTerms");
 
   const onSubmit = async (data: SignupFormData) => {
-    // Simulate API call
-    console.log("Form submitted:", data);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    alert("Account created successfully!");
+    await authClient.signUp.email({
+      email: data.email,
+      password: data.password,
+      username: data.username,
+      name: ""
+    });
   };
 
   const handleGoogleSignup = async () => {

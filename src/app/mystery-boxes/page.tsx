@@ -31,7 +31,7 @@ const HomeScreen = () => {
       <WhatWeDo />
       <section>
       <div className="grid md:grid-cols-2 gap-6">
-          {gridCardGroups.map((cardGroup, index) => (
+          {mainCardGroups.map((cardGroup, index) => (
             <HomeCardGroup
               key={cardGroup.title}
               {...cardGroup}
