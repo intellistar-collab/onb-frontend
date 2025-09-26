@@ -1,8 +1,12 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 
 const Footer = () => {
+  const pathname = usePathname();
   const navigationLinks = [
     { label: "Home", href: "#" },
     { label: "Mystery Boxes", href: "#" },
@@ -104,6 +108,12 @@ const Footer = () => {
     },
   ];
 
+  const hiddenPaths = ["/signup", "/login"];
+
+  if (hiddenPaths.includes(pathname)) {
+    return null;
+  }
+
   return (
     <footer className="py-10">
       <div className="container mx-auto">
@@ -123,40 +133,39 @@ const Footer = () => {
             </div>
           </div>
 
-            <div className="flex gap-4">
+          <div className="flex gap-4">
+            {/* Navigation Links Column 1 */}
+            <div className="md:col-span-1">
+              <ul className="space-y-3 text-sm">
+                {navigationLinks.map((link, index) => (
+                  <li key={index}>
+                    <Link
+                      href={link.href}
+                      className="text-gray-300 hover:text-white transition-colors"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
-          {/* Navigation Links Column 1 */}
-          <div className="md:col-span-1">
-            <ul className="space-y-3 text-sm">
-              {navigationLinks.map((link, index) => (
-                <li key={index}>
-                  <Link
-                    href={link.href}
-                    className="text-gray-300 hover:text-white transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            {/* Navigation Links Column 2 */}
+            <div className="md:col-span-1">
+              <ul className="space-y-3">
+                {legalLinks.map((link, index) => (
+                  <li key={index}>
+                    <Link
+                      href={link.href}
+                      className="text-gray-300 hover:text-white transition-colors"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
-
-          {/* Navigation Links Column 2 */}
-          <div className="md:col-span-1">
-            <ul className="space-y-3">
-              {legalLinks.map((link, index) => (
-                <li key={index}>
-                  <Link
-                    href={link.href}
-                    className="text-gray-300 hover:text-white transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-            </div>
-            </div>
 
           {/* Contact and Social Section */}
           <div className="md:col-span-1">

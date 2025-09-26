@@ -15,6 +15,8 @@ import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
+const hiddenPaths = ["/signup", "/login"];
+
 const TopBar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const router = useRouter();
@@ -26,6 +28,10 @@ const TopBar = () => {
     { name: "HOW TO PLAY", href: "/how-to-play" },
     { name: "RANKS", href: "ranks" },
   ];
+
+  if(hiddenPaths.includes(pathname)) {
+    return null;
+  }
 
   return (
     <nav className="text-white sticky top-0 z-50 backdrop-blur-xl border-b border-gray-800/50">
