@@ -30,13 +30,15 @@ const HomeScreen = () => {
       <Hero />
       <WhatWeDo />
       <section>
-        {mainCardGroups.map((cardGroup, index) => (
-          <HomeCardGroup
-            key={cardGroup.title}
-            {...cardGroup}
-            side={index % 2 === 0 ? "left" : "right"}
-          />
-        ))}
+        <div className="flex flex-col gap-6">
+          {mainCardGroups.map((cardGroup, index) => (
+            <HomeCardGroup
+              key={cardGroup.title}
+              {...cardGroup}
+              side={index % 2 === 0 ? "left" : "right"}
+            />
+          ))}
+        </div>
       </section>
       <NewBox />
       <section>

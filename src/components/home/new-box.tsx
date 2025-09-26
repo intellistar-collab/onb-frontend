@@ -13,7 +13,7 @@ const NewBox = () => {
           fill
           className="object-cover object-center -z-10 opacity-35"
         />
-        <div className="absolute top-0 left-0 flex gap-36 p-8">
+        <div className="absolute top-0 left-0 flex gap-4  md:gap-36 p-8">
           <h1 className="text-4xl font-oswald">NEW BOX LAUNCH!</h1>
           <p>
             Add your email to stay updated with our new box launches! You won’t

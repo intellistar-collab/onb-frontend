@@ -152,14 +152,6 @@
     }
   }
 
-  /* .home-card-heading {
-    -webkit-text-fill-color: white;
-    -webkit-text-stroke-width: 0.5px;
-    -webkit-text-stroke-color: #E081AE;
-
-    @apply font-rage whitespace-nowrap font-extrabold;
-  } */
-
   .home-card-heading-sm {
     color: white;
     text-shadow: 

@@ -28,9 +28,9 @@ const Titles = ({ title }: { title: string }) => {
 
 const Hero = () => {
   return (
-    <section className="h-screen relative overflow-hidden p-0">
+    <section className="h-[25vh] md:h-[50vh] lg:h-[72vh] w-full relative overflow-hidden">
       <div
-        className="h-full mask-subtract"
+        className="mask-subtract h-full"
         style={{
           backgroundImage: `url(${hero_image})`,
           backgroundSize: "cover",
