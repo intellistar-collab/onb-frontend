@@ -98,6 +98,14 @@
     @apply md:p-4;
   }
 
+  img {
+    -webkit-user-drag: none;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+  }
+
   .text-content {
     h1 {
       @apply text-2xl font-bold mb-3 text-foreground;

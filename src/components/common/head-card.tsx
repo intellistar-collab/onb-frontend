@@ -11,7 +11,7 @@ interface HeadCardProps {
 
 const HeadCard = ({ title, subtitle, image, className }: HeadCardProps) => {
   return (
-    <section className="p-4">
+    <section>
       <div
         className={cn(
           "relative h-[45rem] overflow-hidden rounded-2xl",

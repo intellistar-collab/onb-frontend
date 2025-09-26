@@ -17,21 +17,39 @@ import Hero from "@/components/home/hero";
 import SocialMedia from "@/components/common/social-media";
 
 const HomeScreen = () => {
+  const mainCardGroups = [cityStays, sportsEvents, dressToImpress, worldEvents];
+  const gridCardGroups = [
+    personalExperiences,
+    gearUpGadgets,
+    dripCity,
+    greadCarefully,
+  ];
+
   return (
     <main>
       <Hero />
       <WhatWeDo />
-      <HomeCardGroup {...cityStays} />
-      <HomeCardGroup {...sportsEvents} />
-      <HomeCardGroup {...dressToImpress} />
-      <HomeCardGroup {...worldEvents} />
+      <section>
+        {mainCardGroups.map((cardGroup, index) => (
+          <HomeCardGroup
+            key={cardGroup.title}
+            {...cardGroup}
+            side={index % 2 === 0 ? "left" : "right"}
+          />
+        ))}
+      </section>
       <NewBox />
-      <div className="grid md:grid-cols-2 gap-6">
-        <HomeCardGroup {...personalExperiences} />
-        <HomeCardGroup {...gearUpGadgets} />
-        <HomeCardGroup {...dripCity} />
-        <HomeCardGroup {...greadCarefully} />
-      </div>
+      <section>
+        <div className="grid md:grid-cols-2 gap-6">
+          {gridCardGroups.map((cardGroup, index) => (
+            <HomeCardGroup
+              key={cardGroup.title}
+              {...cardGroup}
+              side={index % 2 === 0 ? "left" : "right"}
+            />
+          ))}
+        </div>
+      </section>
       <BoxRequest />
       <SocialMedia />
     </main>

@@ -6,12 +6,14 @@ import {
   CarouselItem,
 } from "@/components/ui/carousel";
 import Image from "next/image";
+import RoundedShape from "@/components/common/rounded-shape";
 
 interface HomeCardGroupProps {
   title: string;
   cards: HomeCard[];
   banner: string;
   type: "carousel" | "grid";
+  side: "left" | "right";
 }
 
 const HomeCardGroup = ({
@@ -19,19 +21,21 @@ const HomeCardGroup = ({
   cards,
   banner,
   type = "carousel",
+  side = "right",
 }: HomeCardGroupProps) => {
+  const clipPath = side === "left" ? "polygon(0% 0%, calc(100% - 20px) 0%, 100% 100%, 0% 100%)" : "polygon(20px 0%, 100% 0%, 100% 100%, 0% 100%)";
   return (
     <div className="space-y-3">
-      <div className="relative h-20 overflow-hidden rounded">
-        <div
-          className="absolute inset-0"
-          style={{
-            clipPath: "polygon(0% 0%, calc(100% - 20px) 0%, 100% 100%, 0% 100%)",
-          }}
+      <div className="relative h-20 overflow-hidden">
+        <RoundedShape
+          clipPath={clipPath}
+          className="absolute inset-0 border"
+          radius={3}
         >
           <Image src={banner} alt={title} fill className="object-cover" />
-        </div>
-        <h1 className="text-4xl absolute bottom-0 right-10 font-pricedown z-10">
+        </RoundedShape>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+        <h1 className={(`text-4xl absolute bottom-2 ${side === "left" ? "left-5" : "right-5"} font-pricedown z-10 text-white`)}>
           {title}
         </h1>
       </div>

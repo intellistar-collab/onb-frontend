@@ -16,15 +16,21 @@ const HowToPlay = () => {
         className="h-[30rem]"
         subtitle="How to Play"
       />
-      <Carousel>
-        <CarouselContent>
-          {howToPlay.map((item) => (
-            <CarouselItem key={item.title} className="basis-8/12 md:basis-1/4">
-              <HowToPlayCard {...item} />
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-      </Carousel>
+      <section>
+        <Carousel>
+          <CarouselContent>
+            {howToPlay.map((item) => (
+              <CarouselItem
+                key={item.title}
+                className="basis-8/12 md:basis-1/4"
+              >
+                <HowToPlayCard {...item} />
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+        </Carousel>
+      </section>
+
       <HeadCard
         image="/box/box-request.webp"
         className="h-[15rem]"

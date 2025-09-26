@@ -6,21 +6,16 @@ type HomeCardProps = HomeCard;
 
 const HomeCard = ({ title, location, image, price }: HomeCardProps) => {
   return (
-    <div className="relative border min-h-[25rem] p-2 rounded-2xl">
-      <div className="relative overflow-hidden">
-        <Image
-          src={"/card-bg.png"}
-          alt={title}
-          fill
-          className="object-cover opacity-25"
-        />
+    <div className="relative border min-h-[25rem] rounded-2xl">
+      <div className="relative overflow-hidden w-full h-full rounded-2xl -z-10 opacity-25">
+        <Image src={"/card-bg.png"} alt={title} fill className="object-cover" />
       </div>
-      <h1 className="home-card-heading-sm text-2xl -rotate-45 absolute -top-1/2 -left-1/2">
+      <h1 className="home-card-heading-sm text-3xl -rotate-45 absolute top-5 left-5 -translate-x-1/2 -translate-y-1/2">
         {location}
       </h1>
 
       <div className="flex flex-col justify-between h-full">
-        <h1 className="font-oswald text-2xl text-center">{title}</h1>
+        <h1 className="font-oswald text-2xl text-center pt-16">{title}</h1>
         <div>
           <Image src={image} alt={title} height={300} width={300} />
 

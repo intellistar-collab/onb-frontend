@@ -2,7 +2,7 @@ import React from 'react'
 
 const BoxRequest = () => {
   return (
-    <div>BoxRequest</div>
+    <section>BoxRequest</section>
   )
 }
 

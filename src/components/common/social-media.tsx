@@ -4,6 +4,7 @@ import { Button } from "../ui/button";
 import Link from "next/link";
 import Image from "next/image";
 import { Instagram, Twitter, MessageCircle } from "lucide-react";
+import RoundedShape from "./rounded-shape";
 
 const gap = "30px";
 
@@ -27,13 +28,9 @@ const SocialMedia = () => {
   return (
     <section>
       <div className="grid grid-cols-3 gap-4 min-h-80">
-        <div
+        <RoundedShape
           className="relative overflow-hidden rounded-md"
-          style={{
-            clipPath:
-              `polygon(0% 0%, 100% 0%, calc(100% - ${gap}) 100%, 0% 100%)`,
-              filter: ""
-          }}
+          clipPath={`polygon(0% 0%, 100% 0%, calc(100% - ${gap}) 100%, 0% 100%)`}
         >
           <Image
             src="/social/social-1.png"
@@ -41,7 +38,7 @@ const SocialMedia = () => {
             fill
             className="object-cover object-center -z-10 opacity-90"
           />
-        </div>
+        </RoundedShape>
 
         <div className="flex flex-col items-center justify-center space-y-6 p-8">
           <div className="flex w-full max-w-sm space-x-2">
@@ -69,12 +66,9 @@ const SocialMedia = () => {
           </div>
         </div>
 
-        <div
+        <RoundedShape
           className="relative overflow-hidden rounded-md"
-          style={{
-            clipPath:
-              `polygon(${gap} 0%, 100% 0%, 100% 100%, 0% 100%)`,
-          }}
+          clipPath={`polygon(${gap} 0%, 100% 0%, 100% 100%, 0% 100%)`}
         >
           <Image
             src="/social/social-2.png"
@@ -82,7 +76,7 @@ const SocialMedia = () => {
             fill
             className="object-cover object-center -z-10 opacity-90"
           />
-        </div>
+        </RoundedShape>
       </div>
     </section>
   );
