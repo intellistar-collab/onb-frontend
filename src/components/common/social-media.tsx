@@ -60,7 +60,7 @@ const SocialMedia = () => {
                 {item.name === "Discord" && (
                   <MessageCircle className="w-5 h-5" />
                 )}
-                <span>{item.name}</span>
+                {/* <span>{item.name}</span> */}
               </Link>
             ))}
           </div>

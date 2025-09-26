@@ -12,10 +12,13 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 const TopBar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
 
   const navItems = [
     { name: "HOME", href: "/" },
@@ -34,7 +37,12 @@ const TopBar = () => {
               <Link
                 key={item.name}
                 href={item.href}
-                className="text-sm md:text-base lg:text-lg xl:text-xl font-medium hover:text-pink-400 transition-colors duration-200"
+                className={cn(
+                  "whitespace-nowrap text-sm md:text-base lg:text-lg xl:text-xl font-medium transition-colors duration-200",
+                  pathname === item.href
+                    ? "text-pink-400"
+                    : "hover:text-pink-400"
+                )}
               >
                 {item.name}
               </Link>
@@ -58,12 +66,7 @@ const TopBar = () => {
           </div>
 
           <div className="flex-shrink-0">
-            <Image
-              src="/logo.svg"
-              height={200}
-              width={200}
-              alt="logo"
-            />
+            <Image src="/logo.svg" height={150} width={150} alt="logo" />
           </div>
 
           {/* Right Side - Desktop */}
@@ -119,8 +122,15 @@ const TopBar = () => {
             </DropdownMenu>
 
             <div className="bg-gray-500/40 rounded-md p-1 gap-2">
-              <Button variant="ghost" onClick={() => router.push("/login")}>SIGN IN</Button>
-              <Button variant="secondary" onClick={() => router.push("/signup")}>SIGN UP</Button>
+              <Button variant="ghost" onClick={() => router.push("/login")}>
+                SIGN IN
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={() => router.push("/signup")}
+              >
+                SIGN UP
+              </Button>
             </div>
           </div>
 

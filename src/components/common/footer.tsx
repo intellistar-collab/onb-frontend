@@ -127,7 +127,7 @@ const Footer = () => {
 
           {/* Navigation Links Column 1 */}
           <div className="md:col-span-1">
-            <ul className="space-y-3">
+            <ul className="space-y-3 text-sm">
               {navigationLinks.map((link, index) => (
                 <li key={index}>
                   <Link
