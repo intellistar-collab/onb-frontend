@@ -1,15 +1,29 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Oswald } from "next/font/google";
+import localFont from "next/font/local";
+import TopBar from "@/components/common/top-bar";
+import Footer from "@/components/common/footer";
+
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const rage = localFont({
+  src: "./rage.ttf",
+  variable: "--font-rage",
+});
+
+const oswald = Oswald({
+  variable: "--font-oswald",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const pricedown = localFont({
+  src: "./pricedown.otf",
+  variable: "--font-pricedown",
+});
+
+const suisseIntl = localFont({
+  src: "./suisse-intl.ttf",
+  variable: "--font-suisseintl",
 });
 
 export const metadata: Metadata = {
@@ -25,9 +39,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${rage.variable} ${oswald.variable} ${pricedown.variable} ${suisseIntl.variable} antialiased`}
       >
+        <TopBar />
         {children}
+        <Footer />
       </body>
     </html>
   );
