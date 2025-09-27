@@ -8,19 +8,19 @@ import { usePathname } from "next/navigation";
 const Footer = () => {
   const pathname = usePathname();
   const navigationLinks = [
-    { label: "Home", href: "#" },
-    { label: "Mystery Boxes", href: "#" },
-    { label: "How To Play", href: "#" },
-    { label: "Ranks", href: "#" },
-    { label: "Account", href: "#" },
-    { label: "Contact Us", href: "#" },
+    { label: "Home", href: "/" },
+    { label: "Mystery Boxes", href: "/box-content" },
+    { label: "How To Play", href: "/how-to-play" },
+    { label: "Ranks", href: "/ranks" },
+    { label: "Account", href: "/account" },
+    { label: "Contact Us", href: "/contact-us" },
   ];
 
   const legalLinks = [
-    { label: "Terms & Conditions", href: "#" },
-    { label: "Privacy Policy", href: "#" },
-    { label: "Cookie Policy", href: "#" },
-    { label: "FAQ", href: "#" },
+    { label: "Terms & Conditions", href: "/terms-and-conditions" },
+    { label: "Privacy Policy", href: "/privacy-policy" },
+    { label: "Cookie Policy", href: "/cookies-policy" },
+    { label: "FAQ", href: "/faq" },
   ];
 
   const socialLinks = [
