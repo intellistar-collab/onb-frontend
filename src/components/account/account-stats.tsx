@@ -4,13 +4,15 @@ import { useState } from "react";
 
 export default function AccountStats() {
   const [stats] = useState({
-    totalSpent: 1250.50,
-    totalWon: 2840.75,
-    winRate: 68,
-    favoriteBox: "Mystery Box Premium",
-    lastActivity: "2 hours ago",
-    currentStreak: 7,
-    bestStreak: 15,
+    totalSpent: 1850.75,
+    totalWon: 3420.50,
+    winRate: 74,
+    favoriteBox: "Elite Gaming Box",
+    lastActivity: "1 hour ago",
+    currentStreak: 12,
+    bestStreak: 23,
+    totalBoxesOpened: 67,
+    rareItemsWon: 8,
   });
 
   const profit = stats.totalWon - stats.totalSpent;
@@ -64,6 +66,11 @@ export default function AccountStats() {
           <span className="text-sm text-muted-foreground">Best Streak</span>
           <span className="font-semibold text-primary">{stats.bestStreak} wins</span>
         </div>
+        
+        <div className="flex justify-between items-center py-2">
+          <span className="text-sm text-muted-foreground">Rare Items</span>
+          <span className="font-semibold text-yellow-500">{stats.rareItemsWon} items</span>
+        </div>
       </div>
 
       {/* Activity Info */}
@@ -77,6 +84,11 @@ export default function AccountStats() {
           <div className="flex justify-between items-center">
             <span className="text-xs text-muted-foreground">Last Activity</span>
             <span className="text-xs font-medium text-foreground">{stats.lastActivity}</span>
+          </div>
+          
+          <div className="flex justify-between items-center">
+            <span className="text-xs text-muted-foreground">Total Boxes</span>
+            <span className="text-xs font-medium text-foreground">{stats.totalBoxesOpened} opened</span>
           </div>
         </div>
       </div>

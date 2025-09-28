@@ -5,14 +5,16 @@ import Image from "next/image";
 
 export default function AccountProfile() {
   const [user] = useState({
-    name: "John Doe",
-    email: "john.doe@example.com",
-    username: "johndoe",
+    name: "Alex Johnson",
+    email: "alex.johnson@email.com",
+    username: "alexj_gamer",
     joinDate: "January 2024",
     avatar: "/images/default-avatar.webp",
-    level: 15,
-    experience: 2450,
-    nextLevelExp: 3000,
+    level: 18,
+    experience: 3250,
+    nextLevelExp: 4000,
+    location: "San Francisco, CA",
+    membershipType: "Premium",
   });
 
   const progressPercentage = (user.experience / user.nextLevelExp) * 100;
@@ -62,12 +64,24 @@ export default function AccountProfile() {
       {/* Quick Stats */}
       <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border">
         <div className="text-center">
-          <div className="text-2xl font-bold text-primary mb-1">42</div>
+          <div className="text-2xl font-bold text-primary mb-1">67</div>
           <div className="text-xs text-muted-foreground">Boxes Opened</div>
         </div>
         <div className="text-center">
-          <div className="text-2xl font-bold text-secondary mb-1">128</div>
+          <div className="text-2xl font-bold text-secondary mb-1">184</div>
           <div className="text-xs text-muted-foreground">Items Won</div>
+        </div>
+      </div>
+      
+      {/* Additional Info */}
+      <div className="mt-4 pt-4 border-t border-border space-y-2">
+        <div className="flex justify-between items-center text-sm">
+          <span className="text-muted-foreground">Location:</span>
+          <span className="text-foreground">{user.location}</span>
+        </div>
+        <div className="flex justify-between items-center text-sm">
+          <span className="text-muted-foreground">Membership:</span>
+          <span className="text-primary font-medium">{user.membershipType}</span>
         </div>
       </div>
     </div>

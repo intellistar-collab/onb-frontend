@@ -24,7 +24,7 @@ const TopBar = () => {
 
   const navItems = [
     { name: "HOME", href: "/" },
-    { name: "MYSTERY BOXES", href: "/mystery-boxes" },
+    { name: "MYSTERY BOXES", href: "/box" },
     { name: "HOW TO PLAY", href: "/how-to-play" },
     { name: "RANKS", href: "ranks" },
   ];
