@@ -56,12 +56,12 @@ const BoxCard = ({ box, showOdds = true }: BoxCardProps) => {
           ))}
         </div>
 
-        <div className="relative mx-auto h-28 w-28 overflow-hidden rounded-xl">
+        <div className="relative mx-auto h-40 w-40 overflow-hidden rounded-xl group-hover:scale-105 transition-transform duration-300">
           <Image
             src={box.image}
             alt={box.title}
             fill
-            sizes="112px"
+            sizes="160px"
             className="object-cover"
           />
         </div>

@@ -25,12 +25,12 @@ const HomeCard = ({ title, location, image, price }: HomeCardProps) => {
         {/* Bottom section with image and controls */}
         <div className="flex flex-col items-center space-y-4">
           {/* Property image */}
-          <div className="relative">
+          <div className="relative overflow-hidden rounded-lg hover:scale-105 transition-transform duration-300">
             <Image 
               src={image} 
               alt={title} 
-              height={200} 
-              width={200} 
+              height={250} 
+              width={250} 
               className="object-cover rounded-lg"
             />
           </div>

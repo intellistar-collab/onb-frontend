@@ -71,12 +71,12 @@ const RewardCard: React.FC<{ reward: BoxReward }> = ({ reward }) => {
           <span className="text-sm font-bold text-white">{reward.odds}</span>
         </div>
         
-        <div className="relative mx-auto mb-3 h-20 w-20 overflow-hidden rounded-lg">
+        <div className="relative mx-auto mb-3 h-32 w-32 overflow-hidden rounded-lg group-hover:scale-105 transition-transform duration-300">
           <Image
             src={reward.image}
             alt={reward.name}
             fill
-            sizes="80px"
+            sizes="128px"
             className="object-cover"
           />
         </div>
@@ -157,13 +157,13 @@ const BoxDetail: React.FC<BoxDetailProps> = ({ box }) => {
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="flex flex-col gap-6 lg:flex-row">
-              <div className="relative mx-auto h-72 w-full max-w-xl overflow-hidden rounded-2xl lg:mx-0 lg:w-80">
+              <div className="relative mx-auto h-80 w-full max-w-2xl overflow-hidden rounded-2xl lg:mx-0 lg:w-96">
                 <Image
                   src={box.heroImage}
                   alt={box.title}
                   fill
-                  sizes="320px"
-                  className="object-cover"
+                  sizes="400px"
+                  className="object-cover hover:scale-105 transition-transform duration-500"
                 />
                 <div
                   className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"

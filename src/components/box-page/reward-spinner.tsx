@@ -202,13 +202,13 @@ const RewardSpinner = React.forwardRef<RewardSpinnerHandle, RewardSpinnerProps>(
                       <span className="text-xs font-semibold text-white/70">{reward.odds}</span>
                     </div>
 
-                    <div className="relative mx-auto mb-4 h-24 w-full overflow-hidden rounded-xl">
+                    <div className="relative mx-auto mb-4 h-32 w-full overflow-hidden rounded-xl">
                       <Image
                         src={reward.image}
                         alt={reward.name}
                         fill
-                        sizes="180px"
-                        className="object-cover"
+                        sizes="200px"
+                        className="object-cover hover:scale-105 transition-transform duration-300"
                       />
                     </div>
 

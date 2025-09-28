@@ -199,9 +199,18 @@ export default function AccountPacks() {
                 </div>
               </div>
 
-              {/* Item Image Placeholder */}
-              <div className="w-full h-32 bg-muted rounded-lg mb-3 flex items-center justify-center">
-                <span className="text-4xl">{getTypeIcon(item.type)}</span>
+              {/* Item Image */}
+              <div className="relative w-full h-48 bg-muted rounded-lg mb-3 overflow-hidden">
+                <Image
+                  src={item.image}
+                  alt={item.name}
+                  fill
+                  sizes="300px"
+                  className="object-cover hover:scale-105 transition-transform duration-300"
+                />
+                <div className="absolute top-2 left-2">
+                  <span className="text-2xl bg-white/90 rounded-full p-1 shadow-sm">{getTypeIcon(item.type)}</span>
+                </div>
               </div>
 
               {/* Item Details */}
