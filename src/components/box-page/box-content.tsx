@@ -1,28 +1,49 @@
-import React from "react";
-import { boxContent } from "@/constant/box-content";
-import BoxCard from "./box-card";
+import React from "react"
+import { ArrowDownToLine, ArrowUpToLine } from "lucide-react"
+
+import { mockBoxCategories } from "@/constant/box-data"
+import BoxCard from "./box-card"
+
+const flattenBoxes = () =>
+  mockBoxCategories
+    .flatMap((category) => category.boxes)
+    .sort((a, b) => a.title.localeCompare(b.title))
 
 const BoxContent = () => {
+  const boxes = flattenBoxes()
+
   return (
-    <section>
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-white text-2xl font-oswald uppercase">BOX CONTENT</h1>
-          <div className="flex gap-2">
-            <button className="px-4 py-2 bg-gray-700 text-white text-sm font-oswald uppercase rounded hover:bg-gray-600 transition-colors">
-              HIDE
-            </button>
-            <button className="px-4 py-2 bg-gray-700 text-white text-sm font-oswald uppercase rounded hover:bg-gray-600 transition-colors">
-              SHOW
-            </button>
-          </div>
+    <section className="space-y-6">
+      <header className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div>
+          <p className="text-sm font-suisse uppercase tracking-[0.3em] text-white/40">
+            Mystery box rewards
+          </p>
+          <h2 className="text-3xl font-pricedown uppercase text-white">
+            Complete Box Lineup
+          </h2>
         </div>
-      <div className="grid grid-cols-5 gap-2">
-        {boxContent.map((item, index) => (
-          <BoxCard key={item.title + index} {...item} />
+
+        <div className="flex items-center gap-3 text-xs font-suisse text-white/60">
+          <span className="inline-flex items-center gap-1 rounded-full border border-white/10 px-4 py-2">
+            <ArrowUpToLine className="h-3.5 w-3.5" />
+            Highest odds first
+          </span>
+          <span className="inline-flex items-center gap-1 rounded-full border border-white/10 px-4 py-2">
+            <ArrowDownToLine className="h-3.5 w-3.5" />
+            Filter by tier
+          </span>
+        </div>
+      </header>
+
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {boxes.map((box) => (
+          <BoxCard key={box.id} box={box} />
         ))}
       </div>
     </section>
-  );
-};
+  )
+}
 
-export default BoxContent;
+export default BoxContent
+ 

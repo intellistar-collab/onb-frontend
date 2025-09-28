@@ -1,98 +1,116 @@
-import React from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { Star } from "lucide-react";
+import React from "react"
+import Image from "next/image"
+import Link from "next/link"
+import { ArrowUpRight, Star } from "lucide-react"
+
+import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import { cn } from "@/lib/utils"
+import type { MysteryBox } from "@/constant/box-data"
 
 interface BoxCardProps {
-  title: string;
-  tag: string;
-  star: number;
-  image: string;
-  price: string;
-  percentage: string;
-  color: string;
-  href?: string;
+  box: MysteryBox
+  showOdds?: boolean
 }
 
-const BoxCard = ({
-  title,
-  tag,
-  star,
-  image,
-  price,
-  percentage,
-  color,
-  href,
-}: BoxCardProps) => {
-  const CardContent = () => (
-    <div
-      className="relative rounded-lg p-4 border transition-transform font-oswald"
-      style={{
-        borderColor: color,
-        backgroundColor: `color-mix(in srgb, ${color} 10%, transparent)`,
-        boxShadow: `0px 0px 12px 0px ${color} inset`,
-      }}
+const RATING_STARS = 5
+
+const BoxCard = ({ box, showOdds = true }: BoxCardProps) => {
+  const href = box.href || `/box/${box.id}`
+  const oddsValue = showOdds ? box.percentage : "—"
+
+  const cardBody = (
+    <Card
+      className="group relative h-full border-white/15 bg-white/5 py-6 transition-transform hover:-translate-y-1"
+      style={{ boxShadow: `0 0 18px -6px ${box.color}` }}
     >
-      {/* Stars */}
-      <div className="flex justify-center mb-2">
-        {[...Array(5)].map((_, i) => (
-          <Star
-            key={i}
-            className={`w-4 h-4 ${
-              i < star ? "text-white fill-white" : "text-gray-600"
-            }`}
-          />
-        ))}
-      </div>
-
-      {/* Tag */}
-      <div className="text-center mb-3">
-        <span className="text-white text-sm font-medium uppercase tracking-wide">
-          {tag}
-        </span>
-      </div>
-
-      {/* Image */}
-      <div className="flex justify-center mb-4">
-        <div className="relative w-24 h-24 rounded-lg overflow-hidden">
-          <Image
-            src={image}
-            alt={title}
-            fill
-            className="object-cover"
-            sizes="96px"
-          />
-        </div>
-      </div>
-
-      {/* Price */}
-
-      <div className="flex justify-between gap-2">
-        <div className="text-center mb-2">
-          <span className="text-white text-xl font-bold">{price}</span>
-        </div>
-        <div className="text-center mb-3">
-          <span className="text-green-400 text-sm font-medium">
-            {percentage}
+      <CardContent className="space-y-4">
+        <div className="flex items-center justify-between">
+          <Badge
+            variant="outline"
+            className="border-white/30 bg-white/10 font-oswald text-[11px] uppercase tracking-[0.2em] text-white"
+          >
+            {box.tag}
+          </Badge>
+          <span
+            className={cn(
+              "rounded-full px-2 py-0.5 text-xs font-semibold uppercase",
+              box.status === "OPEN"
+                ? "bg-emerald-500/20 text-emerald-300"
+                : "bg-amber-500/20 text-amber-200"
+            )}
+          >
+            {box.status}
           </span>
         </div>
-      </div>
-      <div className="text-center">
-        <span className="text-white text-sm font-medium">{title}</span>
-      </div>
-    </div>
-  );
 
-  // If href is provided, wrap in Link, otherwise return the card directly
-  if (href) {
-    return (
-      <Link href={href} className="block">
-        <CardContent />
-      </Link>
-    );
-  }
+        <div className="flex items-center justify-center gap-1 text-white/80">
+          {Array.from({ length: RATING_STARS }).map((_, idx) => (
+            <Star
+              key={idx}
+              className={cn(
+                "h-4 w-4",
+                idx < box.star ? "fill-current text-white" : "text-white/20"
+              )}
+            />
+          ))}
+        </div>
 
-  return <CardContent />;
-};
+        <div className="relative mx-auto h-28 w-28 overflow-hidden rounded-xl">
+          <Image
+            src={box.image}
+            alt={box.title}
+            fill
+            sizes="112px"
+            className="object-cover"
+          />
+        </div>
 
-export default BoxCard;
+        <div className="space-y-1 text-center">
+          <h3 className="text-lg font-oswald uppercase text-white">
+            {box.title}
+          </h3>
+          <p className="text-xs font-suisse uppercase tracking-[0.3em] text-white/50">
+            Drop #{box.location}
+          </p>
+        </div>
+      </CardContent>
+
+      <CardFooter className="flex flex-col gap-3">
+        <div className="flex items-center justify-between text-sm text-white">
+          <div>
+            <p className="text-xs font-suisse text-white/50">Entry</p>
+            <p className="font-oswald text-lg text-white">{box.price}</p>
+          </div>
+          <div className="text-right">
+            <p className="text-xs font-suisse text-white/50">Odds</p>
+            <p className="font-oswald text-lg text-white">{oddsValue}</p>
+          </div>
+        </div>
+        <div className="flex items-center justify-between text-xs text-white/70">
+          <span>Exp. Rewards</span>
+          <span className="font-semibold text-white">
+            +{box.experience.toLocaleString()} XP
+          </span>
+        </div>
+      </CardFooter>
+
+      <div
+        className="pointer-events-none absolute inset-0 rounded-xl border border-white/5 bg-gradient-to-br from-white/10 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100"
+        style={{ boxShadow: `0 0 30px -12px ${box.color}` }}
+      />
+    </Card>
+  )
+
+  return (
+    <Link href={href} className="relative block h-full" prefetch={false}>
+      {cardBody}
+      <span className="pointer-events-none absolute bottom-3 right-3 inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/10 text-white opacity-0 transition-opacity group-hover:opacity-100">
+        <ArrowUpRight className="h-4 w-4" />
+      </span>
+    </Link>
+  )
+}
+
+export default BoxCard
+ 
