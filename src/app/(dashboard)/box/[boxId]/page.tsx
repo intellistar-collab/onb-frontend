@@ -7,16 +7,18 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 
 interface BoxDetailPageProps {
-  params: {
+  params: Promise<{
     boxId: string;
-  };
+  }>;
 }
 
-const BoxDetailPage: React.FC<BoxDetailPageProps> = ({ params }) => {
+const BoxDetailPage = async ({ params }: BoxDetailPageProps) => {
+  const { boxId } = await params;
+  
   // Find the box from all categories
   const box = mockBoxCategories
     .flatMap(category => category.boxes)
-    .find(box => box.id === params.boxId);
+    .find(box => box.id === boxId);
 
   if (!box) {
     notFound();

@@ -1,10 +1,14 @@
+"use client";
+
 import React from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 type HomeCardProps = HomeCard;
 
 const HomeCard = ({ title, location, image, price }: HomeCardProps) => {
+  const router = useRouter();
   return (
     <div className="relative border min-h-[25rem] rounded-2xl">
       {/* Background image */}
@@ -40,7 +44,9 @@ const HomeCard = ({ title, location, image, price }: HomeCardProps) => {
             <div>
               <h3 className="text-lg font-suisseintl">${price}</h3>
             </div>
-            <Button>OPEN</Button>
+            <Button onClick={() => {
+              router.push(`/box/brooklyn-heat`);
+            }}>OPEN</Button>
           </div>
         </div>
       </div>

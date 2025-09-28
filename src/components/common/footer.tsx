@@ -177,7 +177,7 @@ const Footer = () => {
                     href={link.href}
                     className="text-gray-300 hover:text-white hover:translate-x-1 transition-all duration-200 text-sm flex items-center group"
                   >
-                    <span className="w-0 group-hover:w-2 h-0.5 bg-pink-500 mr-0 group-hover:mr-2 transition-all duration-200"></span>
+                    <FaArrowRight className="w-0 opacity-0 group-hover:w-3 group-hover:opacity-100 h-3 text-pink-500 mr-0 group-hover:mr-2 transition-all duration-200" />
                     {link.label}
                   </Link>
                 </li>
@@ -198,7 +198,7 @@ const Footer = () => {
                     href={link.href}
                     className="text-gray-300 hover:text-white hover:translate-x-1 transition-all duration-200 text-sm flex items-center group"
                   >
-                    <span className="w-0 group-hover:w-2 h-0.5 bg-pink-500 mr-0 group-hover:mr-2 transition-all duration-200"></span>
+                    <FaArrowRight className="w-0 opacity-0 group-hover:w-3 group-hover:opacity-100 h-3 text-pink-500 mr-0 group-hover:mr-2 transition-all duration-200" />
                     {link.label}
                   </Link>
                 </li>
@@ -258,15 +258,11 @@ const Footer = () => {
               {paymentMethods.map((payment, index) => (
                 <div
                   key={index}
-                  className="w-16 h-10 bg-white rounded-lg flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 group"
+                  className={`w-16 h-10 ${payment.bgColor} rounded-lg flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 group border border-gray-200`}
                 >
-                  <Image
-                    src={payment.image}
-                    alt={payment.name}
-                    width={40}
-                    height={24}
-                    className="object-contain max-w-[36px] max-h-[20px] group-hover:scale-110 transition-transform duration-300"
-                  />
+                  <div className="group-hover:scale-110 transition-transform duration-300">
+                    {payment.icon}
+                  </div>
                 </div>
               ))}
             </div>
@@ -276,15 +272,12 @@ const Footer = () => {
               {cryptoMethods.map((crypto, index) => (
                 <div
                   key={index}
-                  className="w-12 h-12 bg-gradient-to-br from-gray-800 to-gray-900 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 hover:-translate-y-1 group border border-gray-700 hover:border-gray-600"
+                  className={`w-12 h-12 ${crypto.bgColor} rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 hover:-translate-y-1 group border border-gray-300`}
+                  title={crypto.name}
                 >
-                  <Image
-                    src={crypto.image}
-                    alt={crypto.name}
-                    width={24}
-                    height={24}
-                    className="object-contain group-hover:scale-110 transition-transform duration-300"
-                  />
+                  <div className="group-hover:scale-110 transition-transform duration-300">
+                    {crypto.icon}
+                  </div>
                 </div>
               ))}
             </div>
@@ -295,14 +288,23 @@ const Footer = () => {
         <div className="border-t border-gray-800 mt-8 pt-6">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="flex items-center space-x-4 text-xs text-gray-500">
-              <span>🔒 SSL Secured</span>
+              <span className="flex items-center gap-1">
+                <FaShieldAlt className="w-3 h-3" />
+                SSL Secured
+              </span>
               <span>•</span>
-              <span>⚡ 24/7 Support</span>
+              <span className="flex items-center gap-1">
+                <FaBolt className="w-3 h-3" />
+                24/7 Support
+              </span>
               <span>•</span>
-              <span>🎁 Daily Rewards</span>
+              <span className="flex items-center gap-1">
+                <FaGift className="w-3 h-3" />
+                Daily Rewards
+              </span>
             </div>
-            <div className="text-xs text-gray-500">
-              Made with ❤️ for mystery box enthusiasts
+            <div className="text-xs text-gray-500 flex items-center gap-1">
+              Made with <FaHeart className="w-3 h-3 text-pink-500" /> for mystery box enthusiasts
             </div>
           </div>
         </div>
