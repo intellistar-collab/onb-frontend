@@ -1,7 +1,7 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
+import { getSessionCookie } from "better-auth/cookies";
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   
   // Define protected routes
@@ -13,10 +13,12 @@ export function middleware(request: NextRequest) {
   );
   
   if (isProtectedRoute) {
-    // Check for authentication cookie/session
-    const sessionCookie = request.cookies.get('better-auth.session_token');
-    
-    if (!sessionCookie || !sessionCookie.value) {
+    const sessionCookie = getSessionCookie(request);
+
+    // THIS IS NOT SECURE!
+    // This is the recommended approach to optimistically redirect users
+    // We recommend handling auth checks in each page/route
+    if (!sessionCookie) {
       // Redirect to login page if not authenticated
       const loginUrl = new URL('/login', request.url);
       // Add the current path as a redirect parameter so user can return after login
@@ -29,15 +31,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder files
-     */
-    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
-  ],
+  matcher: ['/account/:path*', '/box/:path*'], // Specify the routes the middleware applies to
 };

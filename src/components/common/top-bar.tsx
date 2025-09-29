@@ -14,6 +14,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import LoginButton from "../auth/login-button";
 
 const hiddenPaths = ["/signup", "/login"];
 
@@ -29,7 +30,7 @@ const TopBar = () => {
     { name: "RANKS", href: "ranks" },
   ];
 
-  if(hiddenPaths.includes(pathname)) {
+  if (hiddenPaths.includes(pathname)) {
     return null;
   }
 
@@ -127,17 +128,7 @@ const TopBar = () => {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <div className="bg-gray-500/40 rounded-md p-1 gap-2">
-              <Button variant="ghost" onClick={() => router.push("/login")}>
-                SIGN IN
-              </Button>
-              <Button
-                variant="secondary"
-                onClick={() => router.push("/signup")}
-              >
-                SIGN UP
-              </Button>
-            </div>
+            <LoginButton />
           </div>
 
           {/* Mobile Menu Button Placeholder for Right Side */}
