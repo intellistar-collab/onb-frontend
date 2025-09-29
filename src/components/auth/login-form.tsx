@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { authClient } from "@/lib/auth-client";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const LoginForm = () => {
   const [email, setEmail] = useState("");
@@ -15,6 +15,7 @@ const LoginForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,7 +32,9 @@ const LoginForm = () => {
       if (result.error) {
         setError(result.error.message || "Login failed");
       } else {
-        router.push("/");
+        // Redirect to the intended page or home
+        const redirectTo = searchParams.get('redirect') || '/';
+        router.push(redirectTo);
       }
     } catch (err) {
       setError("An unexpected error occurred");
@@ -42,8 +45,10 @@ const LoginForm = () => {
 
   const handleGoogleSignIn = async () => {
     try {
+      const redirectTo = searchParams.get('redirect') || '/';
       await authClient.signIn.social({
         provider: "google",
+        callbackURL: `${window.location.origin}${redirectTo}`,
       });
     } catch (err) {
       setError("Google sign-in failed");

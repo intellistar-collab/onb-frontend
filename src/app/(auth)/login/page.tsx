@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import Image from "next/image";
 import LoginForm from "@/components/auth/login-form";
 
@@ -27,7 +27,9 @@ export default function SignupPage() {
         <p className="text-gray-600 mb-8">
           Top up your account and unbox your next trip!
         </p>
-        <LoginForm />
+        <Suspense fallback={<div>Loading...</div>}>
+          <LoginForm />
+        </Suspense>
       </div>
     </main>
   );
