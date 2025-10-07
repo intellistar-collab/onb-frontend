@@ -1,5 +1,4 @@
-import { AccountCommunity } from "@/components/account";
-import { AccountLayout } from "@/components/account/account-layout";
+import { AccountCommunity, AccountLayout } from "@/components/account";
 
 export default function CommunityPage() {
   return (
