@@ -1,0 +1,353 @@
+@keyframes elasticDrop {
+  0% {
+    transform: translateY(-100vh) scale(0.9);
+    opacity: 0;
+  }
+  60% {
+    transform: translateY(20px) scale(1.1);
+    opacity: 1;
+  }
+  80% {
+    transform: translateY(-10px) scale(0.95);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes elasticUp {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100vh) scale(0.8);
+    opacity: 0;
+  }
+}
+
+@keyframes fadeOutScale {
+  0% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1) rotate(5deg);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(0.3) rotate(15deg);
+    opacity: 0;
+  }
+}
+
+@keyframes elasticIn {
+  0% {
+    transform: translateY(-100px) translateX(-20px) scale(0.8);
+    opacity: 0;
+  }
+  15% {
+    transform: translateY(-20px) translateX(15px) scale(0.9);
+    opacity: 0.7;
+  }
+  30% {
+    transform: translateY(10px) translateX(-10px) scale(1.05);
+    opacity: 1;
+  }
+  45% {
+    transform: translateY(-5px) translateX(8px) scale(0.98);
+    opacity: 1;
+  }
+  60% {
+    transform: translateY(3px) translateX(-5px) scale(1.02);
+    opacity: 1;
+  }
+  75% {
+    transform: translateY(-2px) translateX(3px) scale(0.99);
+    opacity: 1;
+  }
+  90% {
+    transform: translateY(1px) translateX(-2px) scale(1.01);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0) translateX(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes elasticOut {
+  0% {
+    transform: translateY(0) translateX(0) scale(1);
+    opacity: 1;
+  }
+  15% {
+    transform: translateY(-5px) translateX(-8px) scale(1.02);
+    opacity: 0.9;
+  }
+  30% {
+    transform: translateY(10px) translateX(12px) scale(0.98);
+    opacity: 0.8;
+  }
+  45% {
+    transform: translateY(-3px) translateX(-6px) scale(1.01);
+    opacity: 0.7;
+  }
+  60% {
+    transform: translateY(15px) translateX(8px) scale(0.95);
+    opacity: 0.5;
+  }
+  75% {
+    transform: translateY(-2px) translateX(-4px) scale(0.9);
+    opacity: 0.3;
+  }
+  90% {
+    transform: translateY(25px) translateX(6px) scale(0.85);
+    opacity: 0.1;
+  }
+  100% {
+    transform: translateY(100px) translateX(-10px) scale(0.8);
+    opacity: 0;
+  }
+}
+
+@keyframes bombExplosion {
+  0% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  10% {
+    transform: scale(1.2) rotate(5deg);
+    opacity: 1;
+  }
+  20% {
+    transform: scale(0.8) rotate(-3deg);
+    opacity: 0.9;
+  }
+  30% {
+    transform: scale(1.5) rotate(10deg);
+    opacity: 0.8;
+  }
+  40% {
+    transform: scale(0.3) rotate(-15deg);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(2.0) rotate(20deg);
+    opacity: 0.4;
+  }
+  60% {
+    transform: scale(0.1) rotate(-30deg);
+    opacity: 0.2;
+  }
+  70% {
+    transform: scale(3.0) rotate(45deg);
+    opacity: 0.1;
+  }
+  80% {
+    transform: scale(0.05) rotate(-60deg);
+    opacity: 0.05;
+  }
+  90% {
+    transform: scale(4.0) rotate(90deg);
+    opacity: 0.02;
+  }
+  100% {
+    transform: scale(0.01) rotate(180deg);
+    opacity: 0;
+  }
+}
+
+.elastic-drop {
+  animation: elasticDrop 0.5s ease-out;
+}
+
+.elastic-up {
+  animation: elasticUp 0.25s ease-in;
+}
+
+/* Enhanced gaming-themed animations */
+@keyframes glowPulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5), 0 0 40px rgba(255, 165, 0, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.8), 0 0 60px rgba(255, 165, 0, 0.5);
+  }
+}
+
+@keyframes floatUp {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes particleFloat {
+  0% {
+    transform: translateY(0px) translateX(0px) rotate(0deg);
+    opacity: 0.7;
+  }
+  25% {
+    transform: translateY(-20px) translateX(10px) rotate(90deg);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-10px) translateX(-15px) rotate(180deg);
+    opacity: 0.8;
+  }
+  75% {
+    transform: translateY(-30px) translateX(5px) rotate(270deg);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateY(0px) translateX(0px) rotate(360deg);
+    opacity: 0.7;
+  }
+}
+
+@keyframes textGlow {
+  0%, 100% {
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5), 0 0 20px rgba(255, 165, 0, 0.3);
+  }
+  50% {
+    text-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 40px rgba(255, 165, 0, 0.5);
+  }
+}
+
+/* Utility classes for enhanced effects */
+.glow-pulse {
+  animation: glowPulse 2s ease-in-out infinite;
+}
+
+.float-up {
+  animation: floatUp 3s ease-in-out infinite;
+}
+
+.shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+.particle-float {
+  animation: particleFloat 4s ease-in-out infinite;
+}
+
+.text-glow {
+  animation: textGlow 2s ease-in-out infinite;
+}
+
+/* Hover effects for interactive elements */
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* Gaming-themed gradient backgrounds */
+.gaming-gradient-1 {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.gaming-gradient-2 {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.gaming-gradient-3 {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+/* Progress bar animation */
+@keyframes progressFill {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: var(--progress-width, 0%);
+  }
+}
+
+/* Enhanced mystery animations for curiosity */
+@keyframes mysteryUrgency {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 20px rgba(147, 51, 234, 0.3), 0 0 40px rgba(236, 72, 153, 0.2);
+  }
+  50% {
+    transform: scale(1.02);
+    box-shadow: 0 0 30px rgba(147, 51, 234, 0.6), 0 0 60px rgba(236, 72, 153, 0.4);
+  }
+}
+
+@keyframes mysteryTextPulse {
+  0%, 100% {
+    text-shadow: 0 0 10px rgba(147, 51, 234, 0.5), 0 0 20px rgba(236, 72, 153, 0.3);
+    opacity: 1;
+  }
+  50% {
+    text-shadow: 0 0 20px rgba(147, 51, 234, 0.8), 0 0 40px rgba(236, 72, 153, 0.5);
+    opacity: 0.9;
+  }
+}
+
+@keyframes mysteryIconFloat {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg) scale(1);
+  }
+  25% {
+    transform: translateY(-3px) rotate(2deg) scale(1.05);
+  }
+  50% {
+    transform: translateY(-6px) rotate(0deg) scale(1.1);
+  }
+  75% {
+    transform: translateY(-3px) rotate(-2deg) scale(1.05);
+  }
+}
+
+@keyframes mysteryRequirementGlow {
+  0%, 100% {
+    border-color: rgba(147, 51, 234, 0.5);
+    background: linear-gradient(135deg, rgba(147, 51, 234, 0.2), rgba(79, 70, 229, 0.2));
+  }
+  50% {
+    border-color: rgba(147, 51, 234, 0.8);
+    background: linear-gradient(135deg, rgba(147, 51, 234, 0.4), rgba(79, 70, 229, 0.4));
+  }
+}
+
+/* Enhanced mystery utility classes */
+.mystery-urgency {
+  animation: mysteryUrgency 3s ease-in-out infinite;
+}
+
+.mystery-text-pulse {
+  animation: mysteryTextPulse 2s ease-in-out infinite;
+}
+
+.mystery-icon-float {
+  animation: mysteryIconFloat 4s ease-in-out infinite;
+}
+
+.mystery-requirement-glow {
+  animation: mysteryRequirementGlow 2s ease-in-out infinite;
+}
