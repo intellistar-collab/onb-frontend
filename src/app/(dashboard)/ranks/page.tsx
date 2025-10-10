@@ -1,42 +1,42 @@
 import React from 'react';
-import { RankCardGroup, WhatWeRank } from '@/components/ranks';
+import { RankCardGroup, LeaderboardTabs, WhatWeRankModal } from '@/components/ranks';
 import SocialMedia from '@/components/common/social-media';
 import { 
-  globalLeaderboard, 
-  weeklyLeaderboard, 
   achievements, 
   monthlyChallenge 
 } from '@/constant/rank-data';
 
 const RankPage = () => {
-  const mainRankGroups = [globalLeaderboard, weeklyLeaderboard];
   const gridRankGroups = [achievements, monthlyChallenge];
 
   return (
-    <main>
-      <WhatWeRank />
-      <section>
-        <div className="flex flex-col gap-6">
-          {mainRankGroups.map((rankGroup, index) => (
-            <RankCardGroup
-              key={rankGroup.title}
-              {...rankGroup}
-              side={index % 2 === 0 ? "left" : "right"}
-            />
-          ))}
+    <main className="min-h-screen bg-black">
+      <WhatWeRankModal />
+      
+      {/* Main Rankings Section - Integrated Tabbed View */}
+      <section className="mt-6">
+        <div className="container mx-auto px-4">
+          <LeaderboardTabs />
         </div>
       </section>
-      <section>
-        <div className="grid md:grid-cols-2 gap-6">
-          {gridRankGroups.map((rankGroup, index) => (
-            <RankCardGroup
-              key={rankGroup.title}
-              {...rankGroup}
-              side={index % 2 === 0 ? "left" : "right"}
-            />
-          ))}
+      
+      {/* Secondary Rankings Section */}
+      <section className="mt-6">
+        <div className="container mx-auto px-4">
+          <div className="grid gap-6 mb-6">
+            {gridRankGroups.map((rankGroup, index) => (
+              <RankCardGroup
+                key={rankGroup.title}
+                {...rankGroup}
+                {...rankGroup.overrides}
+                side={index % 2 === 0 ? "left" : "right"}
+              />
+            ))}
+          </div>
         </div>
       </section>
+      
+      {/* Social Media Section - Keep original styling */}
       <SocialMedia />
     </main>
   );

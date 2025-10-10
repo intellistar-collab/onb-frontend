@@ -19,6 +19,22 @@ interface Achievement {
   progress: number;
   maxProgress: number;
   isCompleted: boolean;
+  isLocked?: boolean;
+  unlockRequirement?: string;
+}
+
+interface RankOverrides {
+  compact?: boolean;
+  headerDescription?: string;
+  rowLimit?: number;
+  showSummaryTiles?: boolean;
+  cardGlow?: string;
+  tableGlow?: string;
+  achievementsGlow?: string;
+  achievementsColumns?: 1 | 2 | 3 | 4;
+  integrateHeader?: boolean;
+  showHeaderCountBadge?: boolean;
+  achievementsCompact?: boolean;
 }
 
 interface RankCategory {
@@ -27,6 +43,7 @@ interface RankCategory {
   type: "leaderboard" | "achievements";
   users?: RankUser[];
   achievements?: Achievement[];
+  overrides?: RankOverrides;
 }
 
 // Mock leaderboard data
@@ -160,36 +177,139 @@ export const playerAchievements: Achievement[] = [
     progress: 20,
     maxProgress: 20,
     isCompleted: true
+  },
+  {
+    id: "diamond_collector",
+    title: "Diamond Collector",
+    description: "Collect 100 rare items",
+    icon: "💎",
+    rarity: "legendary",
+    progress: 0,
+    maxProgress: 100,
+    isCompleted: false,
+    isLocked: true,
+    unlockRequirement: "Complete 'Fashion Icon' achievement"
+  },
+  {
+    id: "streak_master",
+    title: "Streak Master",
+    description: "Win 25 items in a row",
+    icon: "🔥",
+    rarity: "epic",
+    progress: 0,
+    maxProgress: 25,
+    isCompleted: false,
+    isLocked: true,
+    unlockRequirement: "Open 200 boxes"
+  },
+  {
+    id: "millionaire",
+    title: "Millionaire",
+    description: "Collect items worth $1,000,000",
+    icon: "💸",
+    rarity: "legendary",
+    progress: 0,
+    maxProgress: 1000000,
+    isCompleted: false,
+    isLocked: true,
+    unlockRequirement: "Reach Diamond tier"
+  },
+  {
+    id: "world_dominator",
+    title: "World Dominator",
+    description: "Win experiences from all 7 continents",
+    icon: "🌎",
+    rarity: "legendary",
+    progress: 0,
+    maxProgress: 7,
+    isCompleted: false,
+    isLocked: true,
+    unlockRequirement: "Complete 'World Traveler' achievement"
+  },
+  {
+    id: "tech_guru",
+    title: "Tech Guru",
+    description: "Collect 50 tech gadgets",
+    icon: "📱",
+    rarity: "rare",
+    progress: 0,
+    maxProgress: 50,
+    isCompleted: false,
+    isLocked: true,
+    unlockRequirement: "Open 100 boxes"
+  },
+  {
+    id: "legendary_hunter",
+    title: "Legendary Hunter",
+    description: "Find 10 legendary items",
+    icon: "⚡",
+    rarity: "legendary",
+    progress: 0,
+    maxProgress: 10,
+    isCompleted: false,
+    isLocked: true,
+    unlockRequirement: "Reach Platinum tier"
   }
 ];
 
 // Rank categories for the main page
 export const globalLeaderboard: RankCategory = {
   title: "Global Leaderboard",
-  banner: "/home-card/banner/sports-events.webp",
+  banner: "",
   type: "leaderboard",
-  users: topPlayers
+  users: topPlayers,
+  overrides: {
+    integrateHeader: true,
+    showHeaderCountBadge: false,
+    compact: false,
+    headerDescription: "Performance rankings and analytics",
+    rowLimit: 15,
+    showSummaryTiles: true,
+    cardGlow: "#22d3ee",
+    tableGlow: "#60a5fa",
+  }
 };
 
 export const weeklyLeaderboard: RankCategory = {
   title: "Weekly Champions",
-  banner: "/home-card/banner/world-events.webp", 
+  banner: "", 
   type: "leaderboard",
-  users: topPlayers.slice(0, 3)
+  users: topPlayers.slice(0, 6),
+  overrides: {
+    integrateHeader: true,
+    showHeaderCountBadge: false,
+    compact: true,
+    headerDescription: "Weekly performance snapshot",
+    rowLimit: 8,
+    showSummaryTiles: true,
+    cardGlow: "#10b981",
+    tableGlow: "#34d399",
+  }
 };
 
 export const achievements: RankCategory = {
   title: "Achievements",
-  banner: "/home-card/banner/personal-experience.webp",
+  banner: "",
   type: "achievements",
-  achievements: playerAchievements
+  achievements: playerAchievements,
+  overrides: {
+    achievementsColumns: 3,
+    achievementsGlow: "#f59e0b",
+    achievementsCompact: true,
+  }
 };
 
 export const monthlyChallenge: RankCategory = {
   title: "Monthly Challenge",
-  banner: "/home-card/banner/city-stays.webp",
+  banner: "",
   type: "achievements", 
-  achievements: playerAchievements.filter(a => !a.isCompleted).slice(0, 3)
+  achievements: playerAchievements.filter(a => !a.isCompleted).slice(0, 3),
+  overrides: {
+    headerDescription: "This month’s targets",
+    achievementsColumns: 2,
+    achievementsGlow: "#fb7185",
+    achievementsCompact: true,
+  }
 };
 
 export const rankCategories = [
@@ -198,6 +318,5 @@ export const rankCategories = [
   achievements,
   monthlyChallenge
 ];
-
 
 

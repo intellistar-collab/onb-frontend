@@ -17,7 +17,7 @@ const rankTitles2 = [
 
 const Titles = ({ title }: { title: string }) => {
   return (
-    <div className="p-2 bg-white/5 rounded-lg backdrop-blur-lg">
+    <div className="p-2 bg-white/5 rounded-lg backdrop-blur-lg border border-white/10">
       <h1 className="text-3xl font-oswald">{title}</h1>
     </div>
   );
@@ -77,6 +77,5 @@ const RankHero = () => {
 };
 
 export default RankHero;
-
 
 

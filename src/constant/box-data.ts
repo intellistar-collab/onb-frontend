@@ -167,7 +167,7 @@ export const mockBoxCategories: BoxCategory[] = [
         id: "midnight-gold",
         title: "Midnight Gold",
         location: "DXB",
-        status: "COMING SOON",
+        status: "OPEN",
         price: "$1,200",
         tag: "UNCOMMON",
         star: 2,

@@ -10,13 +10,13 @@ const BoxContentPage = () => {
     <main>
       <BoxHero />
       <BoxContent />
-      <HomeCardGroup
+      {/* <HomeCardGroup
         {...cityStays}
         type="grid"
         title="Recommended Picks"
         side={"right"}
         className="md:grid-cols-6"
-      />
+      /> */}
       <NewBox />
     </main>
   );

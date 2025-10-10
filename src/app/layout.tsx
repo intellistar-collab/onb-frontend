@@ -2,7 +2,11 @@ import type { Metadata } from "next";
 import { Oswald } from "next/font/google";
 import localFont from "next/font/local";
 import TopBar from "@/components/common/top-bar";
+import ExperienceBanner from "@/components/common/experience-banner";
 import Footer from "@/components/common/footer";
+import FloatingUsersSidebar from "@/components/common/floating-users-sidebar";
+import { ToastProvider } from "@/components/ui/toast";
+import { AuthProvider } from "@/contexts/auth-context";
 
 import "./globals.css";
 
@@ -40,9 +44,15 @@ export default function RootLayout({
       <body
         className={`${rage.variable} ${oswald.variable} ${pricedown.variable} ${suisseIntl.variable} antialiased`}
       >
-        <TopBar />
-        {children}
-        <Footer />
+        <AuthProvider>
+          <TopBar />
+          <ExperienceBanner />
+          <ToastProvider>
+            {children}
+          </ToastProvider>
+          <Footer />
+          <FloatingUsersSidebar />
+        </AuthProvider>
       </body>
     </html>
   );

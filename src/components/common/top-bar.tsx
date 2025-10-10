@@ -14,14 +14,23 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import LoginButton from "../auth/login-button";
+import EnhancedNotificationIndicator from "./enhanced-notification-indicator";
 
 const hiddenPaths = ["/signup", "/login"];
 
 const TopBar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [newBoxCount, setNewBoxCount] = useState<number>(3);
   const router = useRouter();
   const pathname = usePathname();
+
+  React.useEffect(() => {
+    try {
+      const stored = typeof window !== 'undefined' ? window.localStorage.getItem('newBoxCount') : null;
+      const parsed = stored ? parseInt(stored, 10) : NaN;
+      if (!Number.isNaN(parsed) && parsed >= 0) setNewBoxCount(parsed);
+    } catch {}
+  }, []);
 
   const navItems = [
     { name: "HOME", href: "/" },
@@ -30,7 +39,7 @@ const TopBar = () => {
     { name: "RANKS", href: "ranks" },
   ];
 
-  if (hiddenPaths.includes(pathname)) {
+  if(hiddenPaths.includes(pathname)) {
     return null;
   }
 
@@ -45,13 +54,22 @@ const TopBar = () => {
                 key={item.name}
                 href={item.href}
                 className={cn(
-                  "whitespace-nowrap text-sm md:text-base lg:text-lg xl:text-xl font-medium transition-colors duration-200",
+                  "whitespace-nowrap text-sm md:text-base lg:text-lg xl:text-xl font-medium transition-colors duration-200 flex items-center gap-2 relative",
                   pathname === item.href
                     ? "text-pink-400"
                     : "hover:text-pink-400"
                 )}
               >
                 {item.name}
+                {item.name === "MYSTERY BOXES" && (
+                  <div className="ml-0.5">
+                    <EnhancedNotificationIndicator 
+                      show={newBoxCount > 0} 
+                      count={newBoxCount} 
+                      variant="sparkle"
+                    />
+                  </div>
+                )}
               </Link>
             ))}
           </div>
@@ -128,7 +146,17 @@ const TopBar = () => {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <LoginButton />
+            <div className="bg-gray-500/40 rounded-md p-1 gap-2">
+              <Button variant="ghost" onClick={() => router.push("/login")}>
+                SIGN IN
+              </Button>
+              <Button
+                className="bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white font-medium"
+                onClick={() => router.push("/signup")}
+              >
+                SIGN UP
+              </Button>
+            </div>
           </div>
 
           {/* Mobile Menu Button Placeholder for Right Side */}
@@ -143,10 +171,20 @@ const TopBar = () => {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className="block px-3 py-2 text-base sm:text-lg font-medium hover:text-pink-400 hover:bg-gray-800 rounded-md transition-colors duration-200"
+                  className="block px-3 py-2 text-base sm:text-lg font-medium hover:text-pink-400 hover:bg-gray-800 rounded-md transition-colors duration-200 flex items-center justify-between"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  {item.name}
+                  <span className="relative inline-flex items-center">
+                    {item.name}
+                    {item.name === "MYSTERY BOXES" && (
+                      <span className="relative inline-flex items-center ml-1">
+                        <span className="relative z-10 inline-flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full bg-gradient-to-r from-yellow-400 to-amber-500 text-black text-[12px] font-extrabold leading-none ring-2 ring-yellow-300 shadow-lg shadow-yellow-500/30 animate-bounce">
+                          {newBoxCount > 99 ? '99+' : newBoxCount}
+                        </span>
+                        <span className="pointer-events-none absolute -inset-1 rounded-full bg-yellow-400/40 animate-ping" />
+                      </span>
+                    )}
+                  </span>
                 </Link>
               ))}
 
@@ -209,7 +247,7 @@ const TopBar = () => {
                   SIGN IN
                 </Button>
                 <Button
-                  className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-medium text-sm sm:text-base py-2"
+                  className="w-full bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white font-medium text-sm sm:text-base py-2"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   SIGN UP

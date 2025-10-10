@@ -56,7 +56,7 @@ export default function AccountSidebar() {
   ];
 
   return (
-    <div className="bg-card/80 backdrop-blur-sm rounded-xl border border-border/50 shadow-lg w-14 h-fit sticky top-6">
+    <div className="bg-card/80 backdrop-blur-sm rounded-xl border border-border/50 shadow-lg w-14 h-fit sticky top-6 z-10">
       <div className="p-2">
         {/* Navigation */}
         <nav className="space-y-2">
@@ -84,7 +84,7 @@ export default function AccountSidebar() {
                 </Link>
 
                 {/* Tooltip */}
-                <div className="absolute left-full ml-3 px-3 py-2 bg-popover text-popover-foreground text-sm rounded-lg shadow-xl whitespace-nowrap z-50 opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none group-hover:translate-x-1">
+                <div className="absolute left-full ml-3 px-3 py-2 bg-popover text-popover-foreground text-sm rounded-lg shadow-xl whitespace-nowrap z-50 opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none group-hover:translate-x-1 transform -translate-y-1/2 top-1/2">
                   <div className="font-medium">{item.label}</div>
                   <div className="text-xs text-muted-foreground mt-0.5">{item.description}</div>
                   <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 w-2 h-2 bg-popover rotate-45" />
@@ -105,7 +105,7 @@ export default function AccountSidebar() {
             </Link>
             
             {/* Tooltip */}
-            <div className="absolute left-full ml-3 px-3 py-2 bg-popover text-popover-foreground text-sm rounded-lg shadow-xl whitespace-nowrap z-50 opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none group-hover:translate-x-1">
+            <div className="absolute left-full ml-3 px-3 py-2 bg-popover text-popover-foreground text-sm rounded-lg shadow-xl whitespace-nowrap z-50 opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none group-hover:translate-x-1 transform -translate-y-1/2 top-1/2">
               <div className="font-medium">Back to Home</div>
               <div className="text-xs text-muted-foreground mt-0.5">Return to main page</div>
               <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 w-2 h-2 bg-popover rotate-45" />

@@ -144,6 +144,8 @@ const BoxDetail: React.FC<BoxDetailProps> = ({ box }) => {
               return handleSpin()
             }}
             className="w-full"
+            showSpeedControls={true}
+            defaultSpeed="1x"
           />
         </CardContent>
       </Card>
@@ -271,7 +273,7 @@ const BoxDetail: React.FC<BoxDetailProps> = ({ box }) => {
       </div>
 
       {/* Possible Rewards */}
-      <Card className="border-white/15 bg-white/5">
+      {/* <Card className="border-white/15 bg-white/5">
         <CardHeader>
           <CardTitle className="text-xl font-pricedown text-white">
             Possible Rewards
@@ -287,7 +289,7 @@ const BoxDetail: React.FC<BoxDetailProps> = ({ box }) => {
             ))}
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
     </div>
   )
 }

@@ -35,7 +35,7 @@ const LeaderboardCard = ({
       case 3:
         return "bg-gradient-to-br from-amber-600 to-amber-800";
       default:
-        return "bg-gradient-to-br from-slate-600 to-slate-800";
+        return "bg-gradient-to-br from-zinc-600 to-zinc-800";
     }
   };
 
@@ -55,14 +55,17 @@ const LeaderboardCard = ({
   };
 
   return (
-    <div className="relative border min-h-[20rem] rounded-2xl p-4 bg-gradient-to-br from-slate-900/50 to-slate-800/50 backdrop-blur-sm">
+    <div className="relative border border-white/10 min-h-[12rem] rounded-2xl p-4 bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-300 group">
       {/* Background pattern */}
-      <div className="absolute inset-0 overflow-hidden w-full h-full rounded-2xl -z-10 opacity-10">
+      <div className="absolute inset-0 overflow-hidden w-full h-full rounded-2xl -z-10 opacity-5 group-hover:opacity-10 transition-opacity duration-300">
         <Image src={"/home-card/card-bg.png"} alt="card-bg" fill className="object-cover" />
       </div>
       
       {/* Rank badge */}
-      <div className={`absolute -top-3 -left-3 w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg ${getRankColor(rank)}`}>
+      <div className={`absolute -top-3 -left-3 w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg ${getRankColor(rank)} shadow-lg`}>
+        {rank <= 3 && (
+          <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-yellow-400/20 to-orange-400/20 animate-pulse" />
+        )}
         #{rank}
       </div>
 
@@ -72,14 +75,14 @@ const LeaderboardCard = ({
       </div>
 
       {/* Main content */}
-      <div className="flex flex-col items-center space-y-4 pt-6">
+      <div className="flex flex-col items-center space-y-3 pt-4">
         {/* Avatar */}
         <div className="relative">
           <Image 
             src={avatar} 
             alt={username} 
-            height={80} 
-            width={80} 
+            height={60} 
+            width={60} 
             className="object-cover rounded-full border-4 border-white/20"
           />
           <Badge className={`absolute -bottom-2 left-1/2 -translate-x-1/2 ${getLevelColor(level)} text-white text-xs`}>
@@ -88,23 +91,23 @@ const LeaderboardCard = ({
         </div>
 
         {/* Username */}
-        <h3 className="font-oswald text-xl text-center">{username}</h3>
+        <h3 className="font-oswald text-lg text-center">{username}</h3>
         
         {/* Points */}
         <div className="text-center">
           <p className="text-2xl font-bold text-yellow-400">{points.toLocaleString()}</p>
-          <p className="text-sm text-gray-400">Points</p>
+          <p className="text-sm text-white/60">Points</p>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 gap-4 w-full text-center text-sm">
+        <div className="grid grid-cols-2 gap-3 w-full text-center text-xs">
           <div>
             <p className="font-semibold text-blue-400">{totalBoxesOpened}</p>
-            <p className="text-gray-400">Boxes Opened</p>
+            <p className="text-white/60">Boxes</p>
           </div>
           <div>
             <p className="font-semibold text-green-400">{winRate}%</p>
-            <p className="text-gray-400">Win Rate</p>
+            <p className="text-white/60">Win Rate</p>
           </div>
         </div>
       </div>
@@ -113,6 +116,5 @@ const LeaderboardCard = ({
 };
 
 export default LeaderboardCard;
-
 
 

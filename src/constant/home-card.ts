@@ -8,13 +8,15 @@ interface Event {
 export const sportsEvents: Event = {
   title: "Sports Events",
   banner: "/home-card/banner/sports-events.webp",
-  type: "carousel",
+  type: "grid",
   cards: [
     {
       title: "Abu Dhabi F1 Weekend",
       location: "F1",
       image: "/home-card/onb-box.png",
       price: "19.99",
+      locked: true,
+      requiredOpens: 10,
     },
     {
       title: "Wimbledon Final Weekend",
@@ -27,6 +29,8 @@ export const sportsEvents: Event = {
       location: "F1",
       image: "/home-card/onb-box.png",
       price: "19.99",
+      locked: true,
+      requiredOpens: 50,
     },
     {
       title: "US Open Weekend",
@@ -52,7 +56,7 @@ export const sportsEvents: Event = {
 export const cityStays: Event = {
   title: "City Stays",
   banner: "/home-card/banner/city-stays.webp",
-  type: "carousel",
+  type: "grid",
   cards: [
     {
       title: "Marina Sandz",
@@ -139,7 +143,7 @@ export const personalExperiences: Event = {
 
 export const worldEvents: Event = {
   title: "World Events",
-  type: "carousel",
+  type: "grid",
   banner: "/home-card/banner/world-events.webp",
   cards: [
     {
@@ -183,7 +187,7 @@ export const worldEvents: Event = {
 
 export const dressToImpress: Event = {
   title: "Dress To Impress",
-  type: "carousel",
+  type: "grid",
   banner: "/home-card/banner/dress-to-impress.webp",
   cards: [
     {

@@ -3,80 +3,81 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import Link from "next/link";
 import Image from "next/image";
-import { Instagram, Twitter, MessageCircle } from "lucide-react";
-import RoundedShape from "./rounded-shape";
-
-const gap = "30px";
-
-const socialMedia = [
-  {
-    name: "Instagram",
-    href: "https://www.instagram.com/onenightboxcom",
-  },
-
-  {
-    name: "X (Twitter)",
-    href: "https://x.com/Onenightbox_com",
-  },
-  {
-    name: "Discord",
-    href: "https://discord.gg/fDZ4vsJVUd",
-  },
-];
+import { Instagram, Twitter, MessageCircle, Mail, Heart, Sparkles } from "lucide-react";
 
 const SocialMedia = () => {
   return (
-    <section>
-      <div className="grid grid-cols-3 gap-4 min-h-80">
-        <RoundedShape
-          className="relative overflow-hidden rounded-md"
-          clipPath={`polygon(0% 0%, 100% 0%, calc(100% - ${gap}) 100%, 0% 100%)`}
-        >
+    <section className="relative -mt-4 md:-mt-6">
+      <div className="grid md:grid-cols-2 gap-6">
+        {/* Left: Newsletter Signup */}
+        <div className="relative group rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
+          {/* Background image */}
           <Image
             src="/social/social-1.png"
-            alt="social-media"
+            alt="newsletter-bg"
             fill
-            className="object-cover object-center -z-10 opacity-90"
+            className="object-cover object-center scale-105 group-hover:scale-110 transition-transform duration-700"
           />
-        </RoundedShape>
-
-        <div className="flex flex-col items-center justify-center space-y-6 p-8">
-          <div className="flex w-full max-w-sm space-x-2">
-            <Input placeholder="Email" className="flex-1" />
-            <Button>Subscribe</Button>
-          </div>
-
-          <h2 className="text-xl font-semibold">Our Social Media</h2>
-
-          <div className="flex space-x-4">
-            {socialMedia.map((item) => (
-              <Link
-                href={item.href}
-                key={item.name}
-                className="flex items-center space-x-2 px-4 py-2 rounded-lg border hover:bg-gray-50 transition-colors"
-              >
-                {item.name === "Instagram" && <Instagram className="w-5 h-5" />}
-                {item.name === "X (Twitter)" && <Twitter className="w-5 h-5" />}
-                {item.name === "Discord" && (
-                  <MessageCircle className="w-5 h-5" />
-                )}
-                {/* <span>{item.name}</span> */}
-              </Link>
-            ))}
+          {/* Dark gradient overlay for readability */}
+          <div className="absolute inset-0 bg-gradient-to-tr from-black/70 via-black/40 to-transparent" />
+          {/* Diagonal mask on the right edge */}
+          <div className="absolute right-0 top-0 h-full w-24 bg-black/0" style={{ clipPath: "polygon(0 0, 100% 0, 100% 100%, 20% 100%)" }} />
+          {/* Content */}
+          <div className="relative z-10 p-6 md:p-10">
+            <div className="max-w-lg">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-400/20 text-blue-200 border border-blue-300/30 mb-4">
+                <Mail className="w-4 h-4" />
+                <span className="text-xs font-semibold tracking-wide">STAY UPDATED</span>
+              </div>
+              <h3 className="text-3xl md:text-4xl font-pricedown text-white drop-shadow mb-2">Newsletter</h3>
+              <p className="text-white/85 mb-5">Get exclusive updates, early access to new boxes, and special rewards delivered to your inbox.</p>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <div className="relative flex-1">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/70" />
+                  <Input placeholder="Your email" className="pl-9 bg-white/10 border-white/20 text-white placeholder:text-white/60 focus:bg-white/15 focus:border-blue-300/50" />
+                </div>
+                <Button className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-400 hover:to-cyan-400 text-white font-extrabold shadow-lg hover:shadow-blue-400/30">Subscribe</Button>
+              </div>
+            </div>
           </div>
         </div>
 
-        <RoundedShape
-          className="relative overflow-hidden rounded-md"
-          clipPath={`polygon(${gap} 0%, 100% 0%, 100% 100%, 0% 100%)`}
-        >
+        {/* Right: Follow Community */}
+        <div className="relative group rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
+          {/* Background image */}
           <Image
             src="/social/social-2.png"
-            alt="social-media"
+            alt="follow-community-bg"
             fill
-            className="object-cover object-center -z-10 opacity-90"
+            className="object-cover object-center scale-105 group-hover:scale-110 transition-transform duration-700"
           />
-        </RoundedShape>
+          {/* Color overlay */}
+          <div className="absolute inset-0 bg-gradient-to-tl from-pink-700/60 via-purple-700/30 to-transparent mix-blend-multiply" />
+          {/* Diagonal mask on the left edge */}
+          <div className="absolute left-0 top-0 h-full w-24 bg-black/0" style={{ clipPath: "polygon(0 0, 80% 0, 100% 100%, 0 100%)" }} />
+          {/* Content */}
+          <div className="relative z-10 p-6 md:p-10">
+            <div className="max-w-lg ml-auto">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-pink-500/20 text-pink-200 border border-pink-300/30 mb-4">
+                <Heart className="w-4 h-4" />
+                <span className="text-xs font-semibold tracking-wide">JOIN OUR COMMUNITY</span>
+              </div>
+              <h3 className="text-3xl md:text-4xl font-pricedown text-white drop-shadow mb-2">Follow ONB</h3>
+              <p className="text-white/90 mb-5">Connect with us on social media for the latest updates, behind-the-scenes content, and exclusive community events.</p>
+              <div className="flex gap-3">
+                <a href="https://www.instagram.com/onenightboxcom" className="flex-1 p-3 rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 hover:border-white/30 transition-all text-center group">
+                  <Instagram className="w-5 h-5 text-white mx-auto group-hover:scale-110 transition-transform" />
+                </a>
+                <a href="https://x.com/Onenightbox_com" className="flex-1 p-3 rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 hover:border-white/30 transition-all text-center group">
+                  <Twitter className="w-5 h-5 text-white mx-auto group-hover:scale-110 transition-transform" />
+                </a>
+                <a href="https://discord.gg/fDZ4vsJVUd" className="flex-1 p-3 rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 hover:border-white/30 transition-all text-center group">
+                  <MessageCircle className="w-5 h-5 text-white mx-auto group-hover:scale-110 transition-transform" />
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );

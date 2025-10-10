@@ -16,7 +16,7 @@ export default function AccountPacks() {
         dateWon: "2024-01-15",
         boxName: "Tech Gadgets Box",
         status: "shipped",
-        image: "/public/box/box-item/box0.webp",
+        image: "/box/box-item/box0.webp",
         description: "High-quality wireless gaming headset with noise cancellation"
       },
       {
@@ -28,7 +28,7 @@ export default function AccountPacks() {
         dateWon: "2024-01-12",
         boxName: "Luxury Experience Box",
         status: "available",
-        image: "/public/box/box-item/box1.webp",
+        image: "/box/box-item/box1.webp",
         description: "2-day luxury spa retreat for two people"
       },
       {
@@ -40,7 +40,7 @@ export default function AccountPacks() {
         dateWon: "2024-01-10",
         boxName: "Daily Bonus Box",
         status: "claimed",
-        image: "/public/box/box-item/box2.webp",
+        image: "/box/box-item/box2.webp",
         description: "Extra tokens for your next mystery box purchase"
       },
       {
@@ -52,7 +52,7 @@ export default function AccountPacks() {
         dateWon: "2024-01-08",
         boxName: "Collector's Premium Box",
         status: "pending",
-        image: "/public/box/box-item/box3.webp",
+        image: "/box/box-item/box3.webp",
         description: "Limited edition vintage watch from 1960s"
       },
       {
@@ -64,7 +64,7 @@ export default function AccountPacks() {
         dateWon: "2024-01-05",
         boxName: "Entertainment Box",
         status: "expired",
-        image: "/public/box/box-item/box4.webp",
+        image: "/box/box-item/box4.webp",
         description: "VIP tickets to see your favorite artist live"
       },
       {
@@ -76,7 +76,7 @@ export default function AccountPacks() {
         dateWon: "2024-01-03",
         boxName: "Gaming Gear Box",
         status: "delivered",
-        image: "/public/box/box-item/box5.webp",
+        image: "/box/box-item/box5.webp",
         description: "Mechanical RGB gaming keyboard with custom switches"
       }
     ],

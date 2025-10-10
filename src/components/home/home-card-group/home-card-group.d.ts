@@ -3,4 +3,6 @@ interface HomeCard {
   location: string
   image: string
   price: string
+  locked?: boolean
+  requiredOpens?: number
 }

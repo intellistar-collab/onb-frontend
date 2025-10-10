@@ -7,3 +7,5 @@ export { default as AccountReferrals } from "./account-referrals";
 export { default as AccountCommunity } from "./account-community";
 export { default as AccountSupport } from "./account-support";
 export { default as AccountSidebar } from "./account-sidebar";
+export { AccountLayout } from "./account-layout";
+export { AccountMobileNav } from "./account-mobile-nav";
