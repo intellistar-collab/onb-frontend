@@ -40,10 +40,11 @@ const LoginForm = () => {
 
       // Check user role and redirect accordingly
       const userRole = (result.data?.user as any)?.role;
-      let redirectTo = searchParams.get('redirect') || '/';
+      const redirectParam = searchParams.get('redirect');      
+      let redirectTo = redirectParam || '/';
       
       // If user is ADMIN and no specific redirect, go to admin dashboard
-      if (userRole === 'ADMIN' && !searchParams.get('redirect')) {
+      if (userRole === 'ADMIN' && !redirectParam) {
         redirectTo = '/admin/dashboard';
       }
       
@@ -53,6 +54,8 @@ const LoginForm = () => {
         variant: "success",
         durationMs: 2500,
       });
+      
+      console.log('Redirecting to:', redirectTo);
       router.push(redirectTo);
     } catch (err) {
       // Extract error message from the error object

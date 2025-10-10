@@ -28,9 +28,8 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
     // If authentication is required but user is not authenticated
     if (requireAuth && !isAuthenticated) {
       const loginUrl = redirectTo || "/login";
-      const url = new URL(loginUrl, window.location.origin);
-      url.searchParams.set("redirect", pathname);
-      router.push(url.toString());
+      const redirectParam = encodeURIComponent(pathname);
+      router.push(`${loginUrl}?redirect=${redirectParam}`);
       return;
     }
 

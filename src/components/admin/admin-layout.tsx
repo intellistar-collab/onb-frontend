@@ -75,10 +75,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           {/* Sidebar header */}
           <div className="flex items-center justify-between h-16 px-6 admin-border-primary border-b admin-bg-tertiary">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center transition-transform duration-200 hover:scale-110 hover:rotate-3">
                 <span className="text-sm font-bold text-white">A</span>
               </div>
-              <h1 className="admin-text-primary text-xl font-bold">Admin Panel</h1>
+              <h1 className="admin-text-primary text-xl font-bold transition-colors duration-200">Admin Panel</h1>
             </div>
             <Button
               variant="ghost"
@@ -95,29 +95,50 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             {navigationItems.map((item) => {
               const isActive = pathname === item.href;
               return (
-                <Button
-                  key={item.name}
-                  variant="ghost"
-                  className={`w-full justify-start admin-button-ghost ${
-                    isActive ? 'admin-bg-tertiary admin-text-primary' : 'admin-text-secondary'
-                  }`}
-                  onClick={() => {
-                    router.push(item.href);
-                    setSidebarOpen(false);
-                  }}
-                >
-                  <item.icon className="mr-3 h-5 w-5" />
-                  {item.name}
-                </Button>
+                <div key={item.name} className="relative group">
+                  {/* Active indicator */}
+                  {isActive && (
+                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500 rounded-r-full animate-pulse shadow-lg" />
+                  )}
+                  
+                  {/* Hover indicator */}
+                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-300 dark:bg-blue-600 rounded-r-full opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                  
+                  <Button
+                    variant="ghost"
+                    className={`w-full justify-start transition-all duration-200 ease-in-out transform hover:scale-[1.02] active:scale-95 ${
+                      isActive 
+                        ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 shadow-sm border-l-4 border-blue-500 ml-0' 
+                        : 'admin-button-ghost admin-text-secondary hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-100'
+                    }`}
+                    onClick={() => {
+                      router.push(item.href);
+                      setSidebarOpen(false);
+                    }}
+                  >
+                    <item.icon className={`mr-3 h-5 w-5 transition-all duration-200 ${
+                      isActive 
+                        ? 'text-blue-600 dark:text-blue-400 transform scale-110' 
+                        : 'text-gray-500 dark:text-gray-400 group-hover:scale-105'
+                    }`} />
+                    <span className={`font-medium transition-all duration-200 ${
+                      isActive 
+                        ? 'text-blue-700 dark:text-blue-300 transform translate-x-1' 
+                        : 'text-gray-700 dark:text-gray-300 group-hover:translate-x-0.5'
+                    }`}>
+                      {item.name}
+                    </span>
+                  </Button>
+                </div>
               );
             })}
           </nav>
 
           {/* User info */}
           <div className="p-4 admin-border-primary border-t">
-            <div className="admin-card p-3">
+            <div className="admin-card p-3 transition-all duration-200 hover:shadow-md">
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center transition-transform duration-200 hover:scale-110">
                   <User className="h-4 w-4 text-white" />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -132,10 +153,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               <Button
                 variant="ghost"
                 size="sm"
-                className="w-full mt-2 admin-button-ghost"
+                className="w-full mt-2 admin-button-ghost transition-all duration-200 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 hover:scale-[1.02] group"
                 onClick={handleLogout}
               >
-                <LogOut className="mr-2 h-4 w-4" />
+                <LogOut className="mr-2 h-4 w-4 transition-transform duration-200 group-hover:rotate-12" />
                 Sign Out
               </Button>
             </div>
