@@ -1,12 +1,9 @@
 import type { Metadata } from "next";
 import { Oswald } from "next/font/google";
 import localFont from "next/font/local";
-import TopBar from "@/components/common/top-bar";
-import ExperienceBanner from "@/components/common/experience-banner";
-import Footer from "@/components/common/footer";
-import FloatingUsersSidebar from "@/components/common/floating-users-sidebar";
 import { ToastProvider } from "@/components/ui/toast";
 import { AuthProvider } from "@/contexts/auth-context";
+import ConditionalLayout from "@/components/common/conditional-layout";
 
 import "./globals.css";
 
@@ -40,18 +37,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${rage.variable} ${oswald.variable} ${pricedown.variable} ${suisseIntl.variable} antialiased`}
+        suppressHydrationWarning
       >
         <AuthProvider>
-          <TopBar />
-          <ExperienceBanner />
-          <ToastProvider>
+          <ConditionalLayout>
             {children}
-          </ToastProvider>
-          <Footer />
-          <FloatingUsersSidebar />
+          </ConditionalLayout>
         </AuthProvider>
       </body>
     </html>

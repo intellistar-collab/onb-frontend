@@ -1,147 +1,212 @@
 "use client";
 
 import { AdminRoute } from "@/components/auth/auth-guard";
-import { useAuth } from "@/contexts/auth-context";
+import {
+  AdminPageHeader,
+  AdminStats,
+  AdminCard,
+  AdminTable,
+  AdminQuickAction,
+} from "@/components/admin";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { LogOut, Users, Box, DollarSign, TrendingUp } from "lucide-react";
+import {
+  Users,
+  Package,
+  DollarSign,
+  TrendingUp,
+  Plus,
+  Eye,
+  Edit,
+  Trash2,
+  MoreVertical,
+} from "lucide-react";
 
 export default function AdminDashboard() {
-  const { user, logout } = useAuth();
+  // Mock data
+  const stats = [
+    {
+      label: "Total Users",
+      value: 1247,
+      icon: <Users className="h-8 w-8 text-blue-600" />,
+      trend: { value: "+12% from last month", isPositive: true },
+    },
+    {
+      label: "Active Boxes",
+      value: 23,
+      icon: <Package className="h-8 w-8 text-green-600" />,
+      trend: { value: "+3 new this week", isPositive: true },
+    },
+    {
+      label: "Total Revenue",
+      value: "$45,231",
+      icon: <DollarSign className="h-8 w-8 text-yellow-600" />,
+      trend: { value: "+8% from last month", isPositive: true },
+    },
+    {
+      label: "Conversion Rate",
+      value: "3.2%",
+      icon: <TrendingUp className="h-8 w-8 text-purple-600" />,
+      trend: { value: "+0.5% from last month", isPositive: true },
+    },
+  ];
+
+  const recentUsers = [
+    {
+      id: "1",
+      name: "John Doe",
+      email: "john@example.com",
+      role: "USER",
+      status: "active",
+      createdAt: "2024-01-15",
+    },
+    {
+      id: "2",
+      name: "Jane Smith",
+      email: "jane@example.com",
+      role: "ADMIN",
+      status: "active",
+      createdAt: "2024-01-14",
+    },
+    {
+      id: "3",
+      name: "Bob Johnson",
+      email: "bob@example.com",
+      role: "USER",
+      status: "inactive",
+      createdAt: "2024-01-13",
+    },
+  ];
+
+  const recentBoxes = [
+    {
+      id: "1",
+      name: "Premium Mystery Box",
+      price: 99.99,
+      sold: 45,
+      status: "active",
+      createdAt: "2024-01-15",
+    },
+    {
+      id: "2",
+      name: "Gaming Bundle",
+      price: 149.99,
+      sold: 23,
+      status: "active",
+      createdAt: "2024-01-14",
+    },
+  ];
+
+  const userColumns = [
+    { key: "name", label: "Name" },
+    { key: "email", label: "Email" },
+    { key: "role", label: "Role" },
+    { key: "status", label: "Status" },
+    { key: "createdAt", label: "Joined" },
+  ];
+
+  const boxColumns = [
+    { key: "name", label: "Box Name" },
+    { key: "price", label: "Price" },
+    { key: "sold", label: "Sold" },
+    { key: "status", label: "Status" },
+    { key: "createdAt", label: "Created" },
+  ];
+
+  const userActions = [
+    {
+      label: "View",
+      icon: <Eye className="h-4 w-4" />,
+      onClick: (user: any) => console.log("View user", user),
+    },
+    {
+      label: "Edit",
+      icon: <Edit className="h-4 w-4" />,
+      onClick: (user: any) => console.log("Edit user", user),
+    },
+  ];
+
+  const boxActions = [
+    {
+      label: "View",
+      icon: <Eye className="h-4 w-4" />,
+      onClick: (box: any) => console.log("View box", box),
+    },
+    {
+      label: "Edit",
+      icon: <Edit className="h-4 w-4" />,
+      onClick: (box: any) => console.log("Edit box", box),
+    },
+  ];
 
   return (
     <AdminRoute>
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 p-6">
+      <div className="p-6">
         <div className="max-w-7xl mx-auto">
-          {/* Header */}
-          <div className="flex justify-between items-center mb-8">
-            <div>
-              <h1 className="text-4xl font-bold text-gray-900">Admin Dashboard</h1>
-              <p className="text-gray-600 mt-2">Welcome back, {user?.name || user?.username}!</p>
-            </div>
-            <Button
-              onClick={logout}
-              variant="outline"
-              className="flex items-center gap-2"
-            >
-              <LogOut className="h-4 w-4" />
-              Logout
-            </Button>
-          </div>
+          <AdminPageHeader
+            title="Dashboard Overview"
+            description="Welcome back! Here's what's happening with your platform today."
+            actions={
+              <Button className="bg-slate-100 border border-slate-200 dark:bg-slate-800 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 hover:scale-105 transform transition-all duration-200 shadow-sm hover:shadow-md">
+                <Plus className="h-4 w-4 mr-2" />
+                Create New
+              </Button>
+            }
+          />
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-                <Users className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">1,234</div>
-                <p className="text-xs text-muted-foreground">
-                  +20.1% from last month
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Boxes</CardTitle>
-                <Box className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">567</div>
-                <p className="text-xs text-muted-foreground">
-                  +12.5% from last month
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Revenue</CardTitle>
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">$45,231.89</div>
-                <p className="text-xs text-muted-foreground">
-                  +8.2% from last month
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Growth</CardTitle>
-                <TrendingUp className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">+15.3%</div>
-                <p className="text-xs text-muted-foreground">
-                  +2.1% from last month
-                </p>
-              </CardContent>
-            </Card>
-          </div>
+          <AdminStats stats={stats} className="mb-8" />
 
           {/* Quick Actions */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Quick Actions</CardTitle>
-                <CardDescription>
-                  Common administrative tasks
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <Button className="w-full justify-start" variant="outline">
-                  <Users className="h-4 w-4 mr-2" />
-                  Manage Users
-                </Button>
-                <Button className="w-full justify-start" variant="outline">
-                  <Box className="h-4 w-4 mr-2" />
-                  Manage Boxes
-                </Button>
-                <Button className="w-full justify-start" variant="outline">
-                  <DollarSign className="h-4 w-4 mr-2" />
-                  View Reports
-                </Button>
-              </CardContent>
-            </Card>
+          <AdminCard
+            className="mb-8"
+            header={{
+              title: "Quick Actions",
+              description: "Common administrative tasks",
+            }}
+          >
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              <AdminQuickAction
+                icon={<Users className="h-6 w-6" />}
+                label="Manage Users"
+                onClick={() => console.log("Manage Users")}
+              />
+              <AdminQuickAction
+                icon={<Package className="h-6 w-6" />}
+                label="Create Box"
+                onClick={() => console.log("Create Box")}
+              />
+              <AdminQuickAction
+                icon={<DollarSign className="h-6 w-6" />}
+                label="View Reports"
+                onClick={() => console.log("View Reports")}
+              />
+              <AdminQuickAction
+                icon={<TrendingUp className="h-6 w-6" />}
+                label="Analytics"
+                onClick={() => console.log("Analytics")}
+              />
+            </div>
+          </AdminCard>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Recent Activity</CardTitle>
-                <CardDescription>
-                  Latest system activities
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">New user registered</p>
-                      <p className="text-xs text-muted-foreground">2 minutes ago</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-4">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">Box created</p>
-                      <p className="text-xs text-muted-foreground">5 minutes ago</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-4">
-                    <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">Payment processed</p>
-                      <p className="text-xs text-muted-foreground">10 minutes ago</p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+          {/* Recent Activity */}
+          <div className="space-y-6">
+            <AdminTable
+              title="Recent Users"
+              description="Latest user registrations"
+              data={recentUsers}
+              columns={userColumns}
+              actions={userActions}
+              emptyMessage="No recent users"
+            />
+
+            <AdminTable
+              title="Recent Boxes"
+              description="Latest mystery boxes created"
+              data={recentBoxes}
+              columns={boxColumns}
+              actions={boxActions}
+              emptyMessage="No recent boxes"
+            />
           </div>
         </div>
       </div>

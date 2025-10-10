@@ -55,10 +55,21 @@ const LoginForm = () => {
       });
       router.push(redirectTo);
     } catch (err) {
-      setError("An unexpected error occurred");
+      // Extract error message from the error object
+      let errorMessage = "An unexpected error occurred";
+      
+      if (err instanceof Error) {
+        errorMessage = err.message;
+      } else if (typeof err === 'string') {
+        errorMessage = err;
+      } else if (err && typeof err === 'object' && 'message' in err) {
+        errorMessage = (err as any).message;
+      }
+      
+      setError(errorMessage);
       toast({
-        title: "Something went wrong",
-        description: "Please try again.",
+        title: "Sign in failed",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

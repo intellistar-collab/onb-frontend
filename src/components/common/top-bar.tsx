@@ -1,13 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
-import { Menu, X, ChevronDown } from "lucide-react";
+import { Menu, X, ChevronDown, User, LogOut, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import Image from "next/image";
 import Link from "next/link";
@@ -15,6 +16,7 @@ import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import EnhancedNotificationIndicator from "./enhanced-notification-indicator";
+import { useAuth } from "@/contexts/auth-context";
 
 const hiddenPaths = ["/signup", "/login"];
 
@@ -23,6 +25,7 @@ const TopBar = () => {
   const [newBoxCount, setNewBoxCount] = useState<number>(3);
   const router = useRouter();
   const pathname = usePathname();
+  const { user, isAuthenticated, isAdmin, logout } = useAuth();
 
   React.useEffect(() => {
     try {
@@ -37,6 +40,7 @@ const TopBar = () => {
     { name: "MYSTERY BOXES", href: "/box" },
     { name: "HOW TO PLAY", href: "/how-to-play" },
     { name: "RANKS", href: "ranks" },
+    ...(isAdmin ? [{ name: "ADMIN", href: "/admin/dashboard" }] : []),
   ];
 
   if(hiddenPaths.includes(pathname)) {
@@ -146,17 +150,72 @@ const TopBar = () => {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <div className="bg-gray-500/40 rounded-md p-1 gap-2">
-              <Button variant="ghost" onClick={() => router.push("/login")}>
-                SIGN IN
-              </Button>
-              <Button
-                className="bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white font-medium"
-                onClick={() => router.push("/signup")}
-              >
-                SIGN UP
-              </Button>
-            </div>
+            {isAuthenticated ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="text-white hover:bg-gray-800 text-xs md:text-sm lg:text-base px-2 lg:px-3 flex items-center gap-2"
+                  >
+                    <User className="h-4 w-4" />
+                    {user?.name || user?.username || "User"}
+                    <ChevronDown className="ml-1 h-3 w-3 md:h-4 md:w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="bg-gray-800 border-gray-700 w-48">
+                  <div className="px-3 py-2 text-sm text-gray-300 border-b border-gray-700">
+                    <div className="font-medium text-white">{user?.name || user?.username}</div>
+                    <div className="text-xs text-gray-400">{user?.email}</div>
+                    {isAdmin && (
+                      <div className="text-xs text-pink-400 font-medium">Admin</div>
+                    )}
+                  </div>
+                  <DropdownMenuItem 
+                    className="text-white hover:bg-gray-700 text-xs md:text-sm cursor-pointer"
+                    onClick={() => router.push("/account")}
+                  >
+                    <User className="mr-2 h-4 w-4" />
+                    Account
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    className="text-white hover:bg-gray-700 text-xs md:text-sm cursor-pointer"
+                    onClick={() => router.push("/account/settings")}
+                  >
+                    <Settings className="mr-2 h-4 w-4" />
+                    Settings
+                  </DropdownMenuItem>
+                  {isAdmin && (
+                    <DropdownMenuItem 
+                      className="text-white hover:bg-gray-700 text-xs md:text-sm cursor-pointer"
+                      onClick={() => router.push("/admin/dashboard")}
+                    >
+                      <Settings className="mr-2 h-4 w-4" />
+                      Admin Dashboard
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuSeparator className="bg-gray-700" />
+                  <DropdownMenuItem 
+                    className="text-white hover:bg-gray-700 text-xs md:text-sm cursor-pointer"
+                    onClick={logout}
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <div className="bg-gray-500/40 rounded-md p-1 gap-2">
+                <Button variant="ghost" onClick={() => router.push("/login")}>
+                  SIGN IN
+                </Button>
+                <Button
+                  className="bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white font-medium"
+                  onClick={() => router.push("/signup")}
+                >
+                  SIGN UP
+                </Button>
+              </div>
+            )}
           </div>
 
           {/* Mobile Menu Button Placeholder for Right Side */}
@@ -237,22 +296,86 @@ const TopBar = () => {
                 </DropdownMenu>
               </div>
 
-              {/* Mobile Auth Buttons */}
-              <div className="px-3 py-2 space-y-2">
-                <Button
-                  variant="ghost"
-                  className="w-full text-white hover:bg-gray-800 justify-start text-sm sm:text-base py-2"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  SIGN IN
-                </Button>
-                <Button
-                  className="w-full bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white font-medium text-sm sm:text-base py-2"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  SIGN UP
-                </Button>
-              </div>
+              {/* Mobile Auth Section */}
+              {isAuthenticated ? (
+                <div className="px-3 py-2 space-y-2 border-t border-gray-800">
+                  <div className="px-3 py-2 text-sm text-gray-300">
+                    <div className="font-medium text-white">{user?.name || user?.username}</div>
+                    <div className="text-xs text-gray-400">{user?.email}</div>
+                    {isAdmin && (
+                      <div className="text-xs text-pink-400 font-medium">Admin</div>
+                    )}
+                  </div>
+                  <Button
+                    variant="ghost"
+                    className="w-full text-white hover:bg-gray-800 justify-start text-sm sm:text-base py-2"
+                    onClick={() => {
+                      router.push("/account");
+                      setIsMobileMenuOpen(false);
+                    }}
+                  >
+                    <User className="mr-2 h-4 w-4" />
+                    Account
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className="w-full text-white hover:bg-gray-800 justify-start text-sm sm:text-base py-2"
+                    onClick={() => {
+                      router.push("/account/settings");
+                      setIsMobileMenuOpen(false);
+                    }}
+                  >
+                    <Settings className="mr-2 h-4 w-4" />
+                    Settings
+                  </Button>
+                  {isAdmin && (
+                    <Button
+                      variant="ghost"
+                      className="w-full text-white hover:bg-gray-800 justify-start text-sm sm:text-base py-2"
+                      onClick={() => {
+                        router.push("/admin/dashboard");
+                        setIsMobileMenuOpen(false);
+                      }}
+                    >
+                      <Settings className="mr-2 h-4 w-4" />
+                      Admin Dashboard
+                    </Button>
+                  )}
+                  <Button
+                    variant="ghost"
+                    className="w-full text-white hover:bg-gray-800 justify-start text-sm sm:text-base py-2"
+                    onClick={() => {
+                      logout();
+                      setIsMobileMenuOpen(false);
+                    }}
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Sign Out
+                  </Button>
+                </div>
+              ) : (
+                <div className="px-3 py-2 space-y-2">
+                  <Button
+                    variant="ghost"
+                    className="w-full text-white hover:bg-gray-800 justify-start text-sm sm:text-base py-2"
+                    onClick={() => {
+                      router.push("/login");
+                      setIsMobileMenuOpen(false);
+                    }}
+                  >
+                    SIGN IN
+                  </Button>
+                  <Button
+                    className="w-full bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white font-medium text-sm sm:text-base py-2"
+                    onClick={() => {
+                      router.push("/signup");
+                      setIsMobileMenuOpen(false);
+                    }}
+                  >
+                    SIGN UP
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         )}

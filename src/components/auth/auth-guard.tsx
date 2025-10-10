@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
-import { Loader2 } from "lucide-react";
+import { AdminPageLoading } from "@/components/admin";
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -51,14 +51,7 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
 
   // Show loading spinner while checking authentication
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="flex flex-col items-center space-y-4">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-muted-foreground">Loading...</p>
-        </div>
-      </div>
-    );
+    return <AdminPageLoading text="Authenticating..." />;
   }
 
   // If authentication is required but user is not authenticated
