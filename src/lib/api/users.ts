@@ -74,10 +74,16 @@ export interface UpdateUserData {
 class UsersAPI {
   private async getAuthHeaders(): Promise<HeadersInit> {
     // Get the session token from cookies
-    const token = document.cookie
+    const allCookies = document.cookie;
+    console.log('Frontend API: All cookies:', allCookies);
+    
+    const token = allCookies
       .split('; ')
       .find(row => row.startsWith('better-auth.session_token='))
       ?.split('=')[1];
+
+    console.log('Frontend API: Token found:', !!token);
+    console.log('Frontend API: Token (first 20 chars):', token?.substring(0, 20));
 
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
@@ -86,6 +92,9 @@ class UsersAPI {
     // Only add Authorization header if token exists
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
+      console.log('Frontend API: Authorization header set');
+    } else {
+      console.log('Frontend API: No token found, no Authorization header');
     }
 
     return headers;
@@ -93,14 +102,23 @@ class UsersAPI {
 
   async getAllUsers(): Promise<User[]> {
     try {
+      const headers = await this.getAuthHeaders();
+      console.log('Frontend API: Making request to getAllUsers');
+      console.log('Frontend API: Headers:', headers);
+      console.log('Frontend API: API Base URL:', API_BASE_URL);
+      
       const response = await fetch(`${API_BASE_URL}/users`, {
         method: 'GET',
-        headers: await this.getAuthHeaders(),
+        headers,
         credentials: 'include',
       });
 
+      console.log('Frontend API: Response status:', response.status);
+      console.log('Frontend API: Response headers:', Object.fromEntries(response.headers.entries()));
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
+        console.log('Frontend API: Error data:', errorData);
         const errorMessage = errorData.message || `Failed to fetch users: ${response.statusText}`;
         
         if (response.status === 401) {
@@ -112,7 +130,9 @@ class UsersAPI {
         throw new Error(errorMessage);
       }
 
-      return await response.json();
+      const data = await response.json();
+      console.log('Frontend API: Success - received users:', data.length);
+      return data;
     } catch (error) {
       console.error('Error fetching users:', error);
       throw error;
