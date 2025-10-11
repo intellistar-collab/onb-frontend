@@ -55,7 +55,6 @@ const LoginForm = () => {
         durationMs: 2500,
       });
       
-      console.log('Redirecting to:', redirectTo);
       router.push(redirectTo);
     } catch (err) {
       // Extract error message from the error object

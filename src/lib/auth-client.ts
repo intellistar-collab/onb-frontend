@@ -27,31 +27,5 @@ export const isAuthenticated = async (): Promise<boolean> => {
   }
 };
 
-// Hook for client-side authentication checking
-export const useAuth = () => {
-  const [isAuth, setIsAuth] = React.useState<boolean | null>(null);
-  const [user, setUser] = React.useState<any>(null);
-
-  React.useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const session = await authClient.getSession();
-        if (session.data?.user) {
-          setIsAuth(true);
-          setUser(session.data.user);
-        } else {
-          setIsAuth(false);
-          setUser(null);
-        }
-      } catch (error) {
-        setIsAuth(false);
-        setUser(null);
-      }
-    };
-
-    checkAuth();
-  }, []);
-
-  return { isAuthenticated: isAuth, user, isLoading: isAuth === null };
-};
+// Note: useAuth hook is defined in contexts/auth-context.tsx
 

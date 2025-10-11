@@ -4,21 +4,20 @@ import { AdminRoute } from "@/components/auth/auth-guard";
 import {
   AdminPageHeader,
   AdminStats,
-  AdminSearchFilter,
   AdminTable,
   AdminBadge,
 } from "@/components/admin";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Users, Shield, Edit, Trash2, MoreVertical, Plus, Save, X } from "lucide-react";
+import { Users, Shield, Edit, Trash2, MoreVertical, Plus, Save, X, CheckCircle, UserX, UserCheck } from "lucide-react";
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { useToast } from "@/components/ui/toast";
 import { usersAPI, User, CreateUserData, UpdateUserData } from "@/lib/api/users";
 
 export default function AdminUsers() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedRole, setSelectedRole] = useState("ALL");
+  const [selectedStatus, setSelectedStatus] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -33,8 +32,9 @@ export default function AdminUsers() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    role: "USER",
+    status: "PENDING",
     password: "",
+    confirmPassword: "",
   });
 
   // Fetch users from API
@@ -65,10 +65,31 @@ export default function AdminUsers() {
     try {
       setIsLoading(true);
       
+      // Validate password match
+      if (formData.password !== formData.confirmPassword) {
+        toast({
+          title: "Error",
+          description: "Passwords do not match",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      // Validate password strength
+      if (formData.password.length < 6) {
+        toast({
+          title: "Error",
+          description: "Password must be at least 6 characters long",
+          variant: "destructive",
+        });
+        return;
+      }
+      
       const createUserData: CreateUserData = {
         email: formData.email,
         username: formData.name,
-        role: formData.role,
+        role: "USER", // Explicitly set to USER (backend will also set this)
+        status: formData.status,
         password: formData.password,
       };
       
@@ -100,10 +121,31 @@ export default function AdminUsers() {
     try {
       setIsLoading(true);
       
+      // Validate password if provided
+      if (formData.password) {
+        if (formData.password !== formData.confirmPassword) {
+          toast({
+            title: "Error",
+            description: "Passwords do not match",
+            variant: "destructive",
+          });
+          return;
+        }
+        
+        if (formData.password.length < 6) {
+          toast({
+            title: "Error",
+            description: "Password must be at least 6 characters long",
+            variant: "destructive",
+          });
+          return;
+        }
+      }
+      
       const updateUserData: UpdateUserData = {
         email: formData.email,
         username: formData.name,
-        role: formData.role,
+        status: formData.status,
       };
       
       // Only include password if it's provided
@@ -162,12 +204,61 @@ export default function AdminUsers() {
     }
   };
 
+  const handleApproveUser = async (user: User) => {
+    try {
+      setIsLoading(true);
+      
+      await usersAPI.updateUser(user.id, { status: "ACTIVE" });
+      
+      toast({
+        title: "Success",
+        description: "User approved successfully",
+      });
+      
+      // Refresh the users list
+      await fetchUsers();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to approve user",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDisableUser = async (user: User) => {
+    try {
+      setIsLoading(true);
+      
+      await usersAPI.updateUser(user.id, { status: "DISABLED" });
+      
+      toast({
+        title: "Success",
+        description: "User disabled successfully",
+      });
+      
+      // Refresh the users list
+      await fetchUsers();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to disable user",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const resetForm = () => {
     setFormData({
       name: "",
       email: "",
-      role: "USER",
+      status: "PENDING",
       password: "",
+      confirmPassword: "",
     });
   };
 
@@ -176,8 +267,9 @@ export default function AdminUsers() {
     setFormData({
       name: user.username,
       email: user.email,
-      role: user.role,
+      status: user.status,
       password: "",
+      confirmPassword: "",
     });
     setIsEditModalOpen(true);
   };
@@ -193,11 +285,12 @@ export default function AdminUsers() {
       const matchesSearch =
         user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.email.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesRole = selectedRole === "ALL" || user.role === selectedRole;
-      return matchesSearch && matchesRole;
+      const matchesStatus = selectedStatus === "" || user.status === selectedStatus;
+      return matchesSearch && matchesStatus;
     });
-  }, [users, searchTerm, selectedRole]);
+  }, [users, searchTerm, selectedStatus]);
 
+  // Calculate stats based on user status
   const stats = [
     {
       label: "Total Users",
@@ -205,19 +298,19 @@ export default function AdminUsers() {
       icon: <Users className="h-8 w-8 text-blue-600" />,
     },
     {
-      label: "Admins",
-      value: users.filter((u) => u.role === "ADMIN").length,
-      icon: <Shield className="h-8 w-8 text-purple-600" />,
-    },
-    {
-      label: "Moderators",
-      value: users.filter((u) => u.role === "MODERATOR").length,
-      icon: <Users className="h-8 w-8 text-orange-600" />,
-    },
-    {
-      label: "Regular Users",
-      value: users.filter((u) => u.role === "USER").length,
+      label: "Active Users",
+      value: users.filter((u) => u.status === "ACTIVE").length,
       icon: <Users className="h-8 w-8 text-green-600" />,
+    },
+    {
+      label: "Pending Users",
+      value: users.filter((u) => u.status === "PENDING").length,
+      icon: <Users className="h-8 w-8 text-yellow-600" />,
+    },
+    {
+      label: "Disabled Users",
+      value: users.filter((u) => u.status === "DISABLED").length,
+      icon: <Users className="h-8 w-8 text-red-600" />,
     },
   ];
 
@@ -225,6 +318,7 @@ export default function AdminUsers() {
     {
       key: "user",
       label: "User",
+      className: "w-1/3", // 33% width for user column
       render: (value: any, row: User) => (
         <div>
           <p className="admin-text-primary font-medium">{row.username}</p>
@@ -233,16 +327,57 @@ export default function AdminUsers() {
       ),
     },
     {
-      key: "role",
-      label: "Role",
+      key: "status",
+      label: "Status",
+      className: "w-1/6", // 16% width for status column
       render: (value: string) => {
-        const variant = value === "ADMIN" ? "error" : value === "MODERATOR" ? "warning" : "info";
-        return <AdminBadge variant={variant}>{value}</AdminBadge>;
+        const getStatusConfig = (status: string) => {
+          switch (status) {
+            case "ACTIVE":
+              return {
+                dotColor: "bg-green-500",
+                textColor: "text-green-700 dark:text-green-400",
+                bgColor: "bg-green-50 dark:bg-green-900/20",
+                borderColor: "border-green-200 dark:border-green-800",
+              };
+            case "PENDING":
+              return {
+                dotColor: "bg-yellow-500",
+                textColor: "text-yellow-700 dark:text-yellow-400",
+                bgColor: "bg-yellow-50 dark:bg-yellow-900/20",
+                borderColor: "border-yellow-200 dark:border-yellow-800",
+              };
+            case "DISABLED":
+              return {
+                dotColor: "bg-red-500",
+                textColor: "text-red-700 dark:text-red-400",
+                bgColor: "bg-red-50 dark:bg-red-900/20",
+                borderColor: "border-red-200 dark:border-red-800",
+              };
+            default:
+              return {
+                dotColor: "bg-gray-500",
+                textColor: "text-gray-700 dark:text-gray-400",
+                bgColor: "bg-gray-50 dark:bg-gray-900/20",
+                borderColor: "border-gray-200 dark:border-gray-800",
+              };
+          }
+        };
+
+        const config = getStatusConfig(value);
+        
+        return (
+          <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${config.bgColor} ${config.borderColor}`}>
+            <div className={`w-2 h-2 rounded-full mr-2 ${config.dotColor}`}></div>
+            <span className={config.textColor}>{value}</span>
+          </div>
+        );
       },
     },
     {
       key: "createdAt",
       label: "Created",
+      className: "w-1/4", // 25% width for created column
       render: (value: Date) => (
         <span className="admin-text-tertiary text-sm">
           {new Date(value).toLocaleDateString()}
@@ -252,6 +387,7 @@ export default function AdminUsers() {
     {
       key: "updatedAt",
       label: "Last Updated",
+      className: "w-1/4", // 25% width for updated column
       render: (value: Date) => (
         <span className="admin-text-tertiary text-sm">
           {new Date(value).toLocaleDateString()}
@@ -261,6 +397,24 @@ export default function AdminUsers() {
   ];
 
   const actions = [
+    {
+      label: "Approve",
+      icon: <UserCheck className="h-4 w-4" />,
+      onClick: (user: User) => handleApproveUser(user),
+      show: (user: User) => user.status === "PENDING", // Only for PENDING users
+    },
+    {
+      label: "Disable",
+      icon: <UserX className="h-4 w-4" />,
+      onClick: (user: User) => handleDisableUser(user),
+      show: (user: User) => user.status === "PENDING" || user.status === "ACTIVE", // PENDING and ACTIVE users can be disabled
+    },
+    {
+      label: "Re-enable",
+      icon: <UserCheck className="h-4 w-4" />,
+      onClick: (user: User) => handleApproveUser(user), // Re-enable is same as approve
+      show: (user: User) => user.status === "DISABLED", // Only for DISABLED users
+    },
     {
       label: "Edit",
       icon: <Edit className="h-4 w-4" />,
@@ -272,23 +426,17 @@ export default function AdminUsers() {
       onClick: (user: User) => openDeleteModal(user),
       variant: "destructive" as const,
     },
-    {
-      label: "More",
-      icon: <MoreVertical className="h-4 w-4" />,
-      onClick: (user: User) => console.log("More actions", user),
-    },
   ];
 
   const filterOptions = [
-    { value: "ADMIN", label: "Admin" },
     { value: "MODERATOR", label: "Moderator" },
     { value: "USER", label: "User" },
   ];
 
   return (
     <AdminRoute>
-      <div className="p-6">
-        <div className="max-w-7xl mx-auto">
+      <div className="p-4 sm:p-6">
+        <div className="max-w-7xl mx-auto w-full">
           <AdminPageHeader
             title="User Management"
             description="Manage user accounts and permissions"
@@ -296,10 +444,11 @@ export default function AdminUsers() {
               <div className="flex gap-2">
                 <Button 
                   onClick={() => setIsAddModalOpen(true)}
-                  className="bg-slate-100 border border-slate-200 dark:bg-slate-800 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 hover:scale-105 transform transition-all duration-200 shadow-sm hover:shadow-md"
+                  className="bg-slate-100 border border-slate-200 dark:bg-slate-800 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 hover:scale-105 transform transition-all duration-200 shadow-sm hover:shadow-md text-sm sm:text-base"
                 >
-                  <Users className="h-4 w-4 mr-2" />
-                  Add User
+                  <Users className="h-4 w-4 mr-1 sm:mr-2" />
+                  <span className="hidden sm:inline">Add User</span>
+                  <span className="sm:hidden">Add</span>
                 </Button>
               </div>
             }
@@ -309,12 +458,23 @@ export default function AdminUsers() {
 
           <AdminTable
             title={`Users (${filteredUsers.length})`}
-            description="Manage user accounts, roles, and permissions"
+            description="Manage user accounts, status, and permissions"
             data={filteredUsers}
             columns={columns}
             actions={actions}
             emptyMessage="No users found"
             loading={isInitialLoading}
+            searchPlaceholder="Search users by name or email..."
+            statusFilter={{
+              value: selectedStatus,
+              onChange: setSelectedStatus,
+              options: [
+                { value: "ALL", label: "All" },
+                { value: "PENDING", label: "Pending" },
+                { value: "ACTIVE", label: "Active" },
+                { value: "DISABLED", label: "Disabled" },
+              ],
+            }}
           />
 
           {/* Add User Modal */}
@@ -361,16 +521,28 @@ export default function AdminUsers() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                    Role
+                    Confirm Password
+                  </label>
+                  <Input
+                    type="password"
+                    value={formData.confirmPassword}
+                    onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                    placeholder="Confirm password"
+                    className="bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    Status
                   </label>
                   <select
-                    value={formData.role}
-                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                    value={formData.status}
+                    onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                     className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                   >
-                    <option value="USER">User</option>
-                    <option value="MODERATOR">Moderator</option>
-                    <option value="ADMIN">Admin</option>
+                    <option value="PENDING">Pending</option>
+                    <option value="ACTIVE">Active</option>
+                    <option value="DISABLED">Disabled</option>
                   </select>
                 </div>
                 <div className="flex justify-end gap-2 pt-4">
@@ -440,16 +612,28 @@ export default function AdminUsers() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                    Role
+                    Confirm Password
+                  </label>
+                  <Input
+                    type="password"
+                    value={formData.confirmPassword}
+                    onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                    placeholder="Confirm new password"
+                    className="bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    Status
                   </label>
                   <select
-                    value={formData.role}
-                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                    value={formData.status}
+                    onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                     className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                   >
-                    <option value="USER">User</option>
-                    <option value="MODERATOR">Moderator</option>
-                    <option value="ADMIN">Admin</option>
+                    <option value="PENDING">Pending</option>
+                    <option value="ACTIVE">Active</option>
+                    <option value="DISABLED">Disabled</option>
                   </select>
                 </div>
                 <div className="flex justify-end gap-2 pt-4">

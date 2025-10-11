@@ -43,6 +43,7 @@ const navigationItems = [
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const { user, logout } = useAuth();
   const { isDarkMode, toggleTheme } = useTheme();
   const router = useRouter();
@@ -50,6 +51,17 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  // Scroll detection effect
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.scrollY;
+      setIsScrolled(scrollTop > 20); // Change to solid after 20px scroll
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const handleLogout = async () => {
@@ -68,7 +80,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       )}
 
       {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-72 shadow-xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 admin-bg-secondary admin-border-primary border-r ${
+      <div className={`fixed inset-y-0 left-0 z-50 w-72 shadow-xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 admin-bg-secondary admin-border-primary border-r overflow-hidden ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
         <div className="flex flex-col h-full">
@@ -91,7 +103,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 px-4 py-6 space-y-1">
+          <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
             {navigationItems.map((item) => {
               const isActive = pathname === item.href;
               return (
@@ -165,9 +177,13 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       </div>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col min-h-screen">
+      <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
         {/* Topbar */}
-        <header className="sticky top-0 z-40 h-16 admin-border-primary border-b admin-bg-secondary admin-shadow px-4">
+        <header className={`fixed top-0 left-0 lg:left-72 right-0 z-40 h-16 border-b px-4 transition-all duration-300 ease-in-out ${
+          isScrolled 
+            ? 'admin-bg-secondary backdrop-blur-sm admin-shadow admin-border-primary' 
+            : 'bg-transparent border-transparent shadow-none'
+        }`}>
           <div className="flex items-center justify-between h-full">
             <div className="flex items-center space-x-4">
               <Button
@@ -257,7 +273,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         </header>
 
         {/* Page content */}
-        <main className="flex-1 admin-bg-primary">
+        <main className="flex-1 admin-bg-primary overflow-y-auto pt-16">
           {children}
         </main>
       </div>

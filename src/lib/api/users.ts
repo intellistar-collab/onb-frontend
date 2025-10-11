@@ -5,6 +5,7 @@ export interface User {
   email: string;
   username: string;
   role: string;
+  status: string;
   firstName: string | null;
   lastName: string | null;
   avatar: string | null;
@@ -33,7 +34,8 @@ export interface User {
 export interface CreateUserData {
   email: string;
   username: string;
-  role: string;
+  role?: string; // Made optional since backend will set it to USER automatically
+  status?: string;
   password: string;
   firstName?: string;
   lastName?: string;
@@ -55,6 +57,7 @@ export interface UpdateUserData {
   email?: string;
   username?: string;
   role?: string;
+  status?: string;
   firstName?: string;
   lastName?: string;
   avatar?: string;
@@ -75,15 +78,11 @@ class UsersAPI {
   private async getAuthHeaders(): Promise<HeadersInit> {
     // Get the session token from cookies
     const allCookies = document.cookie;
-    console.log('Frontend API: All cookies:', allCookies);
     
     const token = allCookies
       .split('; ')
       .find(row => row.startsWith('better-auth.session_token='))
       ?.split('=')[1];
-
-    console.log('Frontend API: Token found:', !!token);
-    console.log('Frontend API: Token (first 20 chars):', token?.substring(0, 20));
 
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
@@ -92,9 +91,6 @@ class UsersAPI {
     // Only add Authorization header if token exists
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
-      console.log('Frontend API: Authorization header set');
-    } else {
-      console.log('Frontend API: No token found, no Authorization header');
     }
 
     return headers;
@@ -103,9 +99,6 @@ class UsersAPI {
   async getAllUsers(): Promise<User[]> {
     try {
       const headers = await this.getAuthHeaders();
-      console.log('Frontend API: Making request to getAllUsers');
-      console.log('Frontend API: Headers:', headers);
-      console.log('Frontend API: API Base URL:', API_BASE_URL);
       
       const response = await fetch(`${API_BASE_URL}/users`, {
         method: 'GET',
@@ -113,12 +106,8 @@ class UsersAPI {
         credentials: 'include',
       });
 
-      console.log('Frontend API: Response status:', response.status);
-      console.log('Frontend API: Response headers:', Object.fromEntries(response.headers.entries()));
-
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        console.log('Frontend API: Error data:', errorData);
         const errorMessage = errorData.message || `Failed to fetch users: ${response.statusText}`;
         
         if (response.status === 401) {
@@ -131,7 +120,6 @@ class UsersAPI {
       }
 
       const data = await response.json();
-      console.log('Frontend API: Success - received users:', data.length);
       return data;
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -170,8 +158,16 @@ class UsersAPI {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || `Failed to update user: ${response.statusText}`);
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.message || `Failed to update user: ${response.statusText}`;
+        
+        if (response.status === 401) {
+          throw new Error('Authentication required. Please log in as an admin user.');
+        } else if (response.status === 403) {
+          throw new Error('Access denied. Admin privileges required.');
+        }
+        
+        throw new Error(errorMessage);
       }
 
       return await response.json();
