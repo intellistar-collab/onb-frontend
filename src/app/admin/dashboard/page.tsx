@@ -208,12 +208,6 @@ export default function AdminDashboard() {
           <AdminPageHeader
             title="Dashboard Overview"
             description="Welcome back! Here's what's happening with your platform today."
-            actions={
-              <Button className="bg-slate-100 border border-slate-200 dark:bg-slate-800 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 hover:scale-105 transform transition-all duration-200 shadow-sm hover:shadow-md">
-                <Plus className="h-4 w-4 mr-2" />
-                Create New
-              </Button>
-            }
           />
 
           {/* Stats Cards */}
@@ -227,7 +221,7 @@ export default function AdminDashboard() {
               description: "Common administrative tasks",
             }}
           >
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
               <AdminQuickAction
                 icon={<Users className="h-6 w-6" />}
                 label="Manage Users"
