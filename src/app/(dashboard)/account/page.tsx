@@ -1,3 +1,5 @@
+"use client";
+
 import { AccountProfile, AccountStats, AccountSettings, AccountLayout } from "@/components/account";
 
 export default function AccountPage() {

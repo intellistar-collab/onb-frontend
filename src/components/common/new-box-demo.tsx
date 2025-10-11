@@ -2,24 +2,18 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { useNewBoxNotification } from '@/contexts/NewBoxNotificationContext';
 import { Gift, Sparkles } from 'lucide-react';
 import NewBoxAnimation from './new-box-animation';
-import SoundEffectSimulator from './sound-effect-simulator';
 
 const NewBoxDemo: React.FC = () => {
-  const { addNewBox, clearNotifications } = useNewBoxNotification();
   const [showAnimation, setShowAnimation] = useState(false);
-  const [showSoundEffect, setShowSoundEffect] = useState(false);
 
   const handleAddNewBox = () => {
     setShowAnimation(true);
-    setShowSoundEffect(true);
-    addNewBox();
   };
 
   const handleClearNotifications = () => {
-    clearNotifications();
+    // Clear notifications logic removed - not needed for payment
   };
 
   const handleAnimationComplete = () => {
@@ -51,12 +45,6 @@ const NewBoxDemo: React.FC = () => {
       <NewBoxAnimation 
         trigger={showAnimation} 
         onComplete={handleAnimationComplete}
-      />
-
-      {/* Sound effect simulation */}
-      <SoundEffectSimulator 
-        trigger={showSoundEffect} 
-        type="success"
       />
     </>
   );
