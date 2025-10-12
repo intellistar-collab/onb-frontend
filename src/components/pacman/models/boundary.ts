@@ -25,7 +25,7 @@ export default class Boundary {
   }
 
   flash() {
-    let imageSource = this.image.src;
+    const imageSource = this.image.src;
     this.image = imageSource.includes("white")
       ? this.regularImage
       : this.whiteImage;

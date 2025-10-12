@@ -205,15 +205,16 @@ const TopBar = () => {
               </DropdownMenu>
             ) : (
               <div className="bg-gray-500/40 rounded-md p-1 gap-2">
-                <Button variant="ghost" onClick={() => router.push("/login")}>
-                  SIGN IN
-                </Button>
-                <Button
-                  className="bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white font-medium"
-                  onClick={() => router.push("/signup")}
-                >
-                  SIGN UP
-                </Button>
+                <Link href="/login">
+                  <Button variant="ghost">
+                    SIGN IN
+                  </Button>
+                </Link>
+                <Link href="/signup">
+                  <Button className="bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white font-medium">
+                    SIGN UP
+                  </Button>
+                </Link>
               </div>
             )}
           </div>
@@ -355,25 +356,19 @@ const TopBar = () => {
                 </div>
               ) : (
                 <div className="px-3 py-2 space-y-2">
-                  <Button
-                    variant="ghost"
-                    className="w-full text-white hover:bg-gray-800 justify-start text-sm sm:text-base py-2"
-                    onClick={() => {
-                      router.push("/login");
-                      setIsMobileMenuOpen(false);
-                    }}
-                  >
-                    SIGN IN
-                  </Button>
-                  <Button
-                    className="w-full bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white font-medium text-sm sm:text-base py-2"
-                    onClick={() => {
-                      router.push("/signup");
-                      setIsMobileMenuOpen(false);
-                    }}
-                  >
-                    SIGN UP
-                  </Button>
+                  <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Button
+                      variant="ghost"
+                      className="w-full text-white hover:bg-gray-800 justify-start text-sm sm:text-base py-2"
+                    >
+                      SIGN IN
+                    </Button>
+                  </Link>
+                  <Link href="/signup" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Button className="w-full bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white font-medium text-sm sm:text-base py-2">
+                      SIGN UP
+                    </Button>
+                  </Link>
                 </div>
               )}
             </div>

@@ -131,8 +131,13 @@ export default class PacMan {
 
   chomp() {
     if (this.radians < Math.PI / 36 || this.radians > Math.PI / 4) {
-      if (this.isEating)
-        this.openRate < 0 ? this.munchOne.play() : this.munchTwo.play();
+      if (this.isEating) {
+        if (this.openRate < 0) {
+          this.munchOne.play();
+        } else {
+          this.munchTwo.play();
+        }
+      }
       this.openRate = -this.openRate;
     }
     this.radians += this.openRate;

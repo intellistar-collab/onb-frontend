@@ -3,7 +3,15 @@
 import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
-import { AdminPageLoading } from "@/components/admin";
+// Simple loading component to avoid admin CSS dependencies
+const SimpleLoading = ({ text = "Loading..." }: { text?: string }) => (
+  <div className="fixed inset-0 bg-white bg-opacity-80 flex items-center justify-center z-50">
+    <div className="flex flex-col items-center">
+      <div className="animate-spin rounded-full border-4 border-gray-300 border-t-blue-600 h-12 w-12" />
+      <p className="text-gray-600 text-lg font-bold mt-4">{text}</p>
+    </div>
+  </div>
+);
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -50,7 +58,7 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
 
   // Show loading spinner while checking authentication
   if (isLoading) {
-    return <AdminPageLoading text="Authenticating..." />;
+    return <SimpleLoading text="Authenticating..." />;
   }
 
   // If authentication is required but user is not authenticated
@@ -80,6 +88,13 @@ export const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }
   <AuthGuard requireAuth requireAdmin>{children}</AuthGuard>
 );
 
-export const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <AuthGuard>{children}</AuthGuard>
-);
+export const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isLoading } = useAuth();
+  
+  // For public routes, don't wait for auth check to complete
+  if (isLoading) {
+    return <>{children}</>;
+  }
+  
+  return <>{children}</>;
+};

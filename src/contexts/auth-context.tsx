@@ -169,9 +169,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        await refreshUser();
+        // Add a timeout to prevent hanging on slow network
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Auth timeout')), 3000)
+        );
+        
+        await Promise.race([refreshUser(), timeoutPromise]);
       } catch (error) {
         console.error("Failed to initialize auth:", error);
+        // Don't set user to null on timeout, just stop loading
+        if (error instanceof Error && error.message !== 'Auth timeout') {
+          setUser(null);
+        }
       } finally {
         setIsLoading(false);
       }
