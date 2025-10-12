@@ -26,6 +26,7 @@ import {
   Moon,
   Bell,
   Search,
+  FolderOpen,
 } from "lucide-react";
 
 interface AdminLayoutProps {
@@ -35,8 +36,9 @@ interface AdminLayoutProps {
 const navigationItems = [
   { name: "Dashboard", href: "/admin/dashboard", icon: BarChart3 },
   { name: "Users", href: "/admin/users", icon: Users },
+  { name: "Box Categories", href: "/admin/box-categories", icon: FolderOpen },
   { name: "Boxes", href: "/admin/boxes", icon: Package },
-  { name: "Products", href: "/admin/products", icon: Tag },
+  { name: "Items", href: "/admin/items", icon: Tag },
   { name: "Settings", href: "/admin/settings", icon: Settings },
 ];
 
@@ -52,6 +54,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   useEffect(() => {
     setMounted(true);
   }, []);
+
 
   // Scroll detection effect
   useEffect(() => {
@@ -98,7 +101,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               className="lg:hidden admin-button-ghost"
               onClick={() => setSidebarOpen(false)}
             >
-              <X className="h-5 w-5" />
+              <X className="h-5 w-5" suppressHydrationWarning />
             </Button>
           </div>
 
@@ -132,7 +135,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                       isActive 
                         ? 'text-blue-600 dark:text-blue-400 transform scale-110' 
                         : 'text-gray-500 dark:text-gray-400 group-hover:scale-105'
-                    }`} />
+                    }`} suppressHydrationWarning />
                     <span className={`font-medium transition-all duration-200 ${
                       isActive 
                         ? 'text-blue-700 dark:text-blue-300 transform translate-x-1' 
@@ -151,7 +154,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             <div className="admin-card p-3 transition-all duration-200 hover:shadow-md">
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center transition-transform duration-200 hover:scale-110">
-                  <User className="h-4 w-4 text-white" />
+                  <User className="h-4 w-4 text-white" suppressHydrationWarning />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="admin-text-primary text-sm font-medium truncate">
@@ -168,7 +171,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 className="w-full mt-2 admin-button-ghost transition-all duration-200 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 hover:scale-[1.02] group"
                 onClick={handleLogout}
               >
-                <LogOut className="mr-2 h-4 w-4 transition-transform duration-200 group-hover:rotate-12" />
+                <LogOut className="mr-2 h-4 w-4 transition-transform duration-200 group-hover:rotate-12" suppressHydrationWarning />
                 Sign Out
               </Button>
             </div>
@@ -192,11 +195,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 className="lg:hidden admin-button-ghost"
                 onClick={() => setSidebarOpen(true)}
               >
-                <Menu className="h-5 w-5" />
+                <Menu className="h-5 w-5" suppressHydrationWarning />
               </Button>
               <div className="hidden md:block">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" suppressHydrationWarning />
                   <input
                     type="text"
                     placeholder="Search..."
@@ -214,7 +217,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   onClick={toggleTheme}
                   className="admin-button-ghost"
                 >
-                  {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+                  {isDarkMode ? <Sun className="h-5 w-5" suppressHydrationWarning /> : <Moon className="h-5 w-5" suppressHydrationWarning />}
                 </Button>
               ) : (
                 <Button
@@ -223,7 +226,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   className="admin-button-ghost"
                   disabled
                 >
-                  <Moon className="h-5 w-5" />
+                  <Moon className="h-5 w-5" suppressHydrationWarning />
                 </Button>
               )}
               
@@ -232,13 +235,13 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 size="sm"
                 className="admin-button-ghost"
               >
-                <Bell className="h-5 w-5" />
+                <Bell className="h-5 w-5" suppressHydrationWarning />
               </Button>
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="admin-button-ghost">
-                    <User className="h-5 w-5" />
+                    <User className="h-5 w-5" suppressHydrationWarning />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="admin-bg-secondary admin-border-primary" align="end">
