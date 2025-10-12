@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import styles from "./game.module.css";
 import playGame from "../mechanics/playGame";
 
@@ -101,7 +102,7 @@ export default function Game({ player, callback = playGame }: GameProps) {
       <div id="game-root">
         <div className={styles.gameContainer}>
           {!isPaused && (
-            <img
+            <Image
               src="/logo.svg"
               alt="ONB Logo"
               width={140}

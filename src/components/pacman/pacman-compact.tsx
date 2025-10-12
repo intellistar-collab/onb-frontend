@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/auth-context";
 
@@ -30,11 +31,9 @@ export default function PacmanCompact() {
     <div className="relative h-full w-full flex flex-col justify-center p-6 overflow-hidden">
       {/* Resized Background Pacman image to match section height */}
       <div className="absolute inset-0 w-full h-full flex items-center justify-center">
-        <img
-          src="https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExNDhvNGd6dXc1ejRlMjFlemNwcnc4MnFzbHNieGtoNXFld3llYm5uNSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/cyMqOH8rjgDHG/giphy.gif"
-          alt="Pac-Man background"
-          className="h-full w-auto object-contain"
-        />
+        <div className="h-full w-full bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 flex items-center justify-center">
+          <div className="text-6xl animate-pulse">🎮</div>
+        </div>
       </div>
       
       {/* Dark overlay for text readability */}
