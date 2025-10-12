@@ -43,8 +43,8 @@ export default function AdminProducts() {
   const fetchItems = useCallback(async () => {
     try {
       setIsInitialLoading(true);
-      const response = await itemsAPI.getAllItems({ limit: 1000 }); // Get all items for now
-      setItems(response.data);
+      const response = await itemsAPI.getAllItems(); // Get all items
+      setItems(response);
     } catch (error: any) {
       console.error("Failed to fetch items:", error);
       toast({

@@ -354,14 +354,14 @@ export default function AdminBoxes() {
       className: "w-1/6",
       render: (value: any, row: Box) => (
         <div className="flex items-center">
-          {row.boxCategory ? (
+          {(row as any).category ? (
             <>
               <div
                 className="w-3 h-3 rounded-full mr-2 flex-shrink-0"
-                style={{ backgroundColor: row.boxCategory.color || "#3b82f6" }}
+                style={{ backgroundColor: (row as any).category.color || "#3b82f6" }}
               />
               <span className="admin-text-primary text-sm font-medium truncate">
-                {row.boxCategory.name}
+                {(row as any).category.name}
               </span>
             </>
           ) : (

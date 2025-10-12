@@ -325,13 +325,13 @@ export default function BoxDetailPage() {
                       <div className="space-y-1">
                         <label className="block text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-2">Category</label>
                         <div className="flex items-center space-x-2">
-                          {box.boxCategory?.color && (
+                          {(box as any).category?.color && (
                             <div 
                               className="w-4 h-4 rounded-full border-2 border-slate-300 dark:border-slate-600 shadow-sm"
-                              style={{ backgroundColor: box.boxCategory.color }}
+                              style={{ backgroundColor: (box as any).category.color }}
                             />
                           )}
-                          <p className="admin-text-primary text-base font-medium">{box.boxCategory?.name || "No category"}</p>
+                          <p className="admin-text-primary text-base font-medium">{(box as any).category?.name || "No category"}</p>
                         </div>
                       </div>
                       <div className="space-y-1">

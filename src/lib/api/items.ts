@@ -91,7 +91,8 @@ class ItemsAPI {
   }
 
   async getAllItems(): Promise<Item[]> {
-    return this.request<Item[]>('/items?limit=1000', { headers: await this.getAuthHeaders(), credentials: 'include' });
+    const response = await this.request<{ data: Item[]; meta: any }>('/items?limit=1000', { headers: await this.getAuthHeaders(), credentials: 'include' });
+    return response.data;
   }
 
   async getItemById(id: string): Promise<Item> {
@@ -99,7 +100,8 @@ class ItemsAPI {
   }
 
   async getItemsByBoxId(boxId: string): Promise<Item[]> {
-    return this.request<Item[]>(`/items?boxId=${boxId}&limit=1000`, { headers: await this.getAuthHeaders(), credentials: 'include' });
+    const response = await this.request<{ data: Item[]; meta: any }>(`/items?boxId=${boxId}&limit=1000`, { headers: await this.getAuthHeaders(), credentials: 'include' });
+    return response.data;
   }
 
   async createItem(data: CreateItemData): Promise<Item> {
