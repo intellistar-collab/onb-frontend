@@ -21,6 +21,7 @@ interface Action {
   onClick: (row: any) => void;
   variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
   className?: string;
+  show?: (row: any) => boolean;
 }
 
 interface AdminTableProps {
@@ -36,6 +37,11 @@ interface AdminTableProps {
   searchPlaceholder?: string;
   pageSize?: number;
   showPagination?: boolean;
+  statusFilter?: {
+    value: string;
+    onChange: (value: string) => void;
+    options: { value: string; label: string }[];
+  };
 }
 
 export const AdminTable: React.FC<AdminTableProps> = ({
@@ -51,6 +57,7 @@ export const AdminTable: React.FC<AdminTableProps> = ({
   searchPlaceholder = "Search...",
   pageSize = 10,
   showPagination = true,
+  statusFilter,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -104,16 +111,35 @@ export const AdminTable: React.FC<AdminTableProps> = ({
               </p>
             )}
           </div>
-          {searchable && (
-            <div className="relative w-full sm:w-64">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
-              <Input
-                type="text"
-                placeholder={searchPlaceholder}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
+          {(searchable || statusFilter) && (
+            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+              {searchable && (
+                <div className="relative w-full sm:w-64">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  <Input
+                    type="text"
+                    placeholder={searchPlaceholder}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+              )}
+              {statusFilter && (
+                <div className="relative w-full sm:w-40">
+                  <select
+                    value={statusFilter.value}
+                    onChange={(e) => statusFilter.onChange(e.target.value)}
+                    className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    {statusFilter.options.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -126,7 +152,7 @@ export const AdminTable: React.FC<AdminTableProps> = ({
             <AdminInlineLoading />
           </div>
         ) : (
-          <table className="w-full">
+          <table className="w-full table-fixed">
             <thead>
               <tr className="bg-slate-50 dark:bg-slate-800/50">
                 {columns.map((column) => (
@@ -142,7 +168,7 @@ export const AdminTable: React.FC<AdminTableProps> = ({
                   </th>
                 ))}
                 {actions && actions.length > 0 && (
-                  <th className="text-left py-4 px-6 text-sm font-medium text-slate-700 dark:text-slate-300 last:rounded-tr-xl">
+                  <th className="text-left py-4 px-6 text-sm font-medium text-slate-700 dark:text-slate-300 last:rounded-tr-xl w-32">
                     Actions
                   </th>
                 )}
@@ -184,24 +210,31 @@ export const AdminTable: React.FC<AdminTableProps> = ({
                       </td>
                     ))}
                     {actions && actions.length > 0 && (
-                      <td className="py-4 px-6">
+                      <td className="py-4 px-6 w-32">
                         <div className="flex items-center gap-2">
-                          {actions.map((action, actionIndex) => (
-                            <Button
-                              key={actionIndex}
-                              variant={action.variant || "ghost"}
-                              size="sm"
-                              onClick={() => action.onClick(row)}
-                              className={cn(
-                                "h-8 w-8 p-0 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700",
-                                "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100",
-                                "transition-all duration-150",
-                                action.className
-                              )}
-                            >
-                              {action.icon}
-                            </Button>
-                          ))}
+                          {actions.map((action, actionIndex) => {
+                            // Check if action should be shown for this row
+                            if (action.show && !action.show(row)) {
+                              return null;
+                            }
+                            
+                            return (
+                              <Button
+                                key={actionIndex}
+                                variant={action.variant || "ghost"}
+                                size="sm"
+                                onClick={() => action.onClick(row)}
+                                className={cn(
+                                  "h-8 w-8 p-0 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700",
+                                  "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100",
+                                  "transition-all duration-150",
+                                  action.className
+                                )}
+                              >
+                                {action.icon}
+                              </Button>
+                            );
+                          })}
                         </div>
                       </td>
                     )}

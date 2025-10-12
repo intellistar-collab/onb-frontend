@@ -1,9 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { AdminCard } from "./admin-card";
 import { Button } from "@/components/ui/button";
-import { Search, Filter } from "lucide-react";
+import { Search, Filter, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface FilterOption {
@@ -34,35 +34,117 @@ export const AdminSearchFilter: React.FC<AdminSearchFilterProps> = ({
   onMoreFilters,
   className,
 }) => {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  // Get status color configuration
+  const getStatusConfig = (status: string) => {
+    switch (status) {
+      case "PENDING":
+        return {
+          dotColor: "bg-yellow-500",
+          textColor: "text-yellow-700 dark:text-yellow-400",
+          bgColor: "bg-yellow-50 dark:bg-yellow-900/20",
+          borderColor: "border-yellow-200 dark:border-yellow-800",
+        };
+      case "ACTIVE":
+        return {
+          dotColor: "bg-green-500",
+          textColor: "text-green-700 dark:text-green-400",
+          bgColor: "bg-green-50 dark:bg-green-900/20",
+          borderColor: "border-green-200 dark:border-green-800",
+        };
+      case "DISABLED":
+        return {
+          dotColor: "bg-red-500",
+          textColor: "text-red-700 dark:text-red-400",
+          bgColor: "bg-red-50 dark:bg-red-900/20",
+          borderColor: "border-red-200 dark:border-red-800",
+        };
+      default:
+        return {
+          dotColor: "bg-gray-500",
+          textColor: "text-gray-700 dark:text-gray-400",
+          bgColor: "bg-gray-50 dark:bg-gray-900/20",
+          borderColor: "border-gray-200 dark:border-gray-800",
+        };
+    }
+  };
+
+  const selectedOption = filterOptions.find(option => option.value === filterValue);
+  const selectedConfig = selectedOption ? getStatusConfig(selectedOption.value) : null;
+
   return (
     <AdminCard className={cn("mb-6", className)}>
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="flex-1">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 dark:text-slate-500 h-4 w-4" />
             <input
               type="text"
               placeholder={searchPlaceholder}
               value={searchValue}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="admin-input pl-10 pr-4 py-2"
+              className="w-full pl-10 pr-4 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
         </div>
         <div className="flex gap-2">
           {filterOptions.length > 0 && onFilterChange && (
-            <select
-              value={filterValue || ""}
-              onChange={(e) => onFilterChange(e.target.value)}
-              className="admin-input px-3 py-2"
-            >
-              <option value="">All {filterLabel}s</option>
-              {filterOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+            <div className="relative" ref={dropdownRef}>
+              <button
+                type="button"
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                className="flex items-center justify-between w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-w-[140px]"
+              >
+                <div className="flex items-center gap-2">
+                  {selectedConfig && (
+                    <div className={`w-2 h-2 rounded-full ${selectedConfig.dotColor}`}></div>
+                  )}
+                  <span className="text-sm">
+                    {selectedOption ? selectedOption.label : "All"}
+                  </span>
+                </div>
+                <ChevronDown className="h-4 w-4 text-slate-400" />
+              </button>
+              
+              {isDropdownOpen && (
+                <div className="absolute z-10 w-full mt-1 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-md shadow-lg">
+                  <div className="py-1">
+                    {filterOptions.map((option) => {
+                      const config = getStatusConfig(option.value);
+                      return (
+                        <button
+                          key={option.value}
+                          onClick={() => {
+                            onFilterChange(option.value);
+                            setIsDropdownOpen(false);
+                          }}
+                          className="w-full px-3 py-2 text-left text-sm hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2"
+                        >
+                          <div className={`w-2 h-2 rounded-full ${config.dotColor}`}></div>
+                          <span className={config.textColor}>{option.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
           )}
           {onMoreFilters && (
             <Button

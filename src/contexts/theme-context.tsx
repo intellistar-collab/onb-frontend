@@ -27,18 +27,20 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     setMounted(true);
     
-    // Load theme preference from localStorage after hydration
-    const savedTheme = localStorage.getItem('admin-theme');
-    const shouldBeDark = savedTheme === 'dark';
-    setIsDarkMode(shouldBeDark);
-    
-    // Apply theme to document
-    document.documentElement.setAttribute('data-theme', shouldBeDark ? 'dark' : 'light');
-    // Also set the dark class for Tailwind's dark: prefix
-    if (shouldBeDark) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
+    // Only access localStorage and document after hydration
+    if (typeof window !== 'undefined') {
+      const savedTheme = localStorage.getItem('admin-theme');
+      const shouldBeDark = savedTheme === 'dark';
+      setIsDarkMode(shouldBeDark);
+      
+      // Apply theme to document
+      document.documentElement.setAttribute('data-theme', shouldBeDark ? 'dark' : 'light');
+      // Also set the dark class for Tailwind's dark: prefix
+      if (shouldBeDark) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
     }
   }, []);
 
@@ -61,7 +63,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const value: ThemeContextType = {
-    isDarkMode,
+    isDarkMode: mounted ? isDarkMode : false, // Prevent hydration mismatch
     toggleTheme,
   };
 

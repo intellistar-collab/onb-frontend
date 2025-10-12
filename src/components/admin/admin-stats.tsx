@@ -21,23 +21,25 @@ interface AdminStatsProps {
 
 export const AdminStats: React.FC<AdminStatsProps> = ({ stats, className }) => {
   return (
-    <div className={cn("grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6", className)}>
+    <div className={cn("grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6", className)}>
       {stats.map((stat, index) => (
-        <AdminCard key={index} className="hover:shadow-lg transition-shadow">
-          <div className="flex items-center sm:flex-col sm:items-center sm:text-center sm:space-y-3">
+        <AdminCard key={index} className="hover:shadow-lg transition-shadow p-3 sm:p-6">
+          <div className="flex flex-col items-center text-center space-y-2 sm:space-y-3">
             <div className="flex-shrink-0">
-              {stat.icon}
+              <div className="w-8 h-8 sm:w-12 sm:h-12 flex items-center justify-center">
+                {stat.icon}
+              </div>
             </div>
-            <div className="ml-4 sm:ml-0">
-              <p className="admin-text-secondary text-sm font-medium">
+            <div className="flex-1">
+              <p className="admin-text-secondary text-xs sm:text-sm font-medium mb-1">
                 {stat.label}
               </p>
-              <p className="admin-text-primary text-2xl font-bold">
+              <p className="admin-text-primary text-lg sm:text-2xl font-bold">
                 {typeof stat.value === 'number' ? stat.value.toLocaleString() : stat.value}
               </p>
               {stat.trend && (
                 <p className={cn(
-                  "text-xs font-medium",
+                  "text-xs font-medium mt-1",
                   stat.trend.isPositive ? "text-green-600" : "text-red-600"
                 )}>
                   {stat.trend.value}

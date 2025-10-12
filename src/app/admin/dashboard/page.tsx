@@ -20,8 +20,46 @@ import {
   Trash2,
   MoreVertical,
 } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
+import { usersAPI, type User } from "@/lib/api/users";
 
 export default function AdminDashboard() {
+  const [users, setUsers] = useState<User[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch recent users
+  useEffect(() => {
+    const fetchRecentUsers = async () => {
+      try {
+        setIsLoading(true);
+        const usersData = await usersAPI.getAllUsers();
+        // Sort by most recent first (newest createdAt first)
+        const sortedUsers = usersData.sort((a: User, b: User) => 
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+        setUsers(sortedUsers);
+      } catch (error) {
+        console.error("Failed to fetch recent users:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchRecentUsers();
+  }, []);
+
+  // Get the 5 most recent users
+  const recentUsers = useMemo(() => {
+    return users.slice(0, 5).map(user => ({
+      id: user.id,
+      name: user.username,
+      email: user.email,
+      role: user.role,
+      status: user.status,
+      createdAt: user.createdAt,
+    }));
+  }, [users]);
+
   // Mock data
   const stats = [
     {
@@ -50,32 +88,6 @@ export default function AdminDashboard() {
     },
   ];
 
-  const recentUsers = [
-    {
-      id: "1",
-      name: "John Doe",
-      email: "john@example.com",
-      role: "USER",
-      status: "active",
-      createdAt: "2024-01-15",
-    },
-    {
-      id: "2",
-      name: "Jane Smith",
-      email: "jane@example.com",
-      role: "ADMIN",
-      status: "active",
-      createdAt: "2024-01-14",
-    },
-    {
-      id: "3",
-      name: "Bob Johnson",
-      email: "bob@example.com",
-      role: "USER",
-      status: "inactive",
-      createdAt: "2024-01-13",
-    },
-  ];
 
   const recentBoxes = [
     {
@@ -97,11 +109,75 @@ export default function AdminDashboard() {
   ];
 
   const userColumns = [
-    { key: "name", label: "Name" },
-    { key: "email", label: "Email" },
-    { key: "role", label: "Role" },
-    { key: "status", label: "Status" },
-    { key: "createdAt", label: "Joined" },
+    {
+      key: "user",
+      label: "User",
+      className: "w-1/3", // 33% width for user column
+      render: (value: any, row: any) => (
+        <div>
+          <p className="admin-text-primary font-medium">{row.name}</p>
+          <p className="admin-text-tertiary text-sm">{row.email}</p>
+        </div>
+      ),
+    },
+    {
+      key: "status",
+      label: "Status",
+      className: "w-1/6", // 16% width for status column
+      render: (value: string) => {
+        const getStatusConfig = (status: string) => {
+          switch (status) {
+            case "ACTIVE":
+              return {
+                dotColor: "bg-green-500",
+                textColor: "text-green-700 dark:text-green-400",
+                bgColor: "bg-green-50 dark:bg-green-900/20",
+                borderColor: "border-green-200 dark:border-green-800",
+              };
+            case "PENDING":
+              return {
+                dotColor: "bg-yellow-500",
+                textColor: "text-yellow-700 dark:text-yellow-400",
+                bgColor: "bg-yellow-50 dark:bg-yellow-900/20",
+                borderColor: "border-yellow-200 dark:border-yellow-800",
+              };
+            case "DISABLED":
+              return {
+                dotColor: "bg-red-500",
+                textColor: "text-red-700 dark:text-red-400",
+                bgColor: "bg-red-50 dark:bg-red-900/20",
+                borderColor: "border-red-200 dark:border-red-800",
+              };
+            default:
+              return {
+                dotColor: "bg-gray-500",
+                textColor: "text-gray-700 dark:text-gray-400",
+                bgColor: "bg-gray-50 dark:bg-gray-900/20",
+                borderColor: "border-gray-200 dark:border-gray-800",
+              };
+          }
+        };
+
+        const config = getStatusConfig(value);
+        
+        return (
+          <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${config.bgColor} ${config.borderColor}`}>
+            <div className={`w-2 h-2 rounded-full mr-2 ${config.dotColor}`}></div>
+            <span className={config.textColor}>{value}</span>
+          </div>
+        );
+      },
+    },
+    {
+      key: "createdAt",
+      label: "Created",
+      className: "w-1/4", // 25% width for created column
+      render: (value: Date) => (
+        <span className="admin-text-tertiary text-sm">
+          {new Date(value).toLocaleDateString()}
+        </span>
+      ),
+    },
   ];
 
   const boxColumns = [
@@ -110,19 +186,6 @@ export default function AdminDashboard() {
     { key: "sold", label: "Sold" },
     { key: "status", label: "Status" },
     { key: "createdAt", label: "Created" },
-  ];
-
-  const userActions = [
-    {
-      label: "View",
-      icon: <Eye className="h-4 w-4" />,
-      onClick: (user: any) => console.log("View user", user),
-    },
-    {
-      label: "Edit",
-      icon: <Edit className="h-4 w-4" />,
-      onClick: (user: any) => console.log("Edit user", user),
-    },
   ];
 
   const boxActions = [
@@ -145,12 +208,6 @@ export default function AdminDashboard() {
           <AdminPageHeader
             title="Dashboard Overview"
             description="Welcome back! Here's what's happening with your platform today."
-            actions={
-              <Button className="bg-slate-100 border border-slate-200 dark:bg-slate-800 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 hover:scale-105 transform transition-all duration-200 shadow-sm hover:shadow-md">
-                <Plus className="h-4 w-4 mr-2" />
-                Create New
-              </Button>
-            }
           />
 
           {/* Stats Cards */}
@@ -164,7 +221,7 @@ export default function AdminDashboard() {
               description: "Common administrative tasks",
             }}
           >
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
               <AdminQuickAction
                 icon={<Users className="h-6 w-6" />}
                 label="Manage Users"
@@ -195,8 +252,8 @@ export default function AdminDashboard() {
               description="Latest user registrations"
               data={recentUsers}
               columns={userColumns}
-              actions={userActions}
               emptyMessage="No recent users"
+              loading={isLoading}
             />
 
             <AdminTable
