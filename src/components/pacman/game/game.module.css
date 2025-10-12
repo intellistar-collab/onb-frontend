@@ -1,0 +1,71 @@
+.game {
+  margin: auto;
+  padding-top: 1rem;
+  font-family: var(--font-oswald), sans-serif;
+}
+
+.info {
+  margin: auto;
+  width: 100%;
+}
+
+.board {
+  margin: auto;
+  width: 100%;
+}
+
+@media only screen and (min-device-width: 1024px) {
+  .game {
+    height: 90vh;
+    aspect-ratio: 900 / 1050;
+  }
+}
+
+@media only screen and (max-device-width: 1024px) {
+  .joystick {
+    display: block !important;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 200px;
+    z-index: 10;
+  }
+
+  .up,
+  .left,
+  .right,
+  .down {
+    cursor: pointer;
+  }
+}
+
+.gameContainer {
+  position: relative;
+  width: fit-content;
+  margin: auto;
+}
+
+.overlayImage {
+  position: fixed;
+  top: 47%; /* adjust as needed */
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999; /* make sure it's above the canvas */
+  width: 140px; /* or any size you prefer */
+  height: 70px;
+  pointer-events: none; /* optional: allow clicks through the image */
+}
+
+@media only screen and (max-width: 1024px) {
+  .overlayImage {
+    display: none;
+    top: 29%;
+    width: 95px;
+    height: 49px;
+  }
+}
+
+.joystick {
+  display: none;
+}
