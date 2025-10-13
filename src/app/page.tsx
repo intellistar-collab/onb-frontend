@@ -6,7 +6,7 @@ import { boxesAPI, Box } from "@/lib/api/boxes";
 import Hero from "@/components/home/hero";
 import HomeTabs from "@/components/home/home-tabs";
 import HomeTabsSkeleton from "@/components/home/home-tabs-skeleton";
-import { PacmanCompact } from "@/components/pacman";
+import PimpCatcher from "@/components/pimp-catcher-game/pimp-catcher";
 import Leaderboard from "@/components/common/leaderboard";
 import EngagementSection from "@/components/common/engagement-section";
 
@@ -94,11 +94,10 @@ const HomeScreen = () => {
         <HomeTabsSkeleton /> 
       )}
 
+      {/* Pimp Catcher + Leaderboard Section*/}
       <section className="mt-8">
         <div className="grid md:grid-cols-[7fr_3fr] gap-6 h-[600px]">
-          <div className="relative group rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
-            <PacmanCompact />
-          </div>
+          <PimpCatcher/>
           <Leaderboard />
         </div>
       </section>
