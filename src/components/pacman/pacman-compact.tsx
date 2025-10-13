@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/auth-context";
 import PacmanModal from "./pacman-modal";
 import AuthDialogs from "@/components/auth/auth-dialogs";
+import Image from "next/image";
 
 export default function PacmanCompact() {
   const [isGameModalOpen, setIsGameModalOpen] = useState(false);
@@ -24,12 +25,15 @@ export default function PacmanCompact() {
       <div className="relative h-full w-full flex flex-col justify-center p-6 overflow-hidden">
         {/* Background - Pacman Game Preview */}
         <div className="absolute inset-0 w-full h-full flex items-center justify-center">
-          <img
+          <Image
             src="https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExNDhvNGd6dXc1ejRlMjFlemNwcnc4MnFzbHNieGtoNXFld3llYm5uNSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/cyMqOH8rjgDHG/giphy.gif"
-            alt="Pac-Man background"
+            alt="Pimp Catcher background"
+            width={500}
+            height={400}
             className="h-full w-auto object-contain"
+            unoptimized
           />
-      </div>
+        </div>
         
         {/* Dark overlay for text readability */}
         <div className="absolute inset-0 bg-black/60" />
