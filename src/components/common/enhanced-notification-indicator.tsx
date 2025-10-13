@@ -16,17 +16,13 @@ const EnhancedNotificationIndicator: React.FC<EnhancedNotificationIndicatorProps
   className,
   variant = 'default'
 }) => {
-  const [isAnimating, setIsAnimating] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    if (show) {
-      setIsAnimating(true);
-      const timer = setTimeout(() => setIsAnimating(false), 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [show]);
+    setMounted(true);
+  }, []);
 
-  if (!show) return null;
+  if (!show || !mounted) return null;
 
   const getVariantStyles = () => {
     switch (variant) {
@@ -42,84 +38,36 @@ const EnhancedNotificationIndicator: React.FC<EnhancedNotificationIndicatorProps
   };
 
   return (
-    <div className={cn("relative", className)}>
-      {/* Emergency pulsing rings - multiple layers for urgency */}
-      <div 
-        className="absolute inset-0 rounded-full bg-pink-500/60 animate-ping" 
-        style={{ animationDuration: '0.5s' }}
-      />
-      <div 
-        className="absolute inset-0 rounded-full bg-pink-400/55 animate-ping" 
-        style={{ animationDelay: '0.1s', animationDuration: '0.5s' }} 
-      />
-      <div 
-        className="absolute inset-0 rounded-full bg-pink-600/50 animate-ping" 
-        style={{ animationDelay: '0.2s', animationDuration: '0.5s' }} 
-      />
-      <div 
-        className="absolute inset-0 rounded-full bg-pink-500/45 animate-ping" 
-        style={{ animationDelay: '0.3s', animationDuration: '0.5s' }} 
-      />
+    <div className={cn("relative", className)} suppressHydrationWarning>
+      {/* Pulsing rings */}
+      <div className="absolute inset-0 rounded-full bg-pink-500/60 animate-ping" />
+      <div className="absolute inset-0 rounded-full bg-pink-400/55 animate-ping animation-delay-100" />
+      <div className="absolute inset-0 rounded-full bg-pink-600/50 animate-ping animation-delay-200" />
+      <div className="absolute inset-0 rounded-full bg-pink-500/45 animate-ping animation-delay-300" />
       
-      {/* Emergency urgent flash effect */}
-      <div 
-        className="absolute inset-0 rounded-full bg-pink-500/80 animate-pulse" 
-        style={{ animationDuration: '0.3s' }}
-      />
+      {/* Flash effect */}
+      <div className="absolute inset-0 rounded-full bg-pink-500/80 animate-pulse" />
       
-      {/* Emergency shake effect */}
-      <div 
-        className="absolute inset-0 rounded-full bg-pink-600/60 animate-bounce" 
-        style={{ animationDuration: '0.2s' }}
-      />
+      {/* Shake effect */}
+      <div className="absolute inset-0 rounded-full bg-pink-600/60 animate-bounce" />
     
-      {/* Main notification dot with emergency gradient */}
-      <div 
-        className={cn(
-          "relative flex items-center justify-center w-6 h-6 rounded-full shadow-lg transition-all duration-300",
-          isAnimating ? "scale-110" : "scale-100"
-        )}
-        style={{
-          background: 'linear-gradient(45deg, #ec4899, #f472b6, #ec4899)',
-          animation: 'pulse 0.4s ease-in-out infinite'
-        }}
-      >
-        {/* Emergency gradient background - intense pink */}
-        <div 
-          className="absolute inset-0 bg-gradient-to-r from-pink-500 via-pink-400 to-pink-600 rounded-full animate-pulse" 
-          style={{ animationDuration: '0.6s' }}
-        />
+      {/* Main notification dot */}
+      <div className="relative flex items-center justify-center w-6 h-6 rounded-full shadow-lg transition-all duration-300 bg-gradient-to-r from-pink-500 via-pink-400 to-pink-600 animate-pulse">
+        {/* Gradient background */}
+        <div className="absolute inset-0 bg-gradient-to-r from-pink-500 via-pink-400 to-pink-600 rounded-full animate-pulse" />
         
-        {/* Emergency glow effect - stronger and more urgent */}
-        <div 
-          className="absolute inset-0 bg-gradient-to-r from-pink-500 to-pink-400 opacity-90 blur-sm rounded-full animate-pulse" 
-          style={{ animationDuration: '0.4s' }}
-        />
+        {/* Glow effect */}
+        <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-pink-400 opacity-90 blur-sm rounded-full animate-pulse" />
         
         {/* Count or dot */}
         {count > 0 ? (
-          <span 
-            className="relative z-10 text-xs font-bold text-white drop-shadow-lg animate-pulse"
-            style={{ animationDuration: '0.5s' }}
-          >
+          <span className="relative z-10 text-xs font-bold text-white drop-shadow-lg animate-pulse">
             {count > 9 ? '9+' : count}
           </span>
         ) : (
-          <div 
-            className="relative z-10 w-2 h-2 bg-white rounded-full drop-shadow-lg animate-pulse"
-            style={{ animationDuration: '0.5s' }}
-          />
+          <div className="relative z-10 w-2 h-2 bg-white rounded-full drop-shadow-lg animate-pulse" />
         )}
       </div>
-      
-      
-      {/* Emergency shimmer effect */}
-      {isAnimating && (
-        <div 
-          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/70 to-transparent rounded-full animate-pulse"
-          style={{ animationDuration: '0.3s' }}
-        />
-      )}
     </div>
   );
 };

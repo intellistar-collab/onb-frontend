@@ -5,4 +5,5 @@ interface HomeCard {
   price: string
   locked?: boolean
   requiredOpens?: number
+  href?: string
 }

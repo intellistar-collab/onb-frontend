@@ -1,34 +1,42 @@
 "use client";
 
 import React from "react";
-import { homeCardGroups } from "@/constant/home-card";
 import HomeCardGroup from "@/components/home/home-card-group";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Shuffle, Sparkles, Zap, Star } from "lucide-react";
+import { BoxCategory } from "@/lib/api/box-categories";
+import { Box } from "@/lib/api/boxes";
 
 function getRandomIndex(length: number) {
   return Math.floor(Math.random() * length);
 }
 
-const HomeTabs = () => {
+interface HomeTabsProps {
+  categories: BoxCategory[];
+  boxesByCategory: { [categoryId: string]: Box[] };
+}
+
+const HomeTabs = ({ categories, boxesByCategory }: HomeTabsProps) => {
   const [activeIndex, setActiveIndex] = React.useState(0);
   const [isRandomizing, setIsRandomizing] = React.useState(false);
   const [showConfetti, setShowConfetti] = React.useState(false);
   const contentRef = React.useRef<HTMLDivElement | null>(null);
 
   const handleRandomPick = async () => {
+    if (categories.length === 0) return;
+    
     setIsRandomizing(true);
     setShowConfetti(true);
     
     // Animate through random selections with visual excitement
     for (let i = 0; i < 8; i++) {
-      const tempIdx = getRandomIndex(homeCardGroups.length);
+      const tempIdx = getRandomIndex(categories.length);
       setActiveIndex(tempIdx);
       await new Promise(resolve => setTimeout(resolve, 100));
     }
     
-    const finalIdx = getRandomIndex(homeCardGroups.length);
+    const finalIdx = getRandomIndex(categories.length);
     setActiveIndex(finalIdx);
     
     setTimeout(() => {
@@ -39,6 +47,21 @@ const HomeTabs = () => {
     // scroll content to top when switching
     if (contentRef.current) contentRef.current.scrollTo({ top: 0, behavior: "smooth" });
   };
+
+  // Show empty state if no categories
+  if (categories.length === 0) {
+    return (
+      <section className="overflow-hidden">
+        <div className="flex items-center justify-center py-20">
+          <div className="text-center">
+            <div className="text-6xl mb-4">📦</div>
+            <h3 className="text-xl font-bold mb-2">No Box Categories Available</h3>
+            <p className="text-muted-foreground">Check back later for new mystery boxes!</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="overflow-hidden">
@@ -114,11 +137,12 @@ const HomeTabs = () => {
             <div className="relative">
               <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 via-transparent to-primary/20 rounded-xl opacity-0 transition-opacity duration-500" />
             <nav className="relative flex md:flex-col gap-3 max-h-[90vh] overflow-y-auto custom-scrollbar pl-1 pr-2">
-              {homeCardGroups.map((cardGroup, index) => {
+              {categories.map((category, index) => {
                 const isActive = index === activeIndex;
+                const boxCount = boxesByCategory[category.id]?.length || 0;
                 return (
                   <button
-                    key={cardGroup.title}
+                    key={category.id}
                     onClick={() => setActiveIndex(index)}
                     className={cn(
                       "relative group/tab text-left px-4 py-3.5 rounded-xl border-2 transition-all duration-300",
@@ -132,38 +156,47 @@ const HomeTabs = () => {
                     <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-primary/10 to-transparent opacity-0 group-hover/tab:opacity-100 transition-opacity duration-500" />
                     
                     <div className="relative flex items-center justify-between gap-2">
-                      <span className={cn(
-                        "font-bold transition-all duration-300 text-sm",
-                        isActive ? "text-primary scale-105" : "text-foreground/90 group-hover/tab:text-primary/90"
-                      )}>
-                        {(() => {
-                          const emojiMap: { [key: string]: string } = {
-                            "City Stays": "🏙️",
-                            "Sports Events": "🏀",
-                            "Dress To Impress": "👗",
-                            "World Events": "🌍",
-                            "Personal Experiences": "🔥",
-                            "Gear Up Gadgets": "📸",
-                            "Drip City": "💎",
-                            "Gread Carefully": "👟"
-                          };
-                          return `${emojiMap[cardGroup.title] || "📦"} ${cardGroup.title}`;
-                        })()}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span 
+                          className={cn(
+                            "font-bold transition-all duration-300 text-sm",
+                            isActive ? "text-primary scale-105" : "text-foreground/90 group-hover/tab:text-primary/90"
+                          )} 
+                          style={{ color: category.color || undefined}}
+                        >
+                          📦 {category.name}
+                        </span>
+                      </div>
                       
-                      {isActive ? (
-                        <div className="flex items-center gap-1">
-                          <div className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-lg shadow-primary/50" />
-                          <div className="w-1.5 h-1.5 rounded-full bg-primary/70 animate-pulse" style={{ animationDelay: '0.2s' }} />
-                        </div>
-                      ) : (
-                        <div className="w-2 h-2 rounded-full border-2 border-muted-foreground/30 group-hover/tab:border-primary/50 transition-colors" />
-                      )}
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-muted-foreground">
+                          {boxCount} box{boxCount !== 1 ? 'es' : ''}
+                        </span>
+                        {isActive ? (
+                          <div className="flex items-center gap-1">
+                            <div 
+                              className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-lg shadow-primary/50" 
+                              style={{ backgroundColor: category.color || undefined}}
+                            />
+                            <div 
+                              className="w-1.5 h-1.5 rounded-full bg-primary/70 animate-pulse" 
+                              style={{ animationDelay: '0.2s', backgroundColor: category.color || undefined }} 
+                            />
+                          </div>
+                        ) : (
+                          <div 
+                            className="w-2 h-2 rounded-full border-2 border-muted-foreground/30 group-hover/tab:border-primary/50 transition-colors"  
+                            style={{ backgroundColor: category.color || undefined }}
+                          />
+                        )}
+                      </div>
                     </div>
                     
                     {/* Active indicator line - more prominent */}
                     {isActive && (
-                      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-10 bg-gradient-to-b from-primary via-primary to-primary/40 rounded-r-full shadow-lg shadow-primary/50" />
+                      <div 
+                        className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-10 rounded-r-full shadow-lg shadow-primary/50" 
+                        style={{ backgroundColor: category.color || undefined}}/>
                     )}
                     
                     {/* Corner accent */}
@@ -190,13 +223,26 @@ const HomeTabs = () => {
                 {/* Content background with subtle gradient */}
                 <div className="absolute inset-0 bg-gradient-to-br from-background via-background to-muted/5 rounded-2xl -z-10" />
                 
-                <div key={homeCardGroups[activeIndex].title} className="animate-tab-content">
-                  <HomeCardGroup
-                    {...homeCardGroups[activeIndex]}
-                    side={"left"}
-                    className="pb-8"
-                  />
-                </div>
+                {categories.length > 0 && (
+                  <div key={categories[activeIndex]?.id} className="animate-tab-content">
+                    <HomeCardGroup
+                      title={categories[activeIndex]?.name || "Loading..."}
+                      banner={categories[activeIndex]?.photo || "/home-card/banner/default.webp"}
+                      type="grid"
+                      cards={boxesByCategory[categories[activeIndex]?.id]?.map(box => ({
+                        title: box.title,
+                        location: box.location,
+                        image: box.imageUrl || "/home-card/onb-box.png",
+                        price: box.price ? `$${Number(box.price).toFixed(2)}` : "N/A",
+                        locked: !box.isActive,
+                        requiredOpens: box.isActive ? undefined : 10,
+                        href: `/box/${box.id}`
+                      })) || []}
+                      side={"left"}
+                      className="pb-8"
+                    />
+                  </div>
+                )}
               </div>
           </div>
           

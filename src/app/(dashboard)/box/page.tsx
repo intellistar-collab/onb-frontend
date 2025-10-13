@@ -5,6 +5,7 @@ import React, { useState, useEffect } from "react";
 import BoxCard from "@/components/box-page/box-card";
 import BoxCategoriesList from "@/components/box-page/box-categories-list";
 import BoxHero from "@/components/box-page/hero";
+import BoxPageSkeleton from "@/components/box-page/box-page-skeleton";
 import { boxesAPI, Box } from "@/lib/api/boxes";
 import { boxCategoriesAPI, BoxCategory } from "@/lib/api/box-categories";
 import { getHotPicksBoxes, groupBoxesByCategory } from "@/lib/box-data-transformer";
@@ -54,16 +55,7 @@ const BoxContentPage = () => {
   }, []);
 
   if (loading) {
-    return (
-      <main>
-        <div className="container mx-auto px-4 py-20">
-          <div className="text-center">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
-            <p className="text-white/70 mt-4">Loading boxes...</p>
-          </div>
-        </div>
-      </main>
-    );
+    return <BoxPageSkeleton />;
   }
 
   if (error) {

@@ -95,7 +95,7 @@ const ItemDetailPage = ({ params }: ItemDetailPageProps) => {
           const similarItemsData = await itemsAPI.getItemsByBoxId(itemData.boxId);
           // Filter out the current item
           const filteredSimilar = similarItemsData.filter(similarItem => similarItem.id !== itemId);
-          setSimilarItems(filteredSimilar); // Show max 6 similar items
+          setSimilarItems(filteredSimilar);
         }
       } catch (err) {
         console.error('Error fetching item:', err);
@@ -241,10 +241,10 @@ const ItemDetailPage = ({ params }: ItemDetailPageProps) => {
                     </div>
                   </div>
 
-                  {/* Assigned Box */}
+                  {/* Box */}
                   {assignedBox && (
                     <div className="pt-4 border-t border-white/10">
-                      <p className="text-sm text-white/70 mb-2">Assigned Box</p>
+                      <p className="text-sm text-white/70 mb-2">Box</p>
                       <Link href={`/box/${assignedBox.id}`}>
                         <div className="flex items-center gap-3 p-3 bg-white/5 rounded-lg hover:bg-white/10 transition-colors cursor-pointer">
                           <div className="w-12 h-12 rounded-lg overflow-hidden border border-white/20">

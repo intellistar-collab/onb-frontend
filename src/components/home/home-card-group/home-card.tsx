@@ -9,14 +9,15 @@ import { cn } from "@/lib/utils";
 
 type HomeCardProps = HomeCard;
 
-const HomeCard = ({ title, location, image, price, locked, requiredOpens }: HomeCardProps) => {
+const HomeCard = ({ title, location, image, price, locked, requiredOpens, href }: HomeCardProps) => {
   const router = useRouter();
   const [isHovered, setIsHovered] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
 
   const handleClick = () => {
     if (locked) return;
-    router.push(`/box/brooklyn-heat`);
+    const route = href || `/box/brooklyn-heat`;
+    router.push(route);
   };
 
   return (

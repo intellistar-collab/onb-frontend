@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { boxesAPI, Box } from "@/lib/api/boxes";
 import { itemsAPI, Item } from "@/lib/api/items";
+import { boxCategoriesAPI, BoxCategory } from "@/lib/api/box-categories";
 import { transformBoxToMysteryBox, transformItemsToBoxRewards } from "@/lib/box-data-transformer";
 
 interface BoxDetailPageProps {
@@ -19,6 +20,8 @@ interface BoxDetailPageProps {
 
 const BoxDetailPage = ({ params }: BoxDetailPageProps) => {
   const [box, setBox] = useState<any>(null);
+  const [rawBox, setRawBox] = useState<Box | null>(null);
+  const [boxCategory, setBoxCategory] = useState<BoxCategory | null>(null);
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -46,11 +49,34 @@ const BoxDetailPage = ({ params }: BoxDetailPageProps) => {
           itemsAPI.getItemsByBoxId(boxId)
         ]);
         
-        const transformedBox = transformBoxToMysteryBox(boxData);
+        // Fetch box category if boxCategoryId exists
+        let categoryData = null;
+        if (boxData.boxCategoryId) {
+          try {
+            categoryData = await boxCategoriesAPI.getBoxCategoryById(boxData.boxCategoryId);
+            console.log('Fetched category:', categoryData);
+          } catch (err) {
+            console.warn('Could not fetch box category:', err);
+          }
+        }
+        
+        // Create a box object with the fetched category data
+        const boxWithCategory = {
+          ...boxData,
+          boxCategory: categoryData ? {
+            id: categoryData.id,
+            name: categoryData.name,
+            color: categoryData.color || undefined
+          } : undefined
+        };
+        
+        const transformedBox = transformBoxToMysteryBox(boxWithCategory);
         // Add the transformed items as rewards to the box
         transformedBox.rewards = transformItemsToBoxRewards(itemsData);
         
         setBox(transformedBox);
+        setRawBox(boxData); // Keep raw box data for category display
+        setBoxCategory(categoryData); // Set the fetched category
         setItems(itemsData);
       } catch (err) {
         console.error('Error fetching box:', err);
@@ -133,6 +159,17 @@ const BoxDetailPage = ({ params }: BoxDetailPageProps) => {
               <h1 className="text-3xl md:text-4xl font-pricedown text-white">
                 {box.title.replace('\n', ' ')}
               </h1>
+              {(boxCategory || box?.tag) && (
+                <div className="flex items-center gap-2 mt-2 mb-1">
+                  <div 
+                    className="w-3 h-3 rounded-full border border-white/20"
+                    style={{ backgroundColor: boxCategory?.color || box?.color || '#3b82f6' }}
+                  />
+                  <span className="text-white/80 font-suisse text-sm">
+                    {boxCategory?.name || box?.tag || 'Mystery'}
+                  </span>
+                </div>
+              )}
               <p className="text-white/60 font-suisse">
                 Mystery Box #{box.location} - {box.price}
               </p>
