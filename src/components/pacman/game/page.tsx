@@ -12,6 +12,7 @@ interface GameProps {
 
 export default function Game({ player, callback = playGame }: GameProps) {
   const [isPaused, setIsPaused] = useState(false);
+  const [gameStarted, setGameStarted] = useState(false);
   const joystickRef = useRef(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -28,10 +29,16 @@ export default function Game({ player, callback = playGame }: GameProps) {
   }, []);
 
   useEffect(() => {
-    if (!isLoading) {
-      callback(player, null, setIsPaused);
+    if (!isLoading && gameStarted) {
+      // Add a small delay to ensure DOM elements are ready
+      const timer = setTimeout(() => {
+        console.log("Starting game with player:", player);
+        callback(player, null, setIsPaused);
+      }, 100);
+      
+      return () => clearTimeout(timer);
     }
-  }, [callback, player, isLoading]);
+  }, [callback, player, isLoading, gameStarted]);
 
   useEffect(() => {
         let lastDirection: string | null = null;
@@ -91,6 +98,22 @@ export default function Game({ player, callback = playGame }: GameProps) {
     };
   }, []);
 
+  const handleStartGame = () => {
+    setGameStarted(true);
+  };
+
+  // Add keyboard support for starting the game
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (!isLoading && !gameStarted && (event.key === 'Enter' || event.key === ' ')) {
+        handleStartGame();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [isLoading, gameStarted]);
+
   return (
     <>
       {isLoading && (
@@ -99,38 +122,79 @@ export default function Game({ player, callback = playGame }: GameProps) {
           <div className="ml-4 w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
         </div>
       )}
-      <div id="game-root">
-        <div className={styles.gameContainer}>
-          {!isPaused && (
-            <Image
-              src="/logo.svg"
-              alt="ONB Logo"
-              width={140}
-              height={70}
-              className={styles.overlayImage}
-            />
-          )}
-
-          <div className={styles.game}>
-            <canvas
-              id="info"
-              className={styles.info}
-              data-testid="info"
-              width="600"
-              height="30"
-            ></canvas>
-            <canvas
-              id="board"
-              className={styles.board}
-              data-testid="board"
-              width="896"
-              height="992"
-            ></canvas>
+      
+      {!isLoading && !gameStarted && (
+        <div className="w-full h-full bg-black flex flex-col items-center justify-center text-white font-oswald">
+          {/* Game Title */}
+          <div className="text-center mb-8">
+            <h1 className="text-6xl font-bold text-yellow-400 mb-4 animate-pulse">
+              PAC-MAN
+            </h1>
+            <div className="text-2xl text-blue-400 mb-2">OneNightBox Edition</div>
+            <div className="text-lg text-gray-300">Welcome, {player?.name || 'Player'}!</div>
           </div>
 
-          <div className={styles.joystick} ref={joystickRef} />
+          {/* Game Instructions */}
+          <div className="text-center mb-8 max-w-md">
+            <div className="text-lg text-white mb-4">How to Play:</div>
+            <div className="text-sm text-gray-300 space-y-1">
+              <div>• Use arrow keys or joystick to move</div>
+              <div>• Eat all dots to clear the level</div>
+              <div>• Avoid the ghosts!</div>
+              <div>• Eat power pellets to turn the tables</div>
+            </div>
+          </div>
+
+          {/* Start Button */}
+          <button
+            onClick={handleStartGame}
+            className="bg-yellow-400 hover:bg-yellow-300 text-black font-bold py-4 px-8 rounded-lg text-xl transition-all duration-300 hover:scale-105 shadow-lg"
+          >
+            🎮 START GAME
+          </button>
+
+          {/* High Score Display */}
+          <div className="mt-8 text-center">
+            <div className="text-sm text-gray-400">High Score: 0</div>
+            <div className="text-xs text-gray-500 mt-2">Press ENTER or SPACE to start • Press SPACE to pause during game</div>
+          </div>
         </div>
-      </div>
+      )}
+
+      {!isLoading && gameStarted && (
+        <div id="game-root">
+          <div className={styles.gameContainer}>
+            {!isPaused && (
+              <Image
+                src="/logo.svg"
+                alt="ONB Logo"
+                width={140}
+                height={70}
+                className={styles.overlayImage}
+              />
+            )}
+
+            <div className={styles.game}>
+              <canvas
+                id="info"
+                className={styles.info}
+                data-testid="info"
+                width="600"
+                height="30"
+              ></canvas>
+              <canvas
+                id="board"
+                className={styles.board}
+                data-testid="board"
+                width="896"
+                height="992"
+              ></canvas>
+            </div>
+
+            <div className={styles.joystick} ref={joystickRef} />
+          </div>
+        </div>
+      )}
     </>
   );
 }
