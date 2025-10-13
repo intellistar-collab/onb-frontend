@@ -1,11 +1,89 @@
+"use client";
+
 import NewBox from "@/components/home/new-box";
-import React from "react";
-import { mockBoxCategories } from "@/constant/box-data";
+import React, { useState, useEffect } from "react";
 import BoxCard from "@/components/box-page/box-card";
 import BoxCategoriesList from "@/components/box-page/box-categories-list";
 import BoxHero from "@/components/box-page/hero";
+import { boxesAPI, Box } from "@/lib/api/boxes";
+import { boxCategoriesAPI, BoxCategory } from "@/lib/api/box-categories";
+import { getHotPicksBoxes, groupBoxesByCategory } from "@/lib/box-data-transformer";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 const BoxContentPage = () => {
+  const [hotPicksBoxes, setHotPicksBoxes] = useState<any[]>([]);
+  const [allBoxes, setAllBoxes] = useState<Box[]>([]);
+  const [categories, setCategories] = useState<BoxCategory[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Fetch boxes and categories in parallel
+        const [boxesResponse, categoriesResponse] = await Promise.all([
+          boxesAPI.getAllBoxes(),
+          boxCategoriesAPI.getAllBoxCategories()
+        ]);
+
+        setAllBoxes(boxesResponse);
+        setCategories(categoriesResponse);
+        
+        // Get hot picks (top 5 by purchasedCount)
+        const hotPicks = getHotPicksBoxes(boxesResponse, 5);
+        setHotPicksBoxes(hotPicks);
+
+      } catch (err) {
+        console.error('Error fetching box data:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load boxes');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <main>
+        <div className="container mx-auto px-4 py-20">
+          <div className="text-center">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+            <p className="text-white/70 mt-4">Loading boxes...</p>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  if (error) {
+    return (
+      <main>
+        <div className="container mx-auto px-4 py-20">
+          <div className="text-center">
+            <p className="text-red-400 mb-4">Error: {error}</p>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main>
       <section className="mt-6">
@@ -18,13 +96,21 @@ const BoxContentPage = () => {
               Handpicked mystery boxes with the best odds and most exclusive rewards
             </p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-            {mockBoxCategories
-              .flatMap((c) => c.boxes)
-              .slice(0, 5)
-              .map((box) => (
-                <BoxCard key={box.id} box={box} />
-              ))}
+          <div className="relative">
+            <Carousel className="group/carousel">
+              <CarouselContent className="-ml-3">
+                {hotPicksBoxes.map((box) => (
+                  <CarouselItem
+                    key={box.id}
+                    className="basis-[85%] pl-3 sm:basis-[45%] md:basis-[28%] lg:basis-[20%]"
+                  >
+                    <BoxCard box={box} />
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious className="-left-4 border-white/10 bg-white/10 text-white opacity-0 transition-opacity group-hover/carousel:opacity-100" />
+              <CarouselNext className="-right-4 border-white/10 bg-white/10 text-white opacity-0 transition-opacity group-hover/carousel:opacity-100" />
+            </Carousel>
           </div>
         </div>
       </section>
@@ -43,7 +129,7 @@ const BoxContentPage = () => {
             Browse every box by category
           </p>
         </div>
-        <BoxCategoriesList />
+        <BoxCategoriesList boxes={allBoxes} categories={categories} />
       </section>
 
       <BoxHero />

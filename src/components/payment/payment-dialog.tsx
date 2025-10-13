@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { X, Copy, CheckCircle, Dot, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import QRCode from "./qr-code";
 import StripePayment from "./stripe-payment";
 import PayPalPayment from "./paypal-payment";
@@ -144,9 +144,14 @@ const PaymentDialog: React.FC<PaymentDialogProps> = ({ isOpen, onClose }) => {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl w-full max-h-[90vh] bg-gray-900 border-gray-700 text-white flex flex-col">
         <DialogHeader className="flex flex-row items-center justify-between flex-shrink-0">
-          <DialogTitle className="text-xl font-bold">
-            Add funds to your account
-          </DialogTitle>
+          <div>
+            <DialogTitle className="text-xl font-bold">
+              Add funds to your account
+            </DialogTitle>
+            <DialogDescription className="text-gray-400 mt-1">
+              Choose your preferred payment method to add funds to your account
+            </DialogDescription>
+          </div>
           <Button
             variant="ghost"
             size="sm"

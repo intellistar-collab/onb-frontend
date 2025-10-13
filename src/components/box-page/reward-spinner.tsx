@@ -14,17 +14,18 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import type { BoxReward } from "@/constant/box-data"
 import { Loader2, Sparkles, Zap, Gauge } from "lucide-react"
+import SmartImage from "./loading-image"
 
-const REPEAT_COUNT = 16
-const EXTRA_LOOPS = 3
-const SPIN_DURATION = 4200
+const REPEAT_COUNT = 20
+const EXTRA_LOOPS = 4
+const SPIN_DURATION = 4000
 
 // Simple speed multipliers
 const SPEED_OPTIONS = [
-  { label: "1x", value: "1x", duration: 4200 },
-  { label: "2x", value: "2x", duration: 2100 },
-  { label: "4x", value: "4x", duration: 1050 },
-  { label: "8x", value: "8x", duration: 525 },
+  { label: "1x", value: "1x", duration: 4000 },
+  { label: "2x", value: "2x", duration: 2000 },
+  { label: "4x", value: "4x", duration: 1000 },
+  { label: "8x", value: "8x", duration: 500 },
 ]
 
 const getTierColor = (tier: string) => {
@@ -74,6 +75,15 @@ const RewardSpinner = React.forwardRef<RewardSpinnerHandle, RewardSpinnerProps>(
     showSpeedControls = false,
     defaultSpeed = "1x",
   }, ref) => {
+    // Preload all reward images for faster spinner performance
+    React.useEffect(() => {
+      rewards.forEach(reward => {
+        if (reward.image) {
+          const img = new window.Image();
+          img.src = reward.image;
+        }
+      });
+    }, [rewards]);
     const containerRef = useRef<HTMLDivElement | null>(null)
     const trackRef = useRef<HTMLDivElement | null>(null)
     const timeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -94,17 +104,13 @@ const RewardSpinner = React.forwardRef<RewardSpinnerHandle, RewardSpinnerProps>(
     }, [rewards])
 
     const performSpin = useCallback(async () => {
-      console.log('performSpin called', { isSpinning, disabled, rewardsLength: rewards.length });
-      
       if (isSpinning || disabled || !rewards.length) {
-        console.log('performSpin blocked by conditions', { isSpinning, disabled, rewardsLength: rewards.length });
         return;
       }
 
       const container = containerRef.current
       const track = trackRef.current
       if (!container || !track) {
-        console.log('performSpin blocked - missing refs', { container: !!container, track: !!track });
         return;
       }
 
@@ -151,19 +157,50 @@ const RewardSpinner = React.forwardRef<RewardSpinnerHandle, RewardSpinnerProps>(
       const speedOption = SPEED_OPTIONS.find(option => option.value === currentSpeed)
       const duration = speedOption?.duration || SPIN_DURATION
 
-      requestAnimationFrame(() => {
-        track.style.transition = `transform ${duration}ms cubic-bezier(0.2, 0.8, 0.2, 1)`
-        track.style.transform = `translateX(-${targetOffset}px)`
-      })
+      // Create a multi-stage animation for realistic acceleration/deceleration
+      const startTime = Date.now()
+      let animationId: number
 
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current)
+      const animate = () => {
+        const elapsed = Date.now() - startTime
+        const progress = Math.min(elapsed / duration, 1)
+        
+        // Create a more dramatic speed curve with pronounced acceleration and deceleration
+        let easedProgress: number
+        
+        if (progress < 0.15) {
+          // Gradual acceleration (0-15% of animation)
+          easedProgress = Math.pow(progress / 0.15, 2) * 0.1 // Quadratic ease-in
+        } else if (progress < 0.75) {
+          // High speed section (15-75% of animation)
+          const middleProgress = (progress - 0.15) / 0.6
+          easedProgress = 0.1 + middleProgress * 0.8 // Linear fast section
+        } else {
+          // Dramatic deceleration (75-100% of animation)
+          const endProgress = (progress - 0.75) / 0.25
+          easedProgress = 0.9 + (1 - Math.pow(1 - endProgress, 4)) * 0.1 // Quartic ease-out for dramatic slowdown
+        }
+        
+        const currentOffset = targetOffset * easedProgress
+        track.style.transform = `translateX(-${currentOffset}px)`
+        
+        if (progress < 1) {
+          animationId = requestAnimationFrame(animate)
+        } else {
+          setSelectedReward(winningReward!)
+          setIsSpinning(false)
+        }
       }
 
-      timeoutRef.current = setTimeout(() => {
-        setSelectedReward(winningReward!)
-        setIsSpinning(false)
-      }, duration)
+      // Start the animation
+      animationId = requestAnimationFrame(animate)
+
+      // Cleanup function
+      return () => {
+        if (animationId) {
+          cancelAnimationFrame(animationId)
+        }
+      }
     }, [disabled, isSpinning, onSpin, repeatedRewards.length, rewards, currentSpeed])
 
     useImperativeHandle(
@@ -177,9 +214,10 @@ const RewardSpinner = React.forwardRef<RewardSpinnerHandle, RewardSpinnerProps>(
     )
 
     useEffect(() => {
+      const timeout = timeoutRef.current
       return () => {
-        if (timeoutRef.current) {
-          clearTimeout(timeoutRef.current)
+        if (timeout) {
+          clearTimeout(timeout)
         }
       }
     }, [])
@@ -212,11 +250,14 @@ const RewardSpinner = React.forwardRef<RewardSpinnerHandle, RewardSpinnerProps>(
                   <div
                     key={reward._repeatKey}
                     className={cn(
-                      "w-[220px] shrink-0 rounded-2xl border bg-white/10/50 px-5 py-6 backdrop-blur transition-all duration-300",
+                      "w-[220px] shrink-0 rounded-2xl border bg-white/10/50 px-5 py-6 backdrop-blur transition-all duration-500 ease-out",
                       isSelected
-                        ? "border-amber-400 shadow-[0_0_60px_rgba(251,191,36,0.8)] scale-[1.08] ring-4 ring-amber-400/70 bg-gradient-to-br from-amber-500/20 to-yellow-500/10"
-                        : "border-white/10"
+                        ? "border-amber-400 shadow-[0_0_60px_rgba(251,191,36,0.8)] scale-[1.02] ring-4 ring-amber-400/70 bg-gradient-to-br from-amber-500/20 to-yellow-500/10"
+                        : "border-white/10 hover:border-white/20 hover:bg-white/15"
                     )}
+                    style={isSelected ? {
+                      animation: 'subtle-bounce 2s ease-in-out infinite'
+                    } : undefined}
                   >
                     <div className="mb-3 flex items-center justify-between">
                       <Badge
@@ -232,12 +273,13 @@ const RewardSpinner = React.forwardRef<RewardSpinnerHandle, RewardSpinnerProps>(
                     </div>
 
                     <div className="relative mx-auto mb-4 h-32 w-full overflow-hidden rounded-xl">
-                      <Image
+                        <SmartImage
                         src={reward.image}
                         alt={reward.name}
                         fill
                         sizes="200px"
-                        className="object-cover hover:scale-105 transition-transform duration-300"
+                        className="object-contain transition-transform duration-500 ease-out hover:scale-110"
+                        priority={true}
                       />
                     </div>
 
@@ -315,14 +357,13 @@ const RewardSpinner = React.forwardRef<RewardSpinnerHandle, RewardSpinnerProps>(
               <Button
                 size="lg"
                 className={cn(
-                  "relative z-10 w-full text-lg font-pricedown text-white shadow-2xl transition-all duration-300",
+                  "relative z-10 w-full text-lg font-pricedown text-white shadow-2xl transition-all duration-500 ease-out",
                   isSpinning || disabled || !rewards.length
                     ? "bg-gradient-to-r from-gray-500 to-gray-600 cursor-not-allowed"
-                    : "bg-gradient-to-r from-purple-500 via-pink-500 to-yellow-500 hover:from-purple-600 hover:via-pink-600 hover:to-yellow-600 hover:scale-110 hover:shadow-purple-500/50 animate-pulse"
+                    : "bg-gradient-to-r from-purple-500 via-pink-500 to-yellow-500 hover:from-purple-600 hover:via-pink-600 hover:to-yellow-600 hover:scale-105 hover:shadow-purple-500/50 animate-pulse"
                 )}
                 disabled={isSpinning || disabled || !rewards.length}
                 onClick={() => {
-                  console.log('Button clicked!', { isSpinning, disabled, rewardsLength: rewards.length });
                   void performSpin();
                 }}
               >

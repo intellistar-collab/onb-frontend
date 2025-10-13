@@ -87,15 +87,22 @@ const TopBar = () => {
               className="text-white hover:bg-gray-800 p-1 sm:p-2"
             >
               {isMobileMenuOpen ? (
-                <X className="h-5 w-5 sm:h-6 sm:w-6" />
+                <X className="h-5 w-5 sm:h-6 sm:w-6" suppressHydrationWarning />
               ) : (
-                <Menu className="h-5 w-5 sm:h-6 sm:w-6" />
+                <Menu className="h-5 w-5 sm:h-6 sm:w-6" suppressHydrationWarning />
               )}
             </Button>
           </div>
 
           <div className="flex-shrink-0">
-            <Image src="/logo.svg" height={150} width={150} alt="logo" />
+            <Image 
+              src="/logo.svg" 
+              height={150} 
+              width={150} 
+              alt="logo" 
+              style={{ width: "auto", height: "auto" }}
+              suppressHydrationWarning
+            />
           </div>
 
           {/* Right Side - Desktop */}
@@ -109,7 +116,7 @@ const TopBar = () => {
                   className="text-white hover:bg-gray-800 text-xs md:text-sm lg:text-base px-2 lg:px-3"
                 >
                   £ GBP
-                  <ChevronDown className="ml-1 h-3 w-3 md:h-4 md:w-4" />
+                  <ChevronDown className="ml-1 h-3 w-3 md:h-4 md:w-4" suppressHydrationWarning />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="bg-gray-800 border-gray-700">
@@ -134,7 +141,7 @@ const TopBar = () => {
                   className="text-white hover:bg-gray-800 text-xs md:text-sm lg:text-base px-2 lg:px-3"
                 >
                   EN
-                  <ChevronDown className="ml-1 h-3 w-3 md:h-4 md:w-4" />
+                  <ChevronDown className="ml-1 h-3 w-3 md:h-4 md:w-4" suppressHydrationWarning />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="bg-gray-800 border-gray-700">
@@ -157,9 +164,9 @@ const TopBar = () => {
                     variant="ghost"
                     className="text-white hover:bg-gray-800 text-xs md:text-sm lg:text-base px-2 lg:px-3 flex items-center gap-2"
                   >
-                    <User className="h-4 w-4" />
+                    <User className="h-4 w-4" suppressHydrationWarning />
                     {user?.name || user?.username || "User"}
-                    <ChevronDown className="ml-1 h-3 w-3 md:h-4 md:w-4" />
+                    <ChevronDown className="ml-1 h-3 w-3 md:h-4 md:w-4" suppressHydrationWarning />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="bg-gray-800 border-gray-700 w-48">
@@ -174,14 +181,14 @@ const TopBar = () => {
                     className="text-white hover:bg-gray-700 text-xs md:text-sm cursor-pointer"
                     onClick={() => router.push("/account")}
                   >
-                    <User className="mr-2 h-4 w-4" />
+                    <User className="mr-2 h-4 w-4" suppressHydrationWarning />
                     Account
                   </DropdownMenuItem>
                   <DropdownMenuItem 
                     className="text-white hover:bg-gray-700 text-xs md:text-sm cursor-pointer"
                     onClick={() => router.push("/account/settings")}
                   >
-                    <Settings className="mr-2 h-4 w-4" />
+                    <Settings className="mr-2 h-4 w-4" suppressHydrationWarning />
                     Settings
                   </DropdownMenuItem>
                   {isAdmin && (
@@ -189,7 +196,7 @@ const TopBar = () => {
                       className="text-white hover:bg-gray-700 text-xs md:text-sm cursor-pointer"
                       onClick={() => router.push("/admin/dashboard")}
                     >
-                      <Settings className="mr-2 h-4 w-4" />
+                      <Settings className="mr-2 h-4 w-4" suppressHydrationWarning />
                       Admin Dashboard
                     </DropdownMenuItem>
                   )}
@@ -198,7 +205,7 @@ const TopBar = () => {
                     className="text-white hover:bg-gray-700 text-xs md:text-sm cursor-pointer"
                     onClick={logout}
                   >
-                    <LogOut className="mr-2 h-4 w-4" />
+                    <LogOut className="mr-2 h-4 w-4" suppressHydrationWarning />
                     Sign Out
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -257,7 +264,7 @@ const TopBar = () => {
                       className="text-white hover:bg-gray-800 text-sm sm:text-base px-2 py-1"
                     >
                       £ GBP
-                      <ChevronDown className="ml-1 h-3 w-3 sm:h-4 sm:w-4" />
+                      <ChevronDown className="ml-1 h-3 w-3 sm:h-4 sm:w-4" suppressHydrationWarning />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="bg-gray-800 border-gray-700">
@@ -280,7 +287,7 @@ const TopBar = () => {
                       className="text-white hover:bg-gray-800 text-sm sm:text-base px-2 py-1"
                     >
                       EN
-                      <ChevronDown className="ml-1 h-3 w-3 sm:h-4 sm:w-4" />
+                      <ChevronDown className="ml-1 h-3 w-3 sm:h-4 sm:w-4" suppressHydrationWarning />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="bg-gray-800 border-gray-700">
@@ -315,7 +322,7 @@ const TopBar = () => {
                       setIsMobileMenuOpen(false);
                     }}
                   >
-                    <User className="mr-2 h-4 w-4" />
+                    <User className="mr-2 h-4 w-4" suppressHydrationWarning />
                     Account
                   </Button>
                   <Button
@@ -326,7 +333,7 @@ const TopBar = () => {
                       setIsMobileMenuOpen(false);
                     }}
                   >
-                    <Settings className="mr-2 h-4 w-4" />
+                    <Settings className="mr-2 h-4 w-4" suppressHydrationWarning />
                     Settings
                   </Button>
                   {isAdmin && (
@@ -338,7 +345,7 @@ const TopBar = () => {
                         setIsMobileMenuOpen(false);
                       }}
                     >
-                      <Settings className="mr-2 h-4 w-4" />
+                      <Settings className="mr-2 h-4 w-4" suppressHydrationWarning />
                       Admin Dashboard
                     </Button>
                   )}
@@ -350,7 +357,7 @@ const TopBar = () => {
                       setIsMobileMenuOpen(false);
                     }}
                   >
-                    <LogOut className="mr-2 h-4 w-4" />
+                    <LogOut className="mr-2 h-4 w-4" suppressHydrationWarning />
                     Sign Out
                   </Button>
                 </div>

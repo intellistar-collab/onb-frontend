@@ -11,7 +11,7 @@ export default function SignupPage() {
       <div className="hidden lg:grid lg:grid-cols-12 lg:min-h-screen">
         <div className="relative bg-gray-900 lg:col-span-7">
           <Image
-            src="/signup.webp"
+            src="/hero.webp"
             alt="Signup Background"
             fill
             className="object-cover opacity-40"
@@ -44,7 +44,7 @@ export default function SignupPage() {
         {/* Mobile Header with Background */}
         <div className="relative bg-gray-900 h-48 sm:h-56">
           <Image
-            src="/signup.webp"
+            src="/hero.webp"
             alt="Signup Background"
             fill
             className="object-cover opacity-40"

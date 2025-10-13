@@ -5,14 +5,14 @@ export interface Box {
   title: string;
   description?: string;
   location: string;
-  price: number;
+  price: number | string;
   imageUrl: string;
   backgroundImage?: string;
   isActive: boolean;
   order: number;
   boxCategoryId: string;
   purchasedCount: number;
-  totalRevenue: number;
+  totalRevenue: number | string;
   totalPayout: number;
   exchangeablePayout: number;
   retainedProfitPercentage: number;

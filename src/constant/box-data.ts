@@ -7,6 +7,7 @@ export interface BoxReward {
   price: string
   odds: string
   tier: RewardTier
+  description?: string
 }
 
 export interface BoxStat {
