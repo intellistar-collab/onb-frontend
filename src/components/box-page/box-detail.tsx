@@ -182,7 +182,7 @@ const RewardCard: React.FC<{ reward: BoxReward }> = ({ reward }) => {
                 variant="outline"
                 size="sm"
                 className="w-full bg-white/5 border-white/20 text-white hover:bg-white/10 hover:border-white/30"
-                onClick={() => window.open(`/admin/items/${reward.id}`, '_blank')}
+                onClick={() => window.open(`/item/${reward.id}`, '_blank')}
               >
                 <ExternalLink className="w-4 h-4 mr-2" />
                 More Information
