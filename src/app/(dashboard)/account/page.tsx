@@ -1,27 +1,16 @@
 "use client";
 
-import { AccountProfile, AccountStats, AccountSettings, AccountLayout } from "@/components/account";
+import { AccountOverview, AccountSettings, AccountLayout } from "@/components/account";
 
 export default function AccountPage() {
   return (
-    <AccountLayout
-      title="My Account"
-      description="Manage your profile, settings, and view your statistics"
-      icon="👤"
-    >
-      <div className="flex flex-col xl:flex-row gap-6">
-        {/* Left Column - Profile and Stats */}
-        <div className="w-full xl:w-80 flex-shrink-0">
-          <div className="space-y-6">
-            <AccountProfile />
-            <AccountStats />
-          </div>
-        </div>
-
-        {/* Right Column - Settings */}
-        <div className="flex-1 min-w-0">
-          <AccountSettings />
-        </div>
+    <AccountLayout>
+      <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-6">
+        {/* Left Column - Merged Profile with Stats (1/3 width) */}
+        <AccountOverview />
+        
+        {/* Right Column - Settings (2/3 width) */}
+        <AccountSettings />
       </div>
     </AccountLayout>
   );

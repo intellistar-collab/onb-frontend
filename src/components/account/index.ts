@@ -1,5 +1,4 @@
-export { default as AccountProfile } from "./account-profile";
-export { default as AccountStats } from "./account-stats";
+export { default as AccountOverview } from "./account-overview";
 export { default as AccountSettings } from "./account-settings";
 export { default as AccountWallet } from "./account-wallet";
 export { default as AccountPacks } from "./account-packs";
