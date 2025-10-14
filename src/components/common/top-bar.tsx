@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { Menu, X, ChevronDown, User, LogOut, Settings } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Menu, X, ChevronDown, User, LogOut, Settings, Wallet, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -34,6 +34,7 @@ const TopBar = () => {
       if (!Number.isNaN(parsed) && parsed >= 0) setNewBoxCount(parsed);
     } catch {}
   }, []);
+
 
   const navItems = [
     { name: "HOME", href: "/" },
@@ -175,6 +176,36 @@ const TopBar = () => {
                     <div className="text-xs text-gray-400">{user?.email}</div>
                     {isAdmin && (
                       <div className="text-xs text-pink-400 font-medium">Admin</div>
+                    )}
+                  </div>
+                  
+                  {/* Wallet Balance and Score */}
+                  <div className="px-3 py-2 border-b border-gray-700">
+                    {user?.wallet && user?.score ? (
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Wallet className="h-4 w-4 text-green-400" />
+                            <span className="text-xs text-gray-300">Balance</span>
+                          </div>
+                          <span className="text-sm font-medium text-green-400">
+                            ${Number(user.wallet.balance || 0).toFixed(2)}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Trophy className="h-4 w-4 text-yellow-400" />
+                            <span className="text-xs text-gray-300">Score</span>
+                          </div>
+                          <span className="text-sm font-medium text-yellow-400">
+                            {Number(user.score.score || 0).toLocaleString()}
+                          </span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-xs text-gray-500 text-center py-2">
+                        Loading wallet data...
+                      </div>
                     )}
                   </div>
                   <DropdownMenuItem 

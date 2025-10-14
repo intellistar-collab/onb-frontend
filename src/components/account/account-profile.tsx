@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { profileAPI, UserProfile, UpdateProfileData } from "@/lib/api/account";
+import { useToast } from "@/components/ui/toast";
 
 export default function AccountProfile() {
+  const { toast } = useToast();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [formData, setFormData] = useState<UpdateProfileData>({
     firstName: "",
@@ -24,8 +26,6 @@ export default function AccountProfile() {
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -51,7 +51,7 @@ export default function AccountProfile() {
           gender: profileData.gender || "",
         });
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load profile');
+        console.error('Failed to load profile:', err);
       } finally {
         setLoading(false);
       }
@@ -73,8 +73,6 @@ export default function AccountProfile() {
     e.preventDefault();
     try {
       setSaving(true);
-      setError(null);
-      setSuccess(null);
 
       // Prepare data for API - convert date to ISO format if provided
       const apiData = {
@@ -86,9 +84,21 @@ export default function AccountProfile() {
 
       const updatedProfile = await profileAPI.updateProfile(apiData);
       setProfile(updatedProfile);
-      setSuccess('Profile updated successfully!');
+      
+      toast({
+        title: "Success!",
+        description: "Profile updated successfully!",
+        variant: "success",
+        durationMs: 3000,
+      });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update profile');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to update profile';
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+        durationMs: 5000,
+      });
     } finally {
       setSaving(false);
     }
@@ -110,18 +120,6 @@ export default function AccountProfile() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {error && (
-        <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-          <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>
-        </div>
-      )}
-      
-      {success && (
-        <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-          <p className="text-green-600 dark:text-green-400 text-sm">{success}</p>
-        </div>
-      )}
-
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <input 

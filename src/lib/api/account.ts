@@ -427,3 +427,42 @@ export const preferencesAPI = {
     return response.json();
   },
 };
+
+// Wallet and Score API
+export interface WalletScoreData {
+  wallet: {
+    id: string;
+    balance: number;
+    createdAt: string;
+    updatedAt: string;
+  };
+  score: {
+    id: number;
+    score: number;
+    source: string;
+    createdAt: string;
+  };
+}
+
+export const walletScoreAPI = {
+  async getWalletAndScore(): Promise<WalletScoreData> {
+    const response = await fetch(`${API_BASE_URL}/api/account/wallet-score`, {
+      method: 'GET',
+      headers: await getAuthHeaders(),
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        throw new Error('Unauthorized');
+      }
+      if (response.status === 403) {
+        throw new Error('Forbidden');
+      }
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to get wallet and score');
+    }
+
+    return response.json();
+  },
+};

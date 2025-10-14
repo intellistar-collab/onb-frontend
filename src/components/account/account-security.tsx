@@ -2,20 +2,18 @@
 
 import { useState } from "react";
 import { securityAPI, ChangePasswordData } from "@/lib/api/account";
+import { useToast } from "@/components/ui/toast";
 
 export default function AccountSecurity() {
+  const { toast } = useToast();
   const [passwordData, setPasswordData] = useState<ChangePasswordData>({
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
   const [changingPassword, setChangingPassword] = useState(false);
-  const [passwordError, setPasswordError] = useState<string | null>(null);
-  const [passwordSuccess, setPasswordSuccess] = useState<string | null>(null);
   
   const [enabling2FA, setEnabling2FA] = useState(false);
-  const [twoFactorError, setTwoFactorError] = useState<string | null>(null);
-  const [twoFactorSuccess, setTwoFactorSuccess] = useState<string | null>(null);
   const [qrCode, setQrCode] = useState<string | null>(null);
   const [twoFactorSecret, setTwoFactorSecret] = useState<string | null>(null);
   const [verificationToken, setVerificationToken] = useState("");
@@ -32,29 +30,50 @@ export default function AccountSecurity() {
     e.preventDefault();
     
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setPasswordError("New passwords do not match");
+      toast({
+        title: "Validation Error",
+        description: "New passwords do not match",
+        variant: "destructive",
+        durationMs: 4000,
+      });
       return;
     }
 
     if (passwordData.newPassword.length < 8) {
-      setPasswordError("New password must be at least 8 characters long");
+      toast({
+        title: "Validation Error",
+        description: "New password must be at least 8 characters long",
+        variant: "destructive",
+        durationMs: 4000,
+      });
       return;
     }
 
     try {
       setChangingPassword(true);
-      setPasswordError(null);
-      setPasswordSuccess(null);
 
       await securityAPI.changePassword(passwordData);
-      setPasswordSuccess('Password changed successfully!');
+      
+      toast({
+        title: "Success!",
+        description: "Password changed successfully!",
+        variant: "success",
+        durationMs: 3000,
+      });
+      
       setPasswordData({
         currentPassword: "",
         newPassword: "",
         confirmPassword: "",
       });
     } catch (err) {
-      setPasswordError(err instanceof Error ? err.message : 'Failed to change password');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to change password';
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+        durationMs: 5000,
+      });
     } finally {
       setChangingPassword(false);
     }
@@ -63,14 +82,25 @@ export default function AccountSecurity() {
   const handleEnable2FA = async () => {
     try {
       setEnabling2FA(true);
-      setTwoFactorError(null);
-      setTwoFactorSuccess(null);
 
       const result = await securityAPI.enable2FA();
       setQrCode(result.qrCode);
       setTwoFactorSecret(result.secret);
+      
+      toast({
+        title: "2FA Setup",
+        description: "QR code generated. Please scan with your authenticator app.",
+        variant: "success",
+        durationMs: 4000,
+      });
     } catch (err) {
-      setTwoFactorError(err instanceof Error ? err.message : 'Failed to enable 2FA');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to enable 2FA';
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+        durationMs: 5000,
+      });
     } finally {
       setEnabling2FA(false);
     }
@@ -78,21 +108,38 @@ export default function AccountSecurity() {
 
   const handleVerify2FA = async () => {
     if (!verificationToken) {
-      setTwoFactorError("Please enter the verification code");
+      toast({
+        title: "Validation Error",
+        description: "Please enter the verification code",
+        variant: "destructive",
+        durationMs: 4000,
+      });
       return;
     }
 
     try {
       setEnabling2FA(true);
-      setTwoFactorError(null);
 
       await securityAPI.verify2FA(verificationToken);
-      setTwoFactorSuccess('2FA enabled successfully!');
+      
+      toast({
+        title: "Success!",
+        description: "2FA enabled successfully!",
+        variant: "success",
+        durationMs: 3000,
+      });
+      
       setQrCode(null);
       setTwoFactorSecret(null);
       setVerificationToken("");
     } catch (err) {
-      setTwoFactorError(err instanceof Error ? err.message : 'Failed to verify 2FA');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to verify 2FA';
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+        durationMs: 5000,
+      });
     } finally {
       setEnabling2FA(false);
     }
@@ -103,18 +150,6 @@ export default function AccountSecurity() {
       {/* Password Change Section */}
       <div>
         <h4 className="text-lg font-semibold text-foreground mb-4">Password & Security</h4>
-        
-        {passwordError && (
-          <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg mb-4">
-            <p className="text-red-600 dark:text-red-400 text-sm">{passwordError}</p>
-          </div>
-        )}
-        
-        {passwordSuccess && (
-          <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg mb-4">
-            <p className="text-green-600 dark:text-green-400 text-sm">{passwordSuccess}</p>
-          </div>
-        )}
 
         <form onSubmit={handlePasswordSubmit} className="space-y-4">
           <div>
@@ -166,17 +201,6 @@ export default function AccountSecurity() {
         <h5 className="font-medium text-foreground mb-3">Two-Factor Authentication</h5>
         <p className="text-sm text-muted-foreground mb-4">Add an extra layer of security to your account</p>
         
-        {twoFactorError && (
-          <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg mb-4">
-            <p className="text-red-600 dark:text-red-400 text-sm">{twoFactorError}</p>
-          </div>
-        )}
-        
-        {twoFactorSuccess && (
-          <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg mb-4">
-            <p className="text-green-600 dark:text-green-400 text-sm">{twoFactorSuccess}</p>
-          </div>
-        )}
 
         {!qrCode ? (
           <button 

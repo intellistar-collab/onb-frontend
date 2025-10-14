@@ -1,8 +1,9 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
+import { walletScoreAPI } from "@/lib/api/account";
 
 interface User {
   id: string;
@@ -13,6 +14,18 @@ interface User {
   avatar: string | null;
   createdAt: Date;
   updatedAt: Date;
+  wallet?: {
+    id: string;
+    balance: number;
+    createdAt: string;
+    updatedAt: string;
+  };
+  score?: {
+    id: number;
+    score: number;
+    source: string;
+    createdAt: string;
+  };
 }
 
 interface AuthContextType {
@@ -50,7 +63,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const isAuthenticated = !!user;
   const isAdmin = user?.role === "ADMIN";
 
-  const refreshUser = async () => {
+  const fetchWalletAndScore = async () => {
+    try {
+      const walletScoreData = await walletScoreAPI.getWalletAndScore();
+      return walletScoreData;
+    } catch (error) {
+      console.error("Failed to fetch wallet and score:", error);
+      return null;
+    }
+  };
+
+  const refreshUser = useCallback(async () => {
     try {
       console.log("Refreshing user session...");
       const session = await authClient.getSession();
@@ -59,6 +82,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (session.data?.user) {
         const userData = session.data.user as any;
         console.log("User data found:", userData);
+        
+        // Fetch wallet and score data
+        const walletScoreData = await fetchWalletAndScore();
+        
         setUser({
           id: userData.id,
           email: userData.email,
@@ -68,6 +95,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           avatar: userData.image || userData.avatar || null,
           createdAt: userData.createdAt,
           updatedAt: userData.updatedAt,
+          wallet: walletScoreData?.wallet,
+          score: walletScoreData?.score,
         });
       } else {
         console.log("No user data in session");
@@ -81,7 +110,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setUser(null);
       }
     }
-  };
+  }, []);
 
   const login = async (email: string, password: string, rememberMe = false) => {
     try {
@@ -212,7 +241,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
 
     initializeAuth();
-  }, []);
+  }, [refreshUser]);
 
   const value: AuthContextType = {
     user,
