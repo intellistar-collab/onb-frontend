@@ -99,7 +99,7 @@ const Hero = () => {
       </div>
 
       {/* What We Do Card - Integrated with Background */}
-      <div className="absolute top-8 left-6 w-72">
+      <div className="absolute top-4 left-4 md:top-8 md:left-6 w-64 md:w-72">
         <div className="group relative">
           <div className="absolute -inset-0.5 bg-gradient-to-r from-pink-500/20 to-purple-500/20 rounded-xl blur opacity-40 group-hover:opacity-60 transition duration-500"></div>
           <div className="relative bg-black/30 backdrop-blur-sm rounded-xl p-5 border border-white/10 hover:border-pink-400/30 transition-all duration-300 group-hover:scale-102 shadow-sm">
@@ -107,9 +107,9 @@ const Hero = () => {
               <div className="p-2.5 bg-gradient-to-r from-pink-500/80 to-purple-500/80 rounded-lg shadow-sm">
                 <Gift className="h-5 w-5 text-white" />
               </div>
-              <h2 className="text-lg font-oswald text-white font-bold drop-shadow-lg">What We Do</h2>
+              <h2 className="text-base md:text-lg font-oswald text-white font-bold drop-shadow-lg">What We Do</h2>
             </div>
-            <div className="text-sm text-white/90 leading-relaxed drop-shadow-md space-y-1">
+            <div className="text-xs md:text-sm text-white/90 leading-relaxed drop-shadow-md space-y-1">
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 bg-pink-400 rounded-full animate-pulse"></span>
                 <span className="font-semibold text-pink-300">Experience life-changing trips</span>
@@ -131,7 +131,7 @@ const Hero = () => {
       </div>
 
       {/* What To Do Card with Integrated Adventure Button - Integrated with Background */}
-      <div className="absolute bottom-8 right-6 w-72">
+      <div className="absolute bottom-4 right-4 md:bottom-8 md:right-6 w-64 md:w-72">
         <div className="group relative">
           <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-xl blur opacity-40 group-hover:opacity-60 transition duration-500"></div>
           <div className="relative bg-black/30 backdrop-blur-sm rounded-xl p-5 border border-white/10 hover:border-blue-400/30 transition-all duration-300 group-hover:scale-102 shadow-sm">
@@ -139,9 +139,9 @@ const Hero = () => {
               <div className="p-2.5 bg-gradient-to-r from-blue-500/80 to-cyan-500/80 rounded-lg shadow-sm">
                 <Plane className="h-5 w-5 text-white" />
               </div>
-              <h2 className="text-lg font-oswald text-white font-bold drop-shadow-lg">What To Do</h2>
+              <h2 className="text-base md:text-lg font-oswald text-white font-bold drop-shadow-lg">What To Do</h2>
             </div>
-            <div className="text-sm text-white/90 leading-relaxed mb-4 drop-shadow-md space-y-1">
+            <div className="text-xs md:text-sm text-white/90 leading-relaxed mb-4 drop-shadow-md space-y-1">
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></span>
                 <span className="font-semibold text-cyan-300">Win life-changing trips</span>

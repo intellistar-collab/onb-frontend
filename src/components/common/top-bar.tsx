@@ -17,12 +17,15 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import EnhancedNotificationIndicator from "./enhanced-notification-indicator";
 import { useAuth } from "@/contexts/auth-context";
+import AuthDialogs from "@/components/auth/auth-dialogs";
 
 const hiddenPaths = ["/signup", "/login"];
 
 const TopBar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [newBoxCount, setNewBoxCount] = useState<number>(3);
+  const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
+  const [authDialogTab, setAuthDialogTab] = useState<"login" | "register">("login");
   const router = useRouter();
   const pathname = usePathname();
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
@@ -34,6 +37,16 @@ const TopBar = () => {
       if (!Number.isNaN(parsed) && parsed >= 0) setNewBoxCount(parsed);
     } catch {}
   }, []);
+
+  const openAuthDialog = () => {
+    setAuthDialogTab("login");
+    setIsAuthDialogOpen(true);
+  };
+
+  const closeAuthDialog = () => {
+    setAuthDialogTab("login");
+    setIsAuthDialogOpen(false);
+  };
 
 
   const navItems = [
@@ -243,16 +256,13 @@ const TopBar = () => {
               </DropdownMenu>
             ) : (
               <div className="bg-gray-500/40 rounded-md p-1 gap-2">
-                <Link href="/login">
-                  <Button variant="ghost">
-                    SIGN IN
-                  </Button>
-                </Link>
-                <Link href="/signup">
-                  <Button className="bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white font-medium">
-                    SIGN UP
-                  </Button>
-                </Link>
+                <Button 
+                variant="ghost" 
+                  className="bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white font-medium"
+                  onClick={openAuthDialog}
+                >
+                  SIGN IN
+                </Button>
               </div>
             )}
           </div>
@@ -394,25 +404,29 @@ const TopBar = () => {
                 </div>
               ) : (
                 <div className="px-3 py-2 space-y-2">
-                  <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
-                    <Button
-                      variant="ghost"
-                      className="w-full text-white hover:bg-gray-800 justify-start text-sm sm:text-base py-2"
-                    >
-                      SIGN IN
-                    </Button>
-                  </Link>
-                  <Link href="/signup" onClick={() => setIsMobileMenuOpen(false)}>
-                    <Button className="w-full bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white font-medium text-sm sm:text-base py-2">
-                      SIGN UP
-                    </Button>
-                  </Link>
+                  <Button
+                    variant="ghost"
+                    className="w-full text-white hover:bg-gray-800 justify-start text-sm sm:text-base py-2"
+                    onClick={() => {
+                      openAuthDialog();
+                      setIsMobileMenuOpen(false);
+                    }}
+                  >
+                    SIGN IN
+                  </Button>
                 </div>
               )}
             </div>
           </div>
         )}
       </div>
+      
+      {/* Auth Dialogs */}
+      <AuthDialogs 
+        isOpen={isAuthDialogOpen} 
+        onClose={closeAuthDialog} 
+        defaultTab={authDialogTab}
+      />
     </nav>
   );
 };

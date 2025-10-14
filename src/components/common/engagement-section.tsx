@@ -10,7 +10,7 @@ const EngagementSection = () => {
   return (
     <section className="relative space-y-8">
       {/* Request Box + Community */}
-      <div className="grid lg:grid-cols-2 gap-6 h-[300px]">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-[250px] lg:h-[300px]">
         {/* Left: Request Box */}
         <div className="relative group rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
           {/* Background image */}

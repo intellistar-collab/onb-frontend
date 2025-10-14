@@ -28,14 +28,12 @@ export default function ConditionalLayout({ children }: ConditionalLayoutProps) 
   
   // For non-admin routes, render the full layout with navigation
   return (
-    <>
+    <ToastProvider>
       <TopBar />
       <ExperienceBanner />
-      <ToastProvider>
-        {children}
-      </ToastProvider>
+      {children}
       <Footer />
       <FloatingUsersSidebar />
-    </>
+    </ToastProvider>
   );
 }

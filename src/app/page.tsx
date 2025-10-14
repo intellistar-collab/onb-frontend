@@ -96,7 +96,7 @@ const HomeScreen = () => {
 
       {/* Pimp Catcher + Leaderboard Section*/}
       <section className="mt-8">
-        <div className="grid md:grid-cols-[7fr_3fr] gap-6 h-[600px]">
+        <div className="grid grid-cols-1 md:grid-cols-[7fr_3fr] gap-6 min-h-[400px] md:h-[600px]">
           <PimpCatcher/>
           <Leaderboard />
         </div>

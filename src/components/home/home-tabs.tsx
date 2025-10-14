@@ -233,7 +233,7 @@ const HomeTabs = ({ categories, boxesByCategory }: HomeTabsProps) => {
                         title: box.title,
                         location: box.location,
                         image: box.imageUrl || "/home-card/onb-box.png",
-                        price: box.price ? `$${Number(box.price).toFixed(2)}` : "N/A",
+                        price: box.price ? String(box.price) : "N/A",
                         locked: !box.isActive,
                         requiredOpens: box.isActive ? undefined : 10,
                         href: `/box/${box.id}`
