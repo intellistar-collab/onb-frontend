@@ -108,25 +108,41 @@ export interface UpdatePreferencesData {
   };
 }
 
-// Helper function to get auth headers
-const getAuthHeaders = (): HeadersInit => {
+// Helper function to get auth headers (use better-auth client session)
+import { authClient } from "@/lib/auth-client";
+
+const getAuthHeaders = async (): Promise<HeadersInit> => {
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
   };
-  
-  // Get session token from cookies
-  if (typeof document !== 'undefined') {
-    const cookies = document.cookie.split(';');
-    const sessionCookie = cookies.find(cookie => 
-      cookie.trim().startsWith('better-auth.session_token=')
-    );
-    
-    if (sessionCookie) {
-      const token = sessionCookie.split('=')[1];
+
+  try {
+    const session = await authClient.getSession();
+    const token = session.data?.session?.token;
+    if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
+  } catch (_err) {
+    // Fallback to cookie parsing if session fetch fails (best-effort)
+    try {
+      if (typeof window !== 'undefined') {
+        const lsToken = localStorage.getItem('better-auth.session_token');
+        if (lsToken) {
+          headers['Authorization'] = `Bearer ${lsToken}`;
+          return headers;
+        }
+      }
+      if (typeof document !== 'undefined') {
+        const cookies = document.cookie.split(';');
+        const sessionCookie = cookies.find(cookie => cookie.trim().startsWith('better-auth.session_token='));
+        if (sessionCookie) {
+          const token = sessionCookie.split('=')[1];
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+      }
+    } catch (_e) {}
   }
-  
+
   return headers;
 };
 
@@ -135,7 +151,7 @@ export const profileAPI = {
   async getProfile(): Promise<UserProfile> {
     const response = await fetch(`${API_BASE_URL}/api/account/profile`, {
       method: 'GET',
-      headers: getAuthHeaders(),
+      headers: await getAuthHeaders(),
       credentials: 'include',
     });
 
@@ -156,7 +172,7 @@ export const profileAPI = {
   async updateProfile(data: UpdateProfileData): Promise<UserProfile> {
     const response = await fetch(`${API_BASE_URL}/api/account/profile`, {
       method: 'PUT',
-      headers: getAuthHeaders(),
+      headers: await getAuthHeaders(),
       credentials: 'include',
       body: JSON.stringify(data),
     });
@@ -179,9 +195,9 @@ export const profileAPI = {
 // Security API
 export const securityAPI = {
   async changePassword(data: ChangePasswordData): Promise<{ message: string }> {
-    const response = await fetch(`${API_BASE_URL}/api/account/security/change-password`, {
-      method: 'POST',
-      headers: getAuthHeaders(),
+    const response = await fetch(`${API_BASE_URL}/api/account/change-password`, {
+      method: 'PUT',
+      headers: await getAuthHeaders(),
       credentials: 'include',
       body: JSON.stringify(data),
     });
@@ -203,7 +219,7 @@ export const securityAPI = {
   async enable2FA(): Promise<{ qrCode: string; secret: string }> {
     const response = await fetch(`${API_BASE_URL}/api/account/security/enable-2fa`, {
       method: 'POST',
-      headers: getAuthHeaders(),
+      headers: await getAuthHeaders(),
       credentials: 'include',
     });
 
@@ -224,7 +240,7 @@ export const securityAPI = {
   async verify2FA(token: string): Promise<{ message: string }> {
     const response = await fetch(`${API_BASE_URL}/api/account/security/verify-2fa`, {
       method: 'POST',
-      headers: getAuthHeaders(),
+      headers: await getAuthHeaders(),
       credentials: 'include',
       body: JSON.stringify({ token }),
     });
@@ -249,7 +265,7 @@ export const walletAPI = {
   async getWallet(): Promise<WalletData> {
     const response = await fetch(`${API_BASE_URL}/api/account/wallet`, {
       method: 'GET',
-      headers: getAuthHeaders(),
+      headers: await getAuthHeaders(),
       credentials: 'include',
     });
 
@@ -270,7 +286,7 @@ export const walletAPI = {
   async updateWalletSettings(data: Partial<WalletData>): Promise<WalletData> {
     const response = await fetch(`${API_BASE_URL}/api/account/wallet`, {
       method: 'PUT',
-      headers: getAuthHeaders(),
+      headers: await getAuthHeaders(),
       credentials: 'include',
       body: JSON.stringify(data),
     });
@@ -292,7 +308,7 @@ export const walletAPI = {
   async getTransactions(page = 1, limit = 10): Promise<{ transactions: WalletTransaction[]; total: number; page: number; limit: number }> {
     const response = await fetch(`${API_BASE_URL}/api/account/wallet/transactions?page=${page}&limit=${limit}`, {
       method: 'GET',
-      headers: getAuthHeaders(),
+      headers: await getAuthHeaders(),
       credentials: 'include',
     });
 
@@ -313,7 +329,7 @@ export const walletAPI = {
   async addFunds(amount: number, paymentMethod: string): Promise<{ message: string; transactionId: string }> {
     const response = await fetch(`${API_BASE_URL}/api/account/wallet/add-funds`, {
       method: 'POST',
-      headers: getAuthHeaders(),
+      headers: await getAuthHeaders(),
       credentials: 'include',
       body: JSON.stringify({ amount, paymentMethod }),
     });
@@ -335,7 +351,7 @@ export const walletAPI = {
   async withdraw(amount: number, paymentMethod: string): Promise<{ message: string; transactionId: string }> {
     const response = await fetch(`${API_BASE_URL}/api/account/wallet/withdraw`, {
       method: 'POST',
-      headers: getAuthHeaders(),
+      headers: await getAuthHeaders(),
       credentials: 'include',
       body: JSON.stringify({ amount, paymentMethod }),
     });
@@ -360,7 +376,7 @@ export const preferencesAPI = {
   async getPreferences(): Promise<UserPreferences> {
     const response = await fetch(`${API_BASE_URL}/api/account/preferences`, {
       method: 'GET',
-      headers: getAuthHeaders(),
+      headers: await getAuthHeaders(),
       credentials: 'include',
     });
 
@@ -381,7 +397,7 @@ export const preferencesAPI = {
   async updatePreferences(data: UpdatePreferencesData): Promise<UserPreferences> {
     const response = await fetch(`${API_BASE_URL}/api/account/preferences`, {
       method: 'PUT',
-      headers: getAuthHeaders(),
+      headers: await getAuthHeaders(),
       credentials: 'include',
       body: JSON.stringify(data),
     });

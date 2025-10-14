@@ -36,7 +36,12 @@ const LoginForm = () => {
         return;
       }
 
+      console.log("Attempting login for:", email);
       const result = await login(email, password, rememberMe);
+      console.log("Login result:", result);
+
+      // Wait a bit for the auth state to update
+      await new Promise(resolve => setTimeout(resolve, 200));
 
       // Check user role and redirect accordingly
       const userRole = (result.data?.user as any)?.role;
@@ -55,7 +60,8 @@ const LoginForm = () => {
         durationMs: 2500,
       });
       
-      router.push(redirectTo);
+      // Use window.location.href for a full page reload to ensure auth state is properly set
+      window.location.href = redirectTo;
     } catch (err) {
       // Extract error message from the error object
       let errorMessage = "An unexpected error occurred";

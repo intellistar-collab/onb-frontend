@@ -12,6 +12,15 @@ export const authClient = createAuthClient({
       context.credentials = "include";
       context.headers.set("Content-Type", "application/json");
       context.headers.set("Accept", "application/json");
+      // Add Authorization header from stored token when available
+      try {
+        if (typeof window !== 'undefined') {
+          const token = localStorage.getItem('better-auth.session_token');
+          if (token) {
+            context.headers.set('Authorization', `Bearer ${token}`);
+          }
+        }
+      } catch (_e) {}
     },
   },
   plugins: [usernameClient(), adminClient()],

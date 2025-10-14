@@ -52,9 +52,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const refreshUser = async () => {
     try {
+      console.log("Refreshing user session...");
       const session = await authClient.getSession();
+      console.log("Session data:", session);
+      
       if (session.data?.user) {
         const userData = session.data.user as any;
+        console.log("User data found:", userData);
         setUser({
           id: userData.id,
           email: userData.email,
@@ -66,11 +70,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           updatedAt: userData.updatedAt,
         });
       } else {
+        console.log("No user data in session");
         setUser(null);
       }
     } catch (error) {
       console.error("Failed to refresh user:", error);
-      setUser(null);
+      // Don't immediately set user to null on error, might be temporary network issue
+      // Only set to null if it's a clear authentication error
+      if (error instanceof Error && error.message.includes('Unauthorized')) {
+        setUser(null);
+      }
     }
   };
 
@@ -86,6 +95,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         throw new Error(result.error.message || "Login failed");
       }
 
+      // Persist token locally to avoid third-party cookie blocking issues
+      try {
+        const token = (result.data as any)?.session?.token;
+        if (typeof window !== 'undefined' && token) {
+          localStorage.setItem('better-auth.session_token', token as string);
+        }
+      } catch (_e) {}
+
+      // Add a small delay to ensure cookie is set before refreshing user data
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       // Refresh user data after successful login
       await refreshUser();
       return result;
@@ -160,6 +180,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       await authClient.signOut();
       setUser(null);
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('better-auth.session_token');
+      }
       router.push("/");
     } catch (error) {
       console.error("Logout failed:", error);
@@ -169,12 +192,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const initializeAuth = async () => {
       try {
+        console.log("Initializing auth...");
         // Add a timeout to prevent hanging on slow network
         const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Auth timeout')), 3000)
+          setTimeout(() => reject(new Error('Auth timeout')), 5000)
         );
         
         await Promise.race([refreshUser(), timeoutPromise]);
+        console.log("Auth initialization completed");
       } catch (error) {
         console.error("Failed to initialize auth:", error);
         // Don't set user to null on timeout, just stop loading

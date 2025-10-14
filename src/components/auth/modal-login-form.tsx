@@ -36,7 +36,9 @@ const ModalLoginForm: React.FC<ModalLoginFormProps> = ({ onSuccess }) => {
         return;
       }
 
+      console.log("Attempting login for:", email);
       const result = await login(email, password, rememberMe);
+      console.log("Login result:", result);
 
       toast({
         title: "Welcome back!",
