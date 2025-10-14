@@ -63,15 +63,9 @@ export default function AccountProfile() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     
-    // Convert date input to ISO format for backend
-    let processedValue = value;
-    if (name === 'dob' && value) {
-      processedValue = new Date(value).toISOString();
-    }
-    
     setFormData(prev => ({
       ...prev,
-      [name]: processedValue
+      [name]: value
     }));
   };
 
@@ -82,7 +76,15 @@ export default function AccountProfile() {
       setError(null);
       setSuccess(null);
 
-      const updatedProfile = await profileAPI.updateProfile(formData);
+      // Prepare data for API - convert date to ISO format if provided
+      const apiData = {
+        ...formData,
+        dob: formData.dob && formData.dob.trim() !== "" 
+          ? new Date(formData.dob).toISOString() 
+          : ""
+      };
+
+      const updatedProfile = await profileAPI.updateProfile(apiData);
       setProfile(updatedProfile);
       setSuccess('Profile updated successfully!');
     } catch (err) {
