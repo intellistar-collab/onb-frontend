@@ -44,7 +44,12 @@ export interface UpdateProfileData {
 export interface ChangePasswordData {
   currentPassword: string;
   newPassword: string;
-  confirmPassword: string;
+  confirmPassword: string; // Frontend-only field for validation
+}
+
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
 }
 
 export interface WalletData {
@@ -195,11 +200,17 @@ export const profileAPI = {
 // Security API
 export const securityAPI = {
   async changePassword(data: ChangePasswordData): Promise<{ message: string }> {
+    // Only send currentPassword and newPassword to backend (exclude confirmPassword)
+    const requestData: ChangePasswordRequest = {
+      currentPassword: data.currentPassword,
+      newPassword: data.newPassword,
+    };
+
     const response = await fetch(`${API_BASE_URL}/api/account/change-password`, {
       method: 'PUT',
       headers: await getAuthHeaders(),
       credentials: 'include',
-      body: JSON.stringify(data),
+      body: JSON.stringify(requestData),
     });
 
     if (!response.ok) {
