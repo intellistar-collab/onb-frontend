@@ -1,9 +1,50 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
-import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { walletScoreAPI } from "@/lib/api/account";
+import { createAuthClient, type RequestContext } from "better-auth/client";
+import { usernameClient, adminClient } from "better-auth/client/plugins";
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:8000";
+
+// Define auth client directly in the context
+const authClient = createAuthClient({
+  baseURL: API_BASE_URL,
+  user: {},
+  fetchOptions: {
+    timeout: 8000, // Reduced timeout for faster failure detection
+    onRequest: (context: RequestContext) => {
+      console.log("📡 Auth request to:", context.url);
+      context.credentials = "include";
+      context.headers.set("Content-Type", "application/json");
+      context.headers.set("Accept", "application/json");
+      // Add Authorization header from stored token when available
+      try {
+        if (typeof window !== 'undefined') {
+          const token = localStorage.getItem('better-auth.session_token');
+          if (token) {
+            context.headers.set('Authorization', `Bearer ${token}`);
+          }
+        }
+      } catch (_e) {}
+    },
+    onError: (error) => {
+      console.error("❌ Auth request error:", error);
+    },
+  },
+  plugins: [usernameClient(), adminClient()],
+  // Performance optimizations
+  session: {
+    updateAge: 24 * 60 * 60, // 24 hours - reduce session update frequency
+    expiresIn: 7 * 24 * 60 * 60, // 7 days
+  },
+  // Enable caching for better performance
+  cache: {
+    enabled: true,
+    maxAge: 5 * 60 * 1000, // 5 minutes cache
+  },
+});
 
 interface User {
   id: string;
@@ -73,9 +114,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const refreshUser = useCallback(async () => {
+  const refreshUser = useCallback(async (forceRefresh = false) => {
     try {
       console.log("Refreshing user session...");
+      
+      // Check if we have cached user data and it's recent (within 5 minutes)
+      if (!forceRefresh && typeof window !== 'undefined') {
+        const cachedUser = localStorage.getItem('user');
+        const cacheTime = localStorage.getItem('user_cache_time');
+        
+        if (cachedUser && cacheTime) {
+          const cacheAge = Date.now() - parseInt(cacheTime);
+          if (cacheAge < 5 * 60 * 1000) { // 5 minutes
+            console.log("Using cached user data");
+            const user = JSON.parse(cachedUser);
+            setUser(user);
+            return;
+          }
+        }
+      }
+      
       const session = await authClient.getSession();
       console.log("Session data:", session);
       
@@ -83,8 +141,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const userData = session.data.user as any;
         console.log("User data found:", userData);
         
-        // Fetch wallet and score data
-        const walletScoreData = await fetchWalletAndScore();
+        // Fetch wallet and score data in parallel for better performance
+        const [walletScoreData] = await Promise.allSettled([
+          fetchWalletAndScore()
+        ]);
         
         const user = {
           id: userData.id,
@@ -92,19 +152,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           name: userData.name,
           username: userData.username || userData.name,
           role: userData.role || "USER",
-          avatar: userData.image || userData.avatar || null,
+          avatar: userData.avatar || null,
           createdAt: userData.createdAt,
           updatedAt: userData.updatedAt,
-          wallet: walletScoreData?.wallet,
-          score: walletScoreData?.score,
+          wallet: walletScoreData.status === 'fulfilled' ? walletScoreData.value?.wallet : undefined,
+          score: walletScoreData.status === 'fulfilled' ? walletScoreData.value?.score : undefined,
         };
         
         setUser(user);
         
-        // Store user data in localStorage for game access
+        // Store user data in localStorage with cache timestamp
         try {
           if (typeof window !== 'undefined') {
             localStorage.setItem('user', JSON.stringify(user));
+            localStorage.setItem('user_cache_time', Date.now().toString());
           }
         } catch (error) {
           console.error('Failed to store user data in localStorage:', error);
@@ -116,6 +177,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         try {
           if (typeof window !== 'undefined') {
             localStorage.removeItem('user');
+            localStorage.removeItem('user_cache_time');
           }
         } catch (error) {
           console.error('Failed to clear user data from localStorage:', error);
@@ -133,6 +195,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (email: string, password: string, rememberMe = false) => {
     try {
+      console.log("Attempting login...");
+      
       const result = await authClient.signIn.email({
         email,
         password,
@@ -143,19 +207,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         throw new Error(result.error.message || "Login failed");
       }
 
+      console.log("Login successful:", result);
+
       // Persist token locally to avoid third-party cookie blocking issues
       try {
         const token = (result.data as any)?.session?.token;
         if (typeof window !== 'undefined' && token) {
-          localStorage.setItem('better-auth.session_token', token as string);
+          localStorage.setItem('better-auth.session_token', token);
+          console.log("Token stored in localStorage");
         }
-      } catch (_e) {}
+      } catch (error) {
+        console.error("Failed to store token:", error);
+      }
 
-      // Add a small delay to ensure cookie is set before refreshing user data
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
-      // Refresh user data after successful login
-      await refreshUser();
+      // Refresh user data after successful login (force refresh to get latest data)
+      await refreshUser(true);
       return result;
     } catch (error) {
       console.error("Login failed:", error);
@@ -165,6 +231,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const loginWithGoogle = async (callbackURL?: string) => {
     try {
+      console.log("Attempting Google login...");
+      
       const result = await authClient.signIn.social({
         provider: "google",
         callbackURL: callbackURL || `${window.location.origin}/`,
@@ -173,6 +241,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (result.error) {
         throw new Error(result.error.message || "Google login failed");
       }
+
+      console.log("Google login successful:", result);
 
       // Refresh user data after successful login
       await refreshUser();
@@ -185,6 +255,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const signup = async (email: string, password: string, name: string) => {
     try {
+      console.log("Attempting signup...");
+      
       const result = await authClient.signUp.email({
         email,
         password,
@@ -194,6 +266,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (result.error) {
         throw new Error(result.error.message || "Signup failed");
       }
+
+      console.log("Signup successful:", result);
 
       // Refresh user data after successful signup
       await refreshUser();
@@ -206,6 +280,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const signupWithGoogle = async (callbackURL?: string) => {
     try {
+      console.log("Attempting Google signup...");
+      
       const result = await authClient.signIn.social({
         provider: "google",
         callbackURL: callbackURL || `${window.location.origin}/`,
@@ -214,6 +290,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (result.error) {
         throw new Error(result.error.message || "Google signup failed");
       }
+
+      console.log("Google signup successful:", result);
 
       // Refresh user data after successful signup
       await refreshUser();
@@ -226,7 +304,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = async () => {
     try {
+      console.log("Attempting logout...");
+      
       await authClient.signOut();
+      
       setUser(null);
       if (typeof window !== 'undefined') {
         localStorage.removeItem('better-auth.session_token');
@@ -235,6 +316,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       router.push("/");
     } catch (error) {
       console.error("Logout failed:", error);
+      // Still clear local state even if server logout fails
+      setUser(null);
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('better-auth.session_token');
+        localStorage.removeItem('user');
+      }
+      router.push("/");
     }
   };
 
@@ -244,7 +332,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         console.log("Initializing auth...");
         // Add a timeout to prevent hanging on slow network
         const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Auth timeout')), 5000)
+          setTimeout(() => reject(new Error('Auth timeout')), 8000)
         );
         
         await Promise.race([refreshUser(), timeoutPromise]);
