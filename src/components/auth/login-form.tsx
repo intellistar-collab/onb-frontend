@@ -12,7 +12,7 @@ import { useAuth } from "@/contexts/auth-context";
 
 const LoginForm = () => {
   const { toast } = useToast();
-  const { login, loginWithGoogle } = useAuth();
+  const { login, loginWithGoogle, isLoading: authLoading } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
@@ -22,8 +22,27 @@ const LoginForm = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  // Store redirect parameter in localStorage as backup when component mounts
+  React.useEffect(() => {
+    const redirectParam = searchParams.get('redirect');
+    if (redirectParam && typeof window !== 'undefined') {
+      localStorage.setItem('login_redirect', redirectParam);
+    }
+  }, [searchParams]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Don't allow submission while auth context is still loading
+    if (authLoading) {
+      toast({
+        title: "Please wait",
+        description: "Authentication system is still loading. Please try again in a moment.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setIsLoading(true);
     setError("");
 
@@ -45,8 +64,14 @@ const LoginForm = () => {
 
       // Check user role and redirect accordingly
       const userRole = (result.data?.user as any)?.role;
-      const redirectParam = searchParams.get('redirect');      
+      const redirectParam = searchParams.get('redirect') || 
+                           (typeof window !== 'undefined' ? localStorage.getItem('login_redirect') : null);      
       let redirectTo = redirectParam || '/';
+      
+      // Clear stored redirect after successful login
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('login_redirect');
+      }
       
       // If user is ADMIN and no specific redirect, go to admin dashboard
       if (userRole === 'ADMIN' && !redirectParam) {
@@ -75,6 +100,18 @@ const LoginForm = () => {
       }
       
       setError(errorMessage);
+      
+      // Preserve redirect parameter in URL even on error
+      const redirectParam = searchParams.get('redirect') || 
+                           (typeof window !== 'undefined' ? localStorage.getItem('login_redirect') : null);
+      if (redirectParam && typeof window !== 'undefined') {
+        const currentUrl = new URL(window.location.href);
+        if (!currentUrl.searchParams.has('redirect')) {
+          currentUrl.searchParams.set('redirect', redirectParam);
+          window.history.replaceState({}, '', currentUrl.toString());
+        }
+      }
+      
       toast({
         title: "Sign in failed",
         description: errorMessage,
@@ -87,7 +124,8 @@ const LoginForm = () => {
 
   const handleGoogleSignIn = async () => {
     try {
-      const redirectTo = searchParams.get('redirect') || '/';
+      const redirectTo = searchParams.get('redirect') || 
+                        (typeof window !== 'undefined' ? localStorage.getItem('login_redirect') : null) || '/';
       
       // For Google sign-in, we'll handle role-based redirect after successful authentication
       // The redirect will be processed by the callback URL
@@ -104,7 +142,7 @@ const LoginForm = () => {
   };
 
   return (
-    <form noValidate onSubmit={handleSubmit} className="space-y-4 sm:space-y-6 animate-fade-in">
+      <form noValidate onSubmit={handleSubmit} className="space-y-4 sm:space-y-6 animate-fade-in">
       <Button
         type="button"
         variant="outline"
@@ -146,7 +184,7 @@ const LoginForm = () => {
       <div className="space-y-3 sm:space-y-4">
         <div>
           <Label htmlFor="email" className="text-muted-foreground text-sm sm:text-base">
-            Email/Username
+            Email
           </Label>
           <div className="relative">
             <Mail className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground/70 size-4" />
@@ -210,9 +248,9 @@ const LoginForm = () => {
         <Button
           type="submit"
           className="w-full py-3 sm:py-4 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white h-10 sm:h-11 text-sm sm:text-base transition-transform hover:scale-[1.01] active:scale-100 shadow-lg"
-          disabled={isLoading}
+          disabled={isLoading || authLoading}
         >
-          {isLoading ? "Signing In..." : "Sign In"}
+          {authLoading ? "Loading..." : isLoading ? "Signing In..." : "Sign In"}
         </Button>
       </div>
 
