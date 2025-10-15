@@ -1,8 +1,65 @@
 import axios from "axios";
 import Graphics from "../../../graphics/graphics";
 import playGame from "../../../../playGame";
-import { isAuthenticated } from "../../../../../../../lib/auth-client";
+import { isAuthenticated, authClient } from "../../../../../../../lib/auth-client";
 import { submitPacmanScore } from "../../../../../../../lib/api/pacman";
+import { createRoot } from "react-dom/client";
+import React from "react";
+import GameOver from "../../../../../game-over";
+// Simple toast notification function
+const showToast = (message: string, type: 'success' | 'error' = 'success') => {
+  console.log('Showing toast:', message, type);
+  
+  // Create toast element
+  const toast = document.createElement('div');
+  toast.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    padding: 12px 16px;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    border: 1px solid;
+    transition: all 0.3s ease;
+    transform: translateX(100%);
+    max-width: 300px;
+    ${type === 'success' 
+      ? 'background: rgba(16, 185, 129, 0.2); border-color: rgba(16, 185, 129, 0.4); color: #10b981;' 
+      : 'background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.4); color: #ef4444;'
+    }
+  `;
+  
+  toast.innerHTML = `
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <div style="width: 16px; height: 16px; flex-shrink: 0;">
+        ${type === 'success' 
+          ? '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>'
+          : '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 7h2v6h-2V7m0 8h2v2h-2v-2M1 21h22L12 2L1 21Z"/></svg>'
+        }
+      </div>
+      <span style="font-size: 14px; font-weight: 500;">${message}</span>
+    </div>
+  `;
+  
+  document.body.appendChild(toast);
+  
+  // Animate in
+  setTimeout(() => {
+    toast.style.transform = 'translateX(0)';
+  }, 100);
+  
+  // Remove after 4 seconds
+  setTimeout(() => {
+    toast.style.transform = 'translateX(100%)';
+    setTimeout(() => {
+      if (toast.parentNode) {
+        toast.parentNode.removeChild(toast);
+      }
+    }, 300);
+  }, 4000);
+};
 
 export default class GhostCollision {
   static collisionConditional(ghost: any, pacman: any) {
@@ -57,124 +114,127 @@ export default class GhostCollision {
   ) {
     cancelAnimationFrame(variables.animationId);
 
-    if (variables.player) await saveScore(variables);
     resetAfterGameOver(assets, variables);
 
-    // 🎯 Show game over message
-    const gameOverContainer =
-      document.getElementById("game-over-root") ||
-      (() => {
-        const div = document.createElement("div");
-        div.id = "game-over-root";
-        div.style.cssText = `
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100vw;
-          height: 100vh;
-          background: rgba(0, 0, 0, 0.9);
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          z-index: 10000;
-          color: white;
-          font-family: 'Oswald', sans-serif;
-        `;
-        document.body.appendChild(div);
-        return div;
-      })();
+    // 🎯 Show game over screen using React component
+    const gameOverContainer = document.getElementById("game-over-root") || (() => {
+      const div = document.createElement("div");
+      div.id = "game-over-root";
+      document.body.appendChild(div);
+      return div;
+    })();
 
     // Check if user is logged in using the auth client
     const isLoggedIn = await isAuthenticated();
-    const userData = isLoggedIn ? JSON.parse(localStorage.getItem('user') || '{}') : {};
-    const username = userData.username || userData.email || 'User';
+    console.log('Game Over - isLoggedIn:', isLoggedIn);
     
-    // Create buttons based on login status
-    const buttonsHtml = isLoggedIn 
-      ? `
-        <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
-          <button onclick="window.location.reload()" style="
-            padding: 1rem 2rem;
-            font-size: 1.2rem;
-            background: #47761E;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-family: 'Oswald', sans-serif;
-            transition: background 0.3s;
-          " onmouseover="this.style.background='#5a8a2a'" onmouseout="this.style.background='#47761E'">Play Again</button>
-          <button onclick="submitScore()" style="
-            padding: 1rem 2rem;
-            font-size: 1.2rem;
-            background: #FFDD00;
-            color: #000;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-family: 'Oswald', sans-serif;
-            font-weight: bold;
-            transition: background 0.3s;
-          " onmouseover="this.style.background='#FFE55C'" onmouseout="this.style.background='#FFDD00'">Submit Score</button>
-        </div>
-      `
-      : `
-        <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
-          <button onclick="window.location.reload()" style="
-            padding: 1rem 2rem;
-            font-size: 1.2rem;
-            background: #47761E;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-family: 'Oswald', sans-serif;
-            transition: background 0.3s;
-          " onmouseover="this.style.background='#5a8a2a'" onmouseout="this.style.background='#47761E'">Play Again</button>
-          <button onclick="window.location.href='/login'" style="
-            padding: 1rem 2rem;
-            font-size: 1.2rem;
-            background: #FF6B6B;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-family: 'Oswald', sans-serif;
-            font-weight: bold;
-            transition: background 0.3s;
-          " onmouseover="this.style.background='#FF5252'" onmouseout="this.style.background='#FF6B6B'">Sign In to Save Score</button>
-        </div>
-      `;
-
-    gameOverContainer.innerHTML = `
-      <h1 style="font-size: 3rem; margin-bottom: 1rem; color: #FFDD00;">GAME OVER</h1>
-      <p style="font-size: 1.5rem; margin-bottom: 2rem;">Final Score: $${variables.score}</p>
-      ${buttonsHtml}
-      ${isLoggedIn ? `<p style="font-size: 0.9rem; margin-top: 1rem; color: #ccc;">Score automatically saved for ${username}</p>` : ''}
-    `;
-
-    // Add submitScore function to window if user is logged in
+    let username = 'User';
+    let userId = null;
+    
     if (isLoggedIn) {
-      (window as any).submitScore = async () => {
-        try {
-          const result = await submitPacmanScore({
-            username: username,
-            points: variables.score,
-            level: variables.level || 1,
-          });
+      try {
+        // Get user data from better-auth session
+        const session = await authClient.getSession();
+        console.log('Game Over - session:', session);
+        
+        if (session.data?.user) {
+          const userData = session.data.user as any;
+          console.log('Game Over - userData:', userData);
           
-          if (result.success) {
-            alert('Score submitted successfully!');
-          } else {
-            alert(result.message || 'Failed to submit score. Please try again.');
-          }
-        } catch (error) {
-          console.error('Error submitting score:', error);
-          alert('Error submitting score. Please try again.');
+          username = userData.username || userData.name || userData.email || 'User';
+          userId = userData.id;
+          
+          console.log('Game Over - extracted username:', username, 'userId:', userId);
         }
-      };
+      } catch (error) {
+        console.error('Failed to get user data from session:', error);
+        
+        // Fallback: try to get from localStorage if session fails
+        try {
+          const storedUser = localStorage.getItem('user');
+          if (storedUser) {
+            const userData = JSON.parse(storedUser);
+            username = userData.username || userData.name || userData.email || 'User';
+            userId = userData.id || userData.userId;
+            console.log('Game Over - fallback from localStorage:', { username, userId });
+          }
+        } catch (fallbackError) {
+          console.error('Failed to get user data from localStorage:', fallbackError);
+        }
+      }
     }
+
+    // Automatically submit score if user is logged in
+    if (isLoggedIn && userId) {
+      try {
+        console.log('Auto-submitting score:', { userId, score: variables.score });
+        const result = await submitPacmanScore({
+          userId: userId,
+          score: variables.score,
+        });
+        
+        console.log('Auto score submission result:', result);
+        
+        if (result.success) {
+          showToast(`Score of ${variables.score} automatically saved!`, 'success');
+        } else {
+          showToast(result.message || 'Failed to save score.', 'error');
+        }
+      } catch (error) {
+        console.error('Error auto-submitting score:', error);
+        showToast('Error saving score.', 'error');
+      }
+    }
+
+    // Create React root and render GameOver component
+    const root = createRoot(gameOverContainer);
+    root.render(
+      React.createElement(GameOver, {
+        score: variables.score,
+        level: variables.level || 1,
+        userId: userId,
+        username: username,
+        isLoggedIn: isLoggedIn,
+        onPlayAgain: () => {
+          root.unmount();
+          gameOverContainer.remove();
+          // Reset game and make it ready to play
+          variables.start = true;
+          variables.score = 0;
+          variables.level = 1;
+          variables.lastKeyPressed = "";
+          variables.gameStarted = false;
+          // Reset game state to be ready for immediate play
+          variables.isPaused = false;
+          variables.lives = 3; // Reset lives
+          // Restart the game
+          playGame(variables.player, variables.reactRoot);
+        },
+        onQuit: () => {
+          root.unmount();
+          gameOverContainer.remove();
+          
+          // Dispatch custom event to quit the game (return to preview)
+          const quitEvent = new CustomEvent('gameQuit', {
+            detail: { reason: 'userQuit' }
+          });
+          window.dispatchEvent(quitEvent);
+        },
+        onSignIn: () => {
+          window.location.href = '/login';
+        },
+        onClose: () => {
+          root.unmount();
+          gameOverContainer.remove();
+          
+          // Dispatch custom event to quit the game (return to preview)
+          const quitEvent = new CustomEvent('gameQuit', {
+            detail: { reason: 'userClose' }
+          });
+          window.dispatchEvent(quitEvent);
+        }
+      })
+    );
   }
 
   static async saveScore(
@@ -183,7 +243,7 @@ export default class GhostCollision {
   ) {
     const data = {
       username: variables.player.username,
-      points: variables.score,
+      score: variables.score,
     };
     try {
       const res = await axios.post(
@@ -240,18 +300,35 @@ export default class GhostCollision {
   }
 
   static resetAfterDeath(assets: any, variables: any, callbackOne = playGame) {
+    // Store the last direction before reset
+    const lastDirection = variables.lastKeyPressed;
+    
+    // Reset pacman first
     assets.characters.pacman.reset();
-    variables.lastKeyPressed = "";
+    
+    // Don't reset lastKeyPressed - keep the direction for better UX
+    // variables.lastKeyPressed = "";
     assets.timers.cycleTimer.reset();
     assets.timers.scaredTimer.reset();
 
-        // Apply reset with delay for each ghost
-        Object.values(assets.characters.ghosts).forEach((ghost: any, index: number) => {
-          ghost.reset(index); // Pass index for delayed release
-        });
+    // Apply reset with delay for each ghost
+    Object.values(assets.characters.ghosts).forEach((ghost: any, index: number) => {
+      ghost.reset(index); // Pass index for delayed release
+    });
 
     assets.timers.cycleTimer.start();
     assets.audioPlayer.ghostAudioWantsToPlay = true;
+    
+    // Restore the last direction immediately after reset
+    if (lastDirection) {
+      variables.lastKeyPressed = lastDirection;
+      console.log("Restored last direction after death:", lastDirection);
+      
+      // Let the game's physics system handle the movement
+      // The PacmanManager.changeDirection will be called in the next frame
+      // and will apply the correct velocity based on lastKeyPressed
+    }
+    
     callbackOne(variables.player, variables.reactRoot);
   }
 }

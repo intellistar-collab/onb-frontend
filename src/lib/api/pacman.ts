@@ -1,9 +1,8 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:8000';
 
 export interface PacmanScore {
-  username: string;
-  points: number;
-  level?: number;
+  userId: string;
+  score: number;
 }
 
 export interface PacmanScoreResponse {
@@ -12,7 +11,7 @@ export interface PacmanScoreResponse {
   data?: {
     id: string;
     username: string;
-    points: number;
+    score: number;
     level: number;
     rank?: number;
     timestamp: string;
@@ -24,17 +23,17 @@ export interface PacmanScoreResponse {
  */
 export const submitPacmanScore = async (scoreData: PacmanScore): Promise<PacmanScoreResponse> => {
   try {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('better-auth.session_token');
+    
     const response = await fetch(`${API_BASE_URL}/pacman/scores`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': token || '',
+        'Authorization': token ? `Bearer ${token}` : '',
       },
       body: JSON.stringify({
-        username: scoreData.username,
-        points: scoreData.points,
-        level: scoreData.level || 1,
+        userId: scoreData.userId,
+        score: scoreData.score,
       }),
     });
 

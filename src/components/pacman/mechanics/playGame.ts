@@ -82,7 +82,9 @@ export const assets = Factory.makeAssets(map, variables);
 export default function playGame(player: any, reactRoot: any, onPauseChange?: (paused: boolean) => void) {
   variables.animationId = requestAnimationFrame(() => playGame(player, reactRoot, onPauseChange));
   const board = document.querySelector("#board") as HTMLCanvasElement;
-  if (!board || !board.getContext) return;
+  if (!board || !board.getContext) {
+    return;
+  }
   const ctx = board.getContext("2d") as CanvasRenderingContext2D;
   if (variables.start === true) {
     Object.assign(assets, Factory.makeAssets(map, variables));

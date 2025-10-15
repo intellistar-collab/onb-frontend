@@ -77,7 +77,7 @@ const BoxCard = ({ box, showOdds = true }: BoxCardProps) => {
       </CardContent>
 
       <CardFooter className="flex flex-col gap-3">
-        <div className="flex items-center justify-between text-sm text-white">
+        <div className="flex items-center justify-between text-sm text-white w-full">
           <div>
             <p className="text-xs font-suisse text-white/50">Entry</p>
             <p className="font-oswald text-lg text-white">{box.price}</p>

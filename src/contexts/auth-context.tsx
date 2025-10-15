@@ -86,7 +86,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         // Fetch wallet and score data
         const walletScoreData = await fetchWalletAndScore();
         
-        setUser({
+        const user = {
           id: userData.id,
           email: userData.email,
           name: userData.name,
@@ -97,10 +97,29 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           updatedAt: userData.updatedAt,
           wallet: walletScoreData?.wallet,
           score: walletScoreData?.score,
-        });
+        };
+        
+        setUser(user);
+        
+        // Store user data in localStorage for game access
+        try {
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('user', JSON.stringify(user));
+          }
+        } catch (error) {
+          console.error('Failed to store user data in localStorage:', error);
+        }
       } else {
         console.log("No user data in session");
         setUser(null);
+        // Clear localStorage when no user
+        try {
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem('user');
+          }
+        } catch (error) {
+          console.error('Failed to clear user data from localStorage:', error);
+        }
       }
     } catch (error) {
       console.error("Failed to refresh user:", error);
@@ -211,6 +230,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUser(null);
       if (typeof window !== 'undefined') {
         localStorage.removeItem('better-auth.session_token');
+        localStorage.removeItem('user');
       }
       router.push("/");
     } catch (error) {

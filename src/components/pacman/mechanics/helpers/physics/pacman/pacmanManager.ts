@@ -8,6 +8,12 @@ export default class PacmanManager {
   ) {
     const pacman = assets.characters.pacman;
     const boundaries = assets.props.boundaries;
+    
+    // Debug: Log when changeDirection is called with a direction
+    if (variables.lastKeyPressed) {
+      console.log("PacmanManager.changeDirection called with:", variables.lastKeyPressed);
+    }
+    
     if (variables.lastKeyPressed === "up") {
       checkDirectionChange(pacman, boundaries, {
         velocity: { x: 0, y: -pacman.speed },
@@ -40,6 +46,9 @@ export default class PacmanManager {
     if (count === 0) {
       pacman.velocity.x = velocity.x;
       pacman.velocity.y = velocity.y;
+      console.log("Velocity applied:", velocity);
+    } else {
+      console.log("Boundary collision detected, velocity not applied");
     }
   }
 
