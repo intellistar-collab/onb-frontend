@@ -1,3 +1,6 @@
+
+import { authClient } from "@/lib/auth-client";
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:8000';
 
 export interface UserProfile {
@@ -112,9 +115,6 @@ export interface UpdatePreferencesData {
     showActivity?: boolean;
   };
 }
-
-// Helper function to get auth headers (use better-auth client session)
-import { authClient } from "@/lib/auth-client";
 
 const getAuthHeaders = async (): Promise<HeadersInit> => {
   const headers: HeadersInit = {

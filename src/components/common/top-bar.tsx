@@ -28,7 +28,7 @@ const TopBar = () => {
   const [authDialogTab, setAuthDialogTab] = useState<"login" | "register">("login");
   const router = useRouter();
   const pathname = usePathname();
-  const { user, isAuthenticated, isAdmin, logout } = useAuth();
+  const { user, isAuthenticated, isAdmin, logout, isLoading } = useAuth();
 
   React.useEffect(() => {
     try {
@@ -171,7 +171,12 @@ const TopBar = () => {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {isAuthenticated ? (
+            {isLoading ? (
+              <div className="flex items-center gap-2">
+                <div className="h-8 w-8 bg-muted rounded-full rounded" />
+                <div className="h-4 w-20 bg-muted rounded animate-pulse" />
+              </div>
+            ) : isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -346,7 +351,17 @@ const TopBar = () => {
               </div>
 
               {/* Mobile Auth Section */}
-              {isAuthenticated ? (
+              {isLoading ? (
+                <div className="px-3 py-2 border-t border-gray-800">
+                  <div className="flex items-center gap-3">
+                    <div className="h-8 w-8 bg-muted rounded-full animate-pulse" />
+                    <div className="flex-1 space-y-2">
+                      <div className="h-4 w-24 bg-muted rounded animate-pulse" />
+                      <div className="h-3 w-32 bg-muted rounded animate-pulse" />
+                    </div>
+                  </div>
+                </div>
+              ) : isAuthenticated ? (
                 <div className="px-3 py-2 space-y-2 border-t border-gray-800">
                   <div className="px-3 py-2 text-sm text-gray-300">
                     <div className="font-medium text-white">{user?.name || user?.username}</div>

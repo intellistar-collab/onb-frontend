@@ -3,15 +3,6 @@
 import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
-// Simple loading component to avoid admin CSS dependencies
-const SimpleLoading = ({ text = "Loading..." }: { text?: string }) => (
-  <div className="fixed inset-0 bg-white bg-opacity-80 flex items-center justify-center z-50">
-    <div className="flex flex-col items-center">
-      <div className="animate-spin rounded-full border-4 border-gray-300 border-t-blue-600 h-12 w-12" />
-      <p className="text-gray-600 text-lg font-bold mt-4">{text}</p>
-    </div>
-  </div>
-);
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -56,9 +47,10 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
     }
   }, [isLoading, isAuthenticated, isAdmin, requireAuth, requireAdmin, pathname, router, redirectTo]);
 
-  // Show loading spinner while checking authentication
+  // Show page content with loading states while checking authentication
+  // This allows individual components to show their own skeleton loading
   if (isLoading) {
-    return <SimpleLoading text="Authenticating..." />;
+    return <>{children}</>;
   }
 
   // If authentication is required but user is not authenticated
