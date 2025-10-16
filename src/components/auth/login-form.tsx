@@ -9,7 +9,6 @@ import { useToast } from "@/components/ui/toast";
 import { Mail, Lock, Eye, EyeOff, AlertCircle } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
-import { authClient } from "@/lib/auth-client";
 
 const LoginForm = () => {
   const { toast } = useToast();
@@ -33,17 +32,6 @@ const LoginForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Don't allow submission while auth context is still loading
-    if (authLoading) {
-      toast({
-        title: "Please wait",
-        description: "Authentication system is still loading. Please try again in a moment.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
     setIsLoading(true);
     setError("");
 
@@ -63,43 +51,11 @@ const LoginForm = () => {
       // Wait longer for auth state to update in production
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // Verify authentication is working by checking session
-      let isAuthVerified = false;
-      let retryCount = 0;
-      const maxRetries = 3;
-      
-      while (!isAuthVerified && retryCount < maxRetries) {
-        try {
-          const session = await authClient.getSession();
-          if (session.data?.user) {
-            isAuthVerified = true;
-            console.log("Authentication verified:", session.data.user);
-          } else {
-            console.log(`Auth verification attempt ${retryCount + 1} failed, retrying...`);
-            retryCount++;
-            await new Promise(resolve => setTimeout(resolve, 500));
-          }
-        } catch (error) {
-          console.log(`Auth verification attempt ${retryCount + 1} error:`, error);
-          retryCount++;
-          await new Promise(resolve => setTimeout(resolve, 500));
-        }
-      }
-
-      if (!isAuthVerified) {
-        console.error("Authentication verification failed after retries");
-        throw new Error("Authentication verification failed");
-      }
-
       // Check user role and redirect accordingly
       const userRole = (result.data?.user as any)?.role;
       const redirectParam = searchParams.get('redirect') || 
                            (typeof window !== 'undefined' ? localStorage.getItem('login_redirect') : null);      
       let redirectTo = redirectParam || '/';
-      
-      console.log("User role:", userRole);
-      console.log("Redirect param:", redirectParam);
-      console.log("Final redirect to:", redirectTo);
       
       // Clear stored redirect after successful login
       if (typeof window !== 'undefined') {
@@ -119,13 +75,8 @@ const LoginForm = () => {
         durationMs: 2000,
       });
       
-      // Add a delay to ensure cookies are properly set before redirect
-      console.log("Waiting for authentication to be fully established...");
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Use window.location.href for a full page reload to ensure middleware sees the cookies
       console.log("Redirecting to:", redirectTo);
-      window.location.href = redirectTo;
+      router.push(redirectTo);
     } catch (err) {
       // Extract error message from the error object
       let errorMessage = "An unexpected error occurred";

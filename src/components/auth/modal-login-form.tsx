@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,6 +15,7 @@ interface ModalLoginFormProps {
 }
 
 const ModalLoginForm: React.FC<ModalLoginFormProps> = ({ onSuccess }) => {
+  const router = useRouter();
   const { toast } = useToast();
   const { login, loginWithGoogle } = useAuth();
   const [email, setEmail] = useState("");
@@ -40,14 +42,24 @@ const ModalLoginForm: React.FC<ModalLoginFormProps> = ({ onSuccess }) => {
       const result = await login(email, password, rememberMe);
       console.log("Login result:", result);
 
+      const userRole = (result.data?.user as any)?.role;
+      
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('login_redirect');
+      }
+
       toast({
         title: "Welcome back!",
-        description: "You're now signed in.",
+        description: userRole === 'ADMIN' ? "Welcome back, Admin!" : "You're now signed in.",
         variant: "success",
-        durationMs: 2500,
+        durationMs: 2000,
       });
       
-      onSuccess?.();
+      
+      // If user is ADMIN and no specific redirect, go to admin dashboard
+      if (userRole === 'ADMIN') {
+        router.push('/admin/dashboard');
+      }
     } catch (err) {
       let errorMessage = "An unexpected error occurred";
       
