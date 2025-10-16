@@ -119,23 +119,22 @@ const LoginForm = () => {
         durationMs: 2000,
       });
       
-      // Use router.push for better SPA navigation, with fallback to window.location
-      try {
-        console.log("Attempting redirect to:", redirectTo);
-        // Try using Next.js router first
-        router.push(redirectTo);
-        
-        // Fallback: if router doesn't work, use window.location after a delay
-        setTimeout(() => {
-          if (window.location.pathname !== redirectTo) {
-            console.log("Router push failed, using window.location fallback");
-            window.location.href = redirectTo;
-          }
-        }, 500);
-      } catch (error) {
-        console.error("Router push failed:", error);
-        window.location.href = redirectTo;
+      // Add a delay to ensure cookies are properly set before redirect
+      console.log("Waiting for authentication to be fully established...");
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Store a flag in localStorage to indicate recent login (for middleware bypass)
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('recent_login', Date.now().toString());
       }
+      
+      // Use window.location.href for a full page reload to ensure middleware sees the cookies
+      // Add a query parameter to indicate recent login for middleware bypass
+      const redirectUrl = new URL(redirectTo, window.location.origin);
+      redirectUrl.searchParams.set('_recent_login', 'true');
+      
+      console.log("Redirecting to:", redirectUrl.toString());
+      window.location.href = redirectUrl.toString();
     } catch (err) {
       // Extract error message from the error object
       let errorMessage = "An unexpected error occurred";
