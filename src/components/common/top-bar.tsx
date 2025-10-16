@@ -184,13 +184,13 @@ const TopBar = () => {
                     className="text-white hover:bg-gray-800 text-xs md:text-sm lg:text-base px-2 lg:px-3 flex items-center gap-2"
                   >
                     <User className="h-4 w-4" suppressHydrationWarning />
-                    {user?.name || user?.username || "User"}
+                    {user?.firstName || user?.username || "User"}
                     <ChevronDown className="ml-1 h-3 w-3 md:h-4 md:w-4" suppressHydrationWarning />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="bg-gray-800 border-gray-700 w-48">
                   <div className="px-3 py-2 text-sm text-gray-300 border-b border-gray-700">
-                    <div className="font-medium text-white">{user?.name || user?.username}</div>
+                    <div className="font-medium text-white">@{user?.username}</div>
                     <div className="text-xs text-gray-400">{user?.email}</div>
                     {isAdmin && (
                       <div className="text-xs text-pink-400 font-medium">Admin</div>
@@ -364,7 +364,7 @@ const TopBar = () => {
               ) : isAuthenticated ? (
                 <div className="px-3 py-2 space-y-2 border-t border-gray-800">
                   <div className="px-3 py-2 text-sm text-gray-300">
-                    <div className="font-medium text-white">{user?.name || user?.username}</div>
+                    <div className="font-medium text-white">@{user?.username}</div>
                     <div className="text-xs text-gray-400">{user?.email}</div>
                     {isAdmin && (
                       <div className="text-xs text-pink-400 font-medium">Admin</div>

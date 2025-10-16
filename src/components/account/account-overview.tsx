@@ -108,9 +108,10 @@ export default function AccountOverview() {
 
   // Use real user data or fallback to auth user data
   const user = profile ? {
-    name: `${profile.firstName || ''} ${profile.lastName || ''}`.trim() || authUser?.name || 'User',
     email: profile.email || authUser?.email || '',
     username: profile.username || authUser?.username || '',
+    firstName: profile.firstName || '',
+    lastName: profile.lastName || '',
     joinDate: new Date(profile.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
     avatar: profile.avatar || authUser?.avatar || null,
     level: 18, // Mock level - would come from stats API
@@ -119,9 +120,10 @@ export default function AccountOverview() {
     location: profile.location || profile.city || 'Unknown',
     membershipType: authUser?.role === 'ADMIN' ? 'Admin' : 'Premium',
   } : {
-    name: authUser?.name || 'User',
     email: authUser?.email || '',
     username: authUser?.username || '',
+    firstName: authUser?.firstName || 'User',
+    lastName: authUser?.lastName || '',
     joinDate: 'Unknown',
     avatar: authUser?.avatar || null,
     level: 1,
@@ -169,7 +171,7 @@ export default function AccountOverview() {
               {user.avatar ? (
                 <Image
                   src={user.avatar}
-                  alt={user.name}
+                  alt={user.firstName}
                   width={56}
                   height={56}
                   className="w-full h-full object-cover rounded-full"
@@ -178,7 +180,7 @@ export default function AccountOverview() {
               ) : (
                 <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center" suppressHydrationWarning>
                   <span className="text-lg font-bold text-primary">
-                    {user.name.split(" ").map(n => n[0]).join("").toUpperCase()}
+                    {user.firstName.charAt(0).toUpperCase()}{user.lastName.charAt(0).toUpperCase()}
                   </span>
                 </div>
               )}
@@ -212,7 +214,7 @@ export default function AccountOverview() {
                       {user.avatar ? (
                         <Image
                           src={user.avatar}
-                          alt={user.name}
+                          alt={user.firstName}
                           width={144}
                           height={144}
                           className="w-full h-full object-cover rounded-full"
@@ -221,7 +223,7 @@ export default function AccountOverview() {
                       ) : (
                         <div className="w-36 h-36 rounded-full bg-muted flex items-center justify-center" suppressHydrationWarning>
                           <span className="text-6xl font-bold text-primary">
-                            {user.name.split(" ").map(n => n[0]).join("").toUpperCase()}
+                            {user.firstName.charAt(0).toUpperCase()}{user.lastName.charAt(0).toUpperCase()}
                           </span>
                         </div>
                       )}
@@ -269,7 +271,7 @@ export default function AccountOverview() {
         </div>
         
         <div className="flex-1 min-w-0">
-          <h2 className="text-lg font-semibold text-foreground truncate">{user.name}</h2>
+          <h2 className="text-lg font-semibold text-foreground truncate">{user.firstName} {user.lastName}</h2>
           <p className="text-sm text-muted-foreground truncate">@{user.username}</p>
         </div>
       </div>

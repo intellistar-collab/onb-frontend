@@ -1,6 +1,8 @@
 interface RankUser {
   id: string;
   username: string;
+  firstName: string;
+  lastName: string;
   avatar: string;
   rank: number;
   points: number;
@@ -51,6 +53,8 @@ export const topPlayers: RankUser[] = [
   {
     id: "1",
     username: "BoxMaster2024",
+    firstName: "Alex",
+    lastName: "Johnson",
     avatar: "/home-card/onb-box.png",
     rank: 1,
     points: 15420,
@@ -62,6 +66,8 @@ export const topPlayers: RankUser[] = [
   {
     id: "2", 
     username: "LuckyUnboxer",
+    firstName: "Sarah",
+    lastName: "Williams",
     avatar: "/home-card/onb-box.png",
     rank: 2,
     points: 14890,
@@ -73,6 +79,8 @@ export const topPlayers: RankUser[] = [
   {
     id: "3",
     username: "TreasureHunter",
+    firstName: "Michael",
+    lastName: "Brown",
     avatar: "/home-card/onb-box.png", 
     rank: 3,
     points: 13765,
@@ -84,6 +92,8 @@ export const topPlayers: RankUser[] = [
   {
     id: "4",
     username: "BoxBuster",
+    firstName: "Emma",
+    lastName: "Davis",
     avatar: "/home-card/onb-box.png",
     rank: 4,
     points: 12340,
@@ -95,6 +105,8 @@ export const topPlayers: RankUser[] = [
   {
     id: "5",
     username: "PrizeCollector",
+    firstName: "David",
+    lastName: "Miller",
     avatar: "/home-card/onb-box.png",
     rank: 5,
     points: 11890,
@@ -106,6 +118,8 @@ export const topPlayers: RankUser[] = [
   {
     id: "6",
     username: "UnboxLegend",
+    firstName: "Lisa",
+    lastName: "Wilson",
     avatar: "/home-card/onb-box.png",
     rank: 6,
     points: 10567,

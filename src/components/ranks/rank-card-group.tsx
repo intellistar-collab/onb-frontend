@@ -13,6 +13,8 @@ import { cn } from "@/lib/utils";
 interface RankUser {
   id: string;
   username: string;
+  firstName?: string;
+  lastName?: string;
   avatar: string;
   rank: number;
   points: number;
@@ -310,8 +312,8 @@ const RankCardGroup = ({
                             </td>
                             <td className="px-4 py-3 whitespace-nowrap">
                               <div>
-                                <div className="text-sm md:text-base font-semibold text-white group-hover:text-blue-300 transition-colors duration-300">{user.username}</div>
-                                {/* <div className="text-xs md:text-sm text-white/70">ID: {user.id.slice(0, 8)}</div> */}
+                              <div className="text-sm md:text-base font-semibold text-white group-hover:text-blue-300 transition-colors duration-300">{`${user.firstName} ${user.lastName}`}</div>
+                                <div className="text-xs md:text-sm text-white/70">@{user.username}</div>
                               </div>
                             </td>
                             <td className="px-4 py-3 whitespace-nowrap">

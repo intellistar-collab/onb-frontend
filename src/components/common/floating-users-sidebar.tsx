@@ -6,6 +6,8 @@ import { cn } from '@/lib/utils';
 
 interface User {
   id: string;
+  firstName?: string;
+  lastName?: string;
   username: string;
   avatar: string;
   isOnline: boolean;
@@ -39,6 +41,8 @@ const FloatingUsersSidebar = () => {
       {
         id: '3',
         username: 'LuckyWinner',
+        firstName: 'Yuki',
+        lastName: 'Tanaka',
         avatar: '/api/placeholder/32/32',
         isOnline: true,
         location: 'Tokyo'
@@ -46,6 +50,8 @@ const FloatingUsersSidebar = () => {
       {
         id: '4',
         username: 'MysteryMaster',
+        firstName: 'Ahmed',
+        lastName: 'Al-Rashid',
         avatar: '/api/placeholder/32/32',
         isOnline: true,
         location: 'Dubai'
@@ -53,6 +59,8 @@ const FloatingUsersSidebar = () => {
       {
         id: '5',
         username: 'BoxExplorer',
+        firstName: 'Sophie',
+        lastName: 'Anderson',
         avatar: '/api/placeholder/32/32',
         isOnline: true,
         location: 'Sydney'
@@ -60,6 +68,8 @@ const FloatingUsersSidebar = () => {
       {
         id: '6',
         username: 'PrizeHunter',
+        firstName: 'Marie',
+        lastName: 'Dubois',
         avatar: '/api/placeholder/32/32',
         isOnline: true,
         location: 'Paris'
@@ -67,6 +77,8 @@ const FloatingUsersSidebar = () => {
       {
         id: '7',
         username: 'LuckyStreak',
+        firstName: 'Klaus',
+        lastName: 'Mueller',
         avatar: '/api/placeholder/32/32',
         isOnline: true,
         location: 'Berlin'
@@ -74,6 +86,8 @@ const FloatingUsersSidebar = () => {
       {
         id: '8',
         username: 'BoxAdventurer',
+        firstName: 'Carlos',
+        lastName: 'Rodriguez',
         avatar: '/api/placeholder/32/32',
         isOnline: true,
         location: 'Miami'
@@ -130,11 +144,15 @@ const FloatingUsersSidebar = () => {
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
                 <div className="w-5 h-5 rounded-full bg-gray-600 flex items-center justify-center text-white text-xs font-medium hover:bg-gray-500 transition-colors">
-                  {user.username.charAt(0)}
+                  {(user.firstName || user.username).charAt(0)}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-white text-xs font-medium truncate">{user.username}</div>
-                  <div className="text-gray-400 text-xs truncate">{user.location}</div>
+                  {user.firstName && (
+                    <div className="text-white text-xs font-medium truncate">
+                      {`${user.firstName} ${user.lastName}`}
+                    </div>
+                  )}
+                  <div className="text-gray-400 text-xs truncate">{`@${user.username} • ${user.location}`}</div>
                 </div>
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
               </div>

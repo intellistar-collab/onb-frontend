@@ -156,7 +156,7 @@ export default function Game({ player, callback = playGame }: GameProps) {
                 <h1 className="text-5xl md:text-6xl font-pricedown font-bold text-primary mb-4 animate-pulse">
                   🎮 PIMP CATCHER
                 </h1>
-                <div className="text-xl md:text-2xl text-secondary mb-2 font-oswald">Welcome, {player?.name || 'Player'}!</div>
+                <div className="text-xl md:text-2xl text-secondary mb-2 font-oswald">Welcome, {player?.firstName || player?.username || 'Player'}!</div>
               </div>
             </div>
           </div>

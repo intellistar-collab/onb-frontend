@@ -9,7 +9,8 @@ import { walletScoreAPI } from "@/lib/api/account";
 interface User {
   id: string;
   email: string;
-  name: string;
+  firstName: string;
+  lastName: string;
   username: string;
   role: string;
   avatar: string | null;
@@ -109,8 +110,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const user = {
           id: userData.id,
           email: userData.email,
-          name: userData.name,
-          username: userData.username || userData.name,
+          firstName: userData.firstName || "",
+          lastName: userData.lastName || "",
+          username: userData.username || "",
           role: userData.role || "USER",
           avatar: userData.avatar || null,
           createdAt: userData.createdAt,
