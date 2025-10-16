@@ -24,26 +24,38 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
   useEffect(() => {
     if (isLoading) return;
 
-    // If authentication is required but user is not authenticated
+    // Add a small delay to allow authentication state to settle after login
+    const checkAuth = () => {
+      // If authentication is required but user is not authenticated
+      if (requireAuth && !isAuthenticated) {
+        const loginUrl = redirectTo || "/login";
+        const redirectParam = encodeURIComponent(pathname);
+        router.push(`${loginUrl}?redirect=${redirectParam}`);
+        return;
+      }
+
+      // If admin access is required but user is not admin
+      if (requireAdmin && (!isAuthenticated || !isAdmin)) {
+        router.push(redirectTo || "/");
+        return;
+      }
+
+      // If user is authenticated but trying to access auth pages
+      if (isAuthenticated && (pathname === "/login" || pathname === "/signup")) {
+        // Redirect admin users to admin dashboard, others to home
+        const redirectPath = isAdmin ? "/admin/dashboard" : "/";
+        router.push(redirectPath);
+        return;
+      }
+    };
+
+    // Check immediately, but also add a small delay for cases where auth state is still updating
+    checkAuth();
+    
+    // If we're on a protected route and not authenticated, give a small delay for auth state to update
     if (requireAuth && !isAuthenticated) {
-      const loginUrl = redirectTo || "/login";
-      const redirectParam = encodeURIComponent(pathname);
-      router.push(`${loginUrl}?redirect=${redirectParam}`);
-      return;
-    }
-
-    // If admin access is required but user is not admin
-    if (requireAdmin && (!isAuthenticated || !isAdmin)) {
-      router.push(redirectTo || "/");
-      return;
-    }
-
-    // If user is authenticated but trying to access auth pages
-    if (isAuthenticated && (pathname === "/login" || pathname === "/signup")) {
-      // Redirect admin users to admin dashboard, others to home
-      const redirectPath = isAdmin ? "/admin/dashboard" : "/";
-      router.push(redirectPath);
-      return;
+      const timeoutId = setTimeout(checkAuth, 500);
+      return () => clearTimeout(timeoutId);
     }
   }, [isLoading, isAuthenticated, isAdmin, requireAuth, requireAdmin, pathname, router, redirectTo]);
 

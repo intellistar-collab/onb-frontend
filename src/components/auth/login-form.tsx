@@ -61,8 +61,9 @@ const LoginForm = () => {
         durationMs: 2000,
       });
       
+      // Use window.location.href for a full page reload to ensure authentication state is properly established
       console.log("Redirecting to:", redirectTo);
-      router.push(redirectTo);
+      window.location.href = redirectTo;
     } catch (err) {
       // Extract error message from the error object
       let errorMessage = "An unexpected error occurred";
