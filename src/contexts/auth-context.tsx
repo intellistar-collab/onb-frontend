@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
+import React, { createContext, useContext, useEffect, useState, useCallback, useRef, useMemo } from "react";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { walletScoreAPI } from "@/lib/api/account";
@@ -46,6 +46,15 @@ interface AuthContextType {
 // Constants
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 const PROTECTED_ROUTES = ['/account', '/admin'];
+const DEBOUNCE_DELAY = 100; // ms
+const REFRESH_DELAY = 100; // ms
+
+// Storage keys
+const STORAGE_KEYS = {
+  SESSION_TOKEN: 'better-auth.session_token',
+  USER_DATA: 'user',
+  CACHE_TIME: 'user_cache_time',
+} as const;
 
 // Context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -69,25 +78,57 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
-  const isAuthenticated = !!user;
-  const isAdmin = user?.role === "ADMIN";
+  // Refs for cleanup and debouncing
+  const refreshTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isMountedRef = useRef(true);
 
-  // Helper functions
+  // Memoized computed values
+  const isAuthenticated = useMemo(() => !!user, [user]);
+  const isAdmin = useMemo(() => user?.role === "ADMIN", [user?.role]);
+
+  // Utility functions
+  const isClient = useCallback(() => typeof window !== 'undefined', []);
+
   const clearAuthState = useCallback(() => {
     setUser(null);
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('better-auth.session_token');
-      localStorage.removeItem('user');
-      localStorage.removeItem('user_cache_time');
+    if (isClient()) {
+      Object.values(STORAGE_KEYS).forEach(key => {
+        localStorage.removeItem(key);
+      });
     }
-  }, []);
+  }, [isClient]);
 
   const storeUserData = useCallback((userData: User) => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('user', JSON.stringify(userData));
-      localStorage.setItem('user_cache_time', Date.now().toString());
+    if (isClient()) {
+      try {
+        localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(userData));
+        localStorage.setItem(STORAGE_KEYS.CACHE_TIME, Date.now().toString());
+      } catch (error) {
+        console.warn("Failed to store user data:", error);
+      }
     }
-  }, []);
+  }, [isClient]);
+
+  const getCachedUser = useCallback((): User | null => {
+    if (!isClient()) return null;
+    
+    try {
+      const token = localStorage.getItem(STORAGE_KEYS.SESSION_TOKEN);
+      const cachedUser = localStorage.getItem(STORAGE_KEYS.USER_DATA);
+      const cacheTime = localStorage.getItem(STORAGE_KEYS.CACHE_TIME);
+      
+      if (cachedUser && cacheTime && token) {
+        const cacheAge = Date.now() - parseInt(cacheTime);
+        if (cacheAge < CACHE_DURATION) {
+          return JSON.parse(cachedUser);
+        }
+      }
+    } catch (error) {
+      console.warn("Failed to get cached user:", error);
+    }
+    
+    return null;
+  }, [isClient]);
 
   const fetchWalletAndScore = useCallback(async () => {
     try {
@@ -98,92 +139,136 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, []);
 
-  // Main auth functions
-  const refreshUser = useCallback(async () => {
-    try {
-      const session = await authClient.getSession();
-      
-      if (session.data?.user) {
-        const userData = session.data.user as any;
-        const walletScoreData = await fetchWalletAndScore();
-        
-        const user = {
-          id: userData.id,
-          email: userData.email,
-          firstName: userData.firstName || "",
-          lastName: userData.lastName || "",
-          username: userData.username || "",
-          role: userData.role || "USER",
-          avatar: userData.avatar || null,
-          createdAt: userData.createdAt,
-          updatedAt: userData.updatedAt,
-          wallet: walletScoreData?.wallet,
-          score: walletScoreData?.score,
-        };
-        
-        setUser(user);
-        storeUserData(user);
-      } else {
-        clearAuthState();
-      }
-    } catch (error) {
-      console.error("Failed to refresh user:", error);
-      if (error instanceof Error && (error.message.includes('Unauthorized') || error.message.includes('401'))) {
-        clearAuthState();
-      }
-    }
-  }, [fetchWalletAndScore, storeUserData, clearAuthState]);
+  const createUserFromData = useCallback(async (userData: any): Promise<User> => {
+    const walletScoreData = await fetchWalletAndScore();
+    
+    return {
+      id: userData.id,
+      email: userData.email,
+      firstName: userData.firstName || "",
+      lastName: userData.lastName || "",
+      username: userData.username || "",
+      role: userData.role || "USER",
+      avatar: userData.avatar || null,
+      createdAt: userData.createdAt,
+      updatedAt: userData.updatedAt,
+      wallet: walletScoreData?.wallet,
+      score: walletScoreData?.score,
+    };
+  }, [fetchWalletAndScore]);
 
+  // Debounced refresh function
+  const refreshUser = useCallback(async (): Promise<void> => {
+    // Clear any existing timeout
+    if (refreshTimeoutRef.current) {
+      clearTimeout(refreshTimeoutRef.current);
+    }
+    
+    return new Promise<void>((resolve) => {
+      refreshTimeoutRef.current = setTimeout(async () => {
+        if (!isMountedRef.current) {
+          resolve();
+          return;
+        }
+
+        try {
+          const session = await authClient.getSession();
+          
+          if (session.data?.user) {
+            const userData = await createUserFromData(session.data.user);
+            
+            if (isMountedRef.current) {
+              setUser(userData);
+              storeUserData(userData);
+            }
+          } else {
+            if (isMountedRef.current) {
+              clearAuthState();
+            }
+          }
+        } catch (error) {
+          console.error("Failed to refresh user:", error);
+          if (error instanceof Error && (error.message.includes('Unauthorized') || error.message.includes('401'))) {
+            if (isMountedRef.current) {
+              clearAuthState();
+            }
+          }
+        } finally {
+          resolve();
+        }
+      }, DEBOUNCE_DELAY);
+    });
+  }, [createUserFromData, storeUserData, clearAuthState]);
+
+  // Authentication functions
   const login = useCallback(async (email: string, password: string, rememberMe = false) => {
     try {
-      const result = await authClient.signIn.email({
-        email,
-        password,
-        rememberMe,
+      const baseURL = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:8000";
+      const response = await fetch(`${baseURL}/api/auth/sign-in/email`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ email, password, rememberMe }),
       });
 
-      if (result.error) {
-        throw new Error(result.error.message || "Login failed");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `Login failed: ${response.status}`);
       }
 
-      // Store token
-      const token = (result.data as any)?.session?.token;
-      if (typeof window !== 'undefined' && token) {
-        localStorage.setItem('better-auth.session_token', token as string);
+      const result = await response.json();
+
+      // Store token securely
+      const token = result.session?.token;
+      if (isClient() && token) {
+        localStorage.setItem(STORAGE_KEYS.SESSION_TOKEN, token);
       }
 
-      await refreshUser();
-      await new Promise(resolve => setTimeout(resolve, 100)); // Smooth transition
-      
+      // Update user state
+      if (result.user) {
+        const userData = await createUserFromData(result.user);
+        setUser(userData);
+        storeUserData(userData);
+      }
+
       return result;
     } catch (error) {
       console.error("Login failed:", error);
       clearAuthState();
       throw error;
     }
-  }, [refreshUser, clearAuthState]);
-
-  const loginWithGoogle = useCallback(async (callbackURL?: string) => {
-    throw new Error("Google authentication is not yet implemented");
-  }, []);
+  }, [isClient, createUserFromData, storeUserData, clearAuthState]);
 
   const signup = useCallback(async (email: string, password: string, name: string) => {
     try {
-      const result = await authClient.signUp.email({
-        email,
-        password,
-        name,
+      const baseURL = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:8000";
+      const response = await fetch(`${baseURL}/api/auth/sign-up/email`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ email, password, name }),
       });
 
-      if (result.error) {
-        throw new Error(result.error.message || "Signup failed");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `Signup failed: ${response.status}`);
       }
 
-      return result;
+      return await response.json();
     } catch (error) {
       console.error("Signup failed:", error);
       throw error;
     }
+  }, []);
+
+  const loginWithGoogle = useCallback(async (callbackURL?: string) => {
+    throw new Error("Google authentication is not yet implemented");
   }, []);
 
   const signupWithGoogle = useCallback(async (callbackURL?: string) => {
@@ -196,9 +281,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       clearAuthState();
       await authClient.signOut();
       
+      // Handle redirect
       if (redirectTo) {
         router.push(redirectTo);
-      } else {
+      } else if (isClient()) {
         const currentPath = window.location.pathname;
         const isOnProtectedRoute = PROTECTED_ROUTES.some(route => currentPath.startsWith(route));
         
@@ -211,9 +297,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUser(null);
       clearAuthState();
       
+      // Fallback redirect
       if (redirectTo) {
         router.push(redirectTo);
-      } else {
+      } else if (isClient()) {
         const currentPath = window.location.pathname;
         const isOnProtectedRoute = PROTECTED_ROUTES.some(route => currentPath.startsWith(route));
         
@@ -222,53 +309,71 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
       }
     }
-  }, [router, clearAuthState]);
+  }, [router, clearAuthState, isClient]);
 
   // Initialize auth on mount
   useEffect(() => {
+    isMountedRef.current = true;
+    
     const initializeAuth = async () => {
       try {
         // Check for cached user data first
-        if (typeof window !== 'undefined') {
-          const token = localStorage.getItem('better-auth.session_token');
-          const cachedUser = localStorage.getItem('user');
-          const cacheTime = localStorage.getItem('user_cache_time');
-          
-          if (cachedUser && cacheTime && token) {
-            const cacheAge = Date.now() - parseInt(cacheTime);
-            if (cacheAge < CACHE_DURATION) {
-              const user = JSON.parse(cachedUser);
-              setUser(user);
-              setIsLoading(false);
-              
-              // Refresh in background
-              setTimeout(refreshUser, 100);
-              return;
-            }
+        const cachedUser = getCachedUser();
+        if (cachedUser) {
+          if (isMountedRef.current) {
+            setUser(cachedUser);
+            setIsLoading(false);
           }
           
-          // No token = not authenticated
+          // Refresh in background
+          setTimeout(() => {
+            if (isMountedRef.current) {
+              refreshUser();
+            }
+          }, REFRESH_DELAY);
+          return;
+        }
+        
+        // Check for token
+        if (isClient()) {
+          const token = localStorage.getItem(STORAGE_KEYS.SESSION_TOKEN);
           if (!token) {
-            setUser(null);
-            setIsLoading(false);
+            if (isMountedRef.current) {
+              setUser(null);
+              setIsLoading(false);
+            }
             return;
           }
         }
         
         // Full auth check
-        await refreshUser();
+        if (isMountedRef.current) {
+          await refreshUser();
+        }
       } catch (error) {
         console.error("Auth initialization failed:", error);
-        clearAuthState();
+        if (isMountedRef.current) {
+          clearAuthState();
+        }
       } finally {
-        setIsLoading(false);
+        if (isMountedRef.current) {
+          setIsLoading(false);
+        }
       }
     };
 
     initializeAuth();
-  }, [refreshUser, clearAuthState]);
+    
+    return () => {
+      isMountedRef.current = false;
+      if (refreshTimeoutRef.current) {
+        clearTimeout(refreshTimeoutRef.current);
+      }
+    };
+  }, [getCachedUser, refreshUser, clearAuthState, isClient]);
 
-  const value: AuthContextType = {
+  // Memoized context value
+  const value = useMemo<AuthContextType>(() => ({
     user,
     isLoading,
     isAuthenticated,
@@ -279,7 +384,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     signupWithGoogle,
     logout,
     refreshUser,
-  };
+  }), [
+    user,
+    isLoading,
+    isAuthenticated,
+    isAdmin,
+    login,
+    loginWithGoogle,
+    signup,
+    signupWithGoogle,
+    logout,
+    refreshUser,
+  ]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
