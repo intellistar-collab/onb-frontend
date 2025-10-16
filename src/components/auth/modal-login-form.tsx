@@ -134,7 +134,7 @@ const ModalLoginForm: React.FC<ModalLoginFormProps> = ({ onSuccess }) => {
             htmlFor="email"
             className="text-sm font-medium text-muted-foreground"
           >
-            Email/Username
+            Email
           </label>
           <div className="relative">
             <Mail className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground/70 size-4" />

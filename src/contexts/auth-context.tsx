@@ -134,13 +134,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (email: string, password: string, rememberMe = false) => {
     try {
+      console.log("Auth context login attempt for:", email);
       const result = await authClient.signIn.email({
         email,
         password,
         rememberMe,
       });
 
+      console.log("Auth client result:", result);
+
       if (result.error) {
+        console.error("Auth client error:", result.error);
         throw new Error(result.error.message || "Login failed");
       }
 
@@ -154,7 +158,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         console.error("Failed to store token:", error);
       }
 
+      console.log("Login successful, refreshing user data...");
       await refreshUser();
+      console.log("User data refreshed successfully");
       return result;
     } catch (error) {
       console.error("Login failed:", error);

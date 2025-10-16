@@ -53,7 +53,7 @@ const TopBar = () => {
     { name: "HOME", href: "/" },
     { name: "MYSTERY BOXES", href: "/box" },
     { name: "HOW TO PLAY", href: "/how-to-play" },
-    { name: "RANKS", href: "ranks" },
+    { name: "RANKS", href: "/ranks" },
     ...(isAdmin ? [{ name: "ADMIN", href: "/admin/dashboard" }] : []),
   ];
 

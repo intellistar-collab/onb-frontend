@@ -5,7 +5,7 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   
   // Define protected routes
-  const protectedRoutes = ['/account', '/box', '/admin'];
+  const protectedRoutes = ['/account', '/admin'];
   const adminRoutes = ['/admin'];
   const authRoutes = ['/login', '/signup'];
   

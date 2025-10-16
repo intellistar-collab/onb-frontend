@@ -9,6 +9,7 @@ import { useToast } from "@/components/ui/toast";
 import { Mail, Lock, Eye, EyeOff, AlertCircle } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
+import { authClient } from "@/lib/auth-client";
 
 const LoginForm = () => {
   const { toast } = useToast();
@@ -59,14 +60,46 @@ const LoginForm = () => {
       const result = await login(email, password, rememberMe);
       console.log("Login result:", result);
 
-      // Wait a bit for the auth state to update
-      await new Promise(resolve => setTimeout(resolve, 200));
+      // Wait longer for auth state to update in production
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Verify authentication is working by checking session
+      let isAuthVerified = false;
+      let retryCount = 0;
+      const maxRetries = 3;
+      
+      while (!isAuthVerified && retryCount < maxRetries) {
+        try {
+          const session = await authClient.getSession();
+          if (session.data?.user) {
+            isAuthVerified = true;
+            console.log("Authentication verified:", session.data.user);
+          } else {
+            console.log(`Auth verification attempt ${retryCount + 1} failed, retrying...`);
+            retryCount++;
+            await new Promise(resolve => setTimeout(resolve, 500));
+          }
+        } catch (error) {
+          console.log(`Auth verification attempt ${retryCount + 1} error:`, error);
+          retryCount++;
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
+      }
+
+      if (!isAuthVerified) {
+        console.error("Authentication verification failed after retries");
+        throw new Error("Authentication verification failed");
+      }
 
       // Check user role and redirect accordingly
       const userRole = (result.data?.user as any)?.role;
       const redirectParam = searchParams.get('redirect') || 
                            (typeof window !== 'undefined' ? localStorage.getItem('login_redirect') : null);      
       let redirectTo = redirectParam || '/';
+      
+      console.log("User role:", userRole);
+      console.log("Redirect param:", redirectParam);
+      console.log("Final redirect to:", redirectTo);
       
       // Clear stored redirect after successful login
       if (typeof window !== 'undefined') {
@@ -76,17 +109,33 @@ const LoginForm = () => {
       // If user is ADMIN and no specific redirect, go to admin dashboard
       if (userRole === 'ADMIN' && !redirectParam) {
         redirectTo = '/admin/dashboard';
+        console.log("Admin user, redirecting to dashboard:", redirectTo);
       }
       
       toast({
         title: "Welcome back!",
         description: userRole === 'ADMIN' ? "Welcome back, Admin!" : "You're now signed in.",
         variant: "success",
-        durationMs: 2500,
+        durationMs: 2000,
       });
       
-      // Use window.location.href for a full page reload to ensure auth state is properly set
-      window.location.href = redirectTo;
+      // Use router.push for better SPA navigation, with fallback to window.location
+      try {
+        console.log("Attempting redirect to:", redirectTo);
+        // Try using Next.js router first
+        router.push(redirectTo);
+        
+        // Fallback: if router doesn't work, use window.location after a delay
+        setTimeout(() => {
+          if (window.location.pathname !== redirectTo) {
+            console.log("Router push failed, using window.location fallback");
+            window.location.href = redirectTo;
+          }
+        }, 500);
+      } catch (error) {
+        console.error("Router push failed:", error);
+        window.location.href = redirectTo;
+      }
     } catch (err) {
       // Extract error message from the error object
       let errorMessage = "An unexpected error occurred";
