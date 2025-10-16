@@ -1,3 +1,5 @@
+import { getAuthHeaders, authenticatedFetch, handleApiError } from './auth-utils';
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:8000';
 
 export interface BoxCategory {
@@ -28,17 +30,11 @@ export interface UpdateBoxCategoryData {
 }
 
 class BoxCategoriesAPI {
-  private async getAuthHeaders(): Promise<HeadersInit> {
-    const token = localStorage.getItem('better-auth.session_token');
-    return {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
-    };
-  }
+  // Using centralized getAuthHeaders from auth-utils
 
   async getAllBoxCategories(): Promise<BoxCategory[]> {
     try {
-      const headers = await this.getAuthHeaders();
+      const headers = await getAuthHeaders();
       
       const response = await fetch(`${API_BASE_URL}/box-categories`, {
         method: 'GET',
@@ -59,7 +55,7 @@ class BoxCategoriesAPI {
 
   async getBoxCategoryById(id: string): Promise<BoxCategory> {
     try {
-      const headers = await this.getAuthHeaders();
+      const headers = await getAuthHeaders();
       
       const response = await fetch(`${API_BASE_URL}/box-categories/${id}`, {
         method: 'GET',
@@ -80,7 +76,7 @@ class BoxCategoriesAPI {
 
   async createBoxCategory(data: CreateBoxCategoryData): Promise<BoxCategory> {
     try {
-      const headers = await this.getAuthHeaders();
+      const headers = await getAuthHeaders();
       
       const response = await fetch(`${API_BASE_URL}/box-categories`, {
         method: 'POST',
@@ -102,7 +98,7 @@ class BoxCategoriesAPI {
 
   async updateBoxCategory(id: string, data: UpdateBoxCategoryData): Promise<BoxCategory> {
     try {
-      const headers = await this.getAuthHeaders();
+      const headers = await getAuthHeaders();
       
       const response = await fetch(`${API_BASE_URL}/box-categories/${id}`, {
         method: 'PUT',
@@ -124,7 +120,7 @@ class BoxCategoriesAPI {
 
   async deleteBoxCategory(id: string): Promise<void> {
     try {
-      const headers = await this.getAuthHeaders();
+      const headers = await getAuthHeaders();
       
       const response = await fetch(`${API_BASE_URL}/box-categories/${id}`, {
         method: 'DELETE',
@@ -143,7 +139,7 @@ class BoxCategoriesAPI {
 
   async uploadPhoto(file: File): Promise<{ uploadUrl: string }> {
     try {
-      const headers = await this.getAuthHeaders();
+      const headers = await getAuthHeaders();
       
       const formData = new FormData();
       formData.append('file', file);

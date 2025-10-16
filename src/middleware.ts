@@ -27,14 +27,8 @@ export function middleware(request: NextRequest) {
   if (isProtectedRoute) {
     // Check for authentication cookie/session
     const sessionCookie = request.cookies.get('better-auth.session_token') || 
-                         request.cookies.get('session');
-    
-    // Debug logging for production issues
-    console.log(`[Middleware] Checking route: ${pathname}`);
-    console.log(`[Middleware] Referer: ${referer}`);
-    console.log(`[Middleware] Recent login flag: ${isRecentLogin}`);
-    console.log(`[Middleware] Session cookie exists: ${!!sessionCookie}`);
-    console.log(`[Middleware] Session cookie value: ${sessionCookie?.value ? 'present' : 'missing'}`);
+                         request.cookies.get('session') ||
+                         request.cookies.get('auth_token');
     
     // Check if this is a redirect from login page (might be a timing issue)
     const isFromLogin = referer && referer.includes('/login');

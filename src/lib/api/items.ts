@@ -1,3 +1,5 @@
+import { getAuthHeaders, authenticatedFetch, handleApiError } from './auth-utils';
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:8000';
 
 export interface Item {
@@ -47,22 +49,7 @@ export interface ItemStats {
 }
 
 class ItemsAPI {
-  private async getAuthHeaders(): Promise<HeadersInit> {
-    const allCookies = document.cookie;
-    const token = allCookies
-      .split('; ')
-      .find(row => row.startsWith('better-auth.session_token='))
-      ?.split('=')[1];
-
-    const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-    };
-
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-    return headers;
-  }
+  // Using centralized getAuthHeaders from auth-utils
 
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const url = `${API_BASE_URL}${endpoint}`;
@@ -91,54 +78,61 @@ class ItemsAPI {
   }
 
   async getAllItems(): Promise<Item[]> {
-    const response = await this.request<{ data: Item[]; meta: any }>('/items?limit=1000', { headers: await this.getAuthHeaders(), credentials: 'include' });
+    const headers = await getAuthHeaders();
+    const response = await this.request<{ data: Item[]; meta: any }>('/items?limit=1000', { headers, credentials: 'include' });
     return response.data;
   }
 
   async getItemById(id: string): Promise<Item> {
-    return this.request<Item>(`/items/${id}`, { headers: await this.getAuthHeaders(), credentials: 'include' });
+    const headers = await getAuthHeaders();
+    return this.request<Item>(`/items/${id}`, { headers, credentials: 'include' });
   }
 
   async getItemsByBoxId(boxId: string): Promise<Item[]> {
-    const response = await this.request<{ data: Item[]; meta: any }>(`/items?boxId=${boxId}&limit=1000`, { headers: await this.getAuthHeaders(), credentials: 'include' });
+    const headers = await getAuthHeaders();
+    const response = await this.request<{ data: Item[]; meta: any }>(`/items?boxId=${boxId}&limit=1000`, { headers, credentials: 'include' });
     return response.data;
   }
 
   async createItem(data: CreateItemData): Promise<Item> {
+    const headers = await getAuthHeaders();
     return this.request<Item>('/items', {
       method: 'POST',
-      headers: await this.getAuthHeaders(),
+      headers,
       credentials: 'include',
       body: JSON.stringify(data),
     });
   }
 
   async updateItem(id: string, data: UpdateItemData): Promise<Item> {
+    const headers = await getAuthHeaders();
     return this.request<Item>(`/items/${id}`, {
       method: 'PUT',
-      headers: await this.getAuthHeaders(),
+      headers,
       credentials: 'include',
       body: JSON.stringify(data),
     });
   }
 
   async deleteItem(id: string): Promise<{ message: string }> {
+    const headers = await getAuthHeaders();
     return this.request<{ message: string }>(`/items/${id}`, {
       method: 'DELETE',
-      headers: await this.getAuthHeaders(),
+      headers,
       credentials: 'include',
     });
   }
 
   async getItemStats(): Promise<ItemStats> {
-    return this.request<ItemStats>('/items/stats', { headers: await this.getAuthHeaders(), credentials: 'include' });
+    const headers = await getAuthHeaders();
+    return this.request<ItemStats>('/items/stats', { headers, credentials: 'include' });
   }
 
   async uploadImage(file: File): Promise<{ uploadUrl: string }> {
     const formData = new FormData();
     formData.append('image', file);
 
-    const authHeaders = await this.getAuthHeaders() as Record<string, string>;
+    const authHeaders = await getAuthHeaders() as Record<string, string>;
     delete authHeaders['Content-Type']; // Allow browser to set Content-Type for FormData
 
     const response = await fetch(`${API_BASE_URL}/items/upload`, {

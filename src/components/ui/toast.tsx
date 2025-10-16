@@ -58,7 +58,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 
 function Toaster({ toasts, onDismiss }: { toasts: ToastInternal[]; onDismiss: (id: string) => void }) {
   return (
-    <div className="fixed z-50 bottom-4 left-1/2 -translate-x-1/2 w-[calc(100%-1.5rem)] max-w-sm sm:max-w-md sm:right-4 sm:left-auto sm:translate-x-0 flex flex-col gap-2">
+    <div className="fixed z-[60] top-4 right-4 w-[calc(100%-2rem)] max-w-sm flex flex-col gap-2">
       {toasts.map((t) => (
         <ToastCard key={t.id} toast={t} onClose={() => onDismiss(t.id)} />)
       )}

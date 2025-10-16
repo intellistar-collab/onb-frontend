@@ -1,10 +1,11 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
-import {authClient} from "@/lib/auth-client";
+import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { walletScoreAPI } from "@/lib/api/account";
 
+// Types
 interface User {
   id: string;
   email: string;
@@ -41,8 +42,14 @@ interface AuthContextType {
   refreshUser: () => Promise<void>;
 }
 
+// Constants
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const PROTECTED_ROUTES = ['/account', '/admin'];
+
+// Context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Hook
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
@@ -51,6 +58,7 @@ export const useAuth = () => {
   return context;
 };
 
+// Provider
 interface AuthProviderProps {
   children: React.ReactNode;
 }
@@ -63,28 +71,39 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const isAuthenticated = !!user;
   const isAdmin = user?.role === "ADMIN";
 
-  const fetchWalletAndScore = async () => {
+  // Helper functions
+  const clearAuthState = useCallback(() => {
+    setUser(null);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('better-auth.session_token');
+      localStorage.removeItem('user');
+      localStorage.removeItem('user_cache_time');
+    }
+  }, []);
+
+  const storeUserData = useCallback((userData: User) => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('user', JSON.stringify(userData));
+      localStorage.setItem('user_cache_time', Date.now().toString());
+    }
+  }, []);
+
+  const fetchWalletAndScore = useCallback(async () => {
     try {
-      const walletScoreData = await walletScoreAPI.getWalletAndScore();
-      return walletScoreData;
+      return await walletScoreAPI.getWalletAndScore();
     } catch (error) {
       console.error("Failed to fetch wallet and score:", error);
       return null;
     }
-  };
+  }, []);
 
+  // Main auth functions
   const refreshUser = useCallback(async () => {
     try {
-      console.log("Refreshing user session...");
-      
       const session = await authClient.getSession();
-      console.log("Session data:", session);
       
       if (session.data?.user) {
         const userData = session.data.user as any;
-        console.log("User data found:", userData);
-        
-        // Fetch wallet and score data in parallel for better performance
         const walletScoreData = await fetchWalletAndScore();
         
         const user = {
@@ -101,94 +120,52 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         };
         
         setUser(user);
-        
-        // Store user data in localStorage for game access
-        try {
-          if (typeof window !== 'undefined') {
-            localStorage.setItem('user', JSON.stringify(user));
-          }
-        } catch (error) {
-          console.error('Failed to store user data in localStorage:', error);
-        }
+        storeUserData(user);
       } else {
-        console.log("No user data in session");
-        setUser(null);
-        // Clear localStorage when no user
-        try {
-          if (typeof window !== 'undefined') {
-            localStorage.removeItem('user');
-          }
-        } catch (error) {
-          console.error('Failed to clear user data from localStorage:', error);
-        }
+        clearAuthState();
       }
     } catch (error) {
       console.error("Failed to refresh user:", error);
-      // Don't immediately set user to null on error, might be temporary network issue
-      // Only set to null if it's a clear authentication error
-      if (error instanceof Error && error.message.includes('Unauthorized')) {
-        setUser(null);
+      if (error instanceof Error && (error.message.includes('Unauthorized') || error.message.includes('401'))) {
+        clearAuthState();
       }
     }
-  }, []);
+  }, [fetchWalletAndScore, storeUserData, clearAuthState]);
 
-  const login = async (email: string, password: string, rememberMe = false) => {
+  const login = useCallback(async (email: string, password: string, rememberMe = false) => {
     try {
-      console.log("Auth context login attempt for:", email);
       const result = await authClient.signIn.email({
         email,
         password,
         rememberMe,
       });
 
-      console.log("Auth client result:", result);
-
       if (result.error) {
-        console.error("Auth client error:", result.error);
         throw new Error(result.error.message || "Login failed");
       }
 
-      // Persist token locally to avoid third-party cookie blocking issues
-      try {
-        const token = (result.data as any)?.session?.token;
-        if (typeof window !== 'undefined' && token) {
-          localStorage.setItem('better-auth.session_token', token as string);
-        }
-      } catch (error) {
-        console.error("Failed to store token:", error);
+      // Store token
+      const token = (result.data as any)?.session?.token;
+      if (typeof window !== 'undefined' && token) {
+        localStorage.setItem('better-auth.session_token', token as string);
       }
 
-      console.log("Login successful, refreshing user data...");
       await refreshUser();
-      console.log("User data refreshed successfully");
+      await new Promise(resolve => setTimeout(resolve, 100)); // Smooth transition
+      
       return result;
     } catch (error) {
       console.error("Login failed:", error);
+      clearAuthState();
       throw error;
     }
-  };
+  }, [refreshUser, clearAuthState]);
 
-  const loginWithGoogle = async (callbackURL?: string) => {
-    try {
-      const result = await authClient.signIn.social({
-        provider: "google",
-        callbackURL: callbackURL || `${window.location.origin}/`,
-      });
+  const loginWithGoogle = useCallback(async (callbackURL?: string) => {
+    throw new Error("Google authentication is not yet implemented");
+  }, []);
 
-      if (result.error) {
-        throw new Error(result.error.message || "Google login failed");
-      }
-
-      // Refresh user data after successful login
-      await refreshUser();
-      return result;
-    } catch (error) {
-      console.error("Google login failed:", error);
-      throw error;
-    }
-  };
-
-  const signup = async (email: string, password: string, name: string) => {
+  const signup = useCallback(async (email: string, password: string, name: string) => {
     try {
       const result = await authClient.signUp.email({
         email,
@@ -200,61 +177,56 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         throw new Error(result.error.message || "Signup failed");
       }
 
-      // Refresh user data after successful signup
-      await refreshUser();
       return result;
     } catch (error) {
       console.error("Signup failed:", error);
       throw error;
     }
-  };
+  }, []);
 
-  const signupWithGoogle = async (callbackURL?: string) => {
+  const signupWithGoogle = useCallback(async (callbackURL?: string) => {
+    throw new Error("Google authentication is not yet implemented");
+  }, []);
+
+  const logout = useCallback(async (redirectTo?: string) => {
     try {
-      const result = await authClient.signIn.social({
-        provider: "google",
-        callbackURL: callbackURL || `${window.location.origin}/`,
-      });
-
-      if (result.error) {
-        throw new Error(result.error.message || "Google signup failed");
-      }
-
-      // Refresh user data after successful signup
-      await refreshUser();
-      return result;
-    } catch (error) {
-      console.error("Google signup failed:", error);
-      throw error;
-    }
-  };
-
-  const logout = async (redirectTo?: string) => {
-    try {
+      setUser(null);
+      clearAuthState();
       await authClient.signOut();
       
-      setUser(null);
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('better-auth.session_token');
-        localStorage.removeItem('user');
-      }
-      
-      // If redirectTo is provided, use it; otherwise stay on current page
       if (redirectTo) {
         router.push(redirectTo);
+      } else {
+        const currentPath = window.location.pathname;
+        const isOnProtectedRoute = PROTECTED_ROUTES.some(route => currentPath.startsWith(route));
+        
+        if (isOnProtectedRoute) {
+          router.push("/");
+        }
       }
-      // If no redirect specified, don't navigate - user stays on current page
     } catch (error) {
       console.error("Logout failed:", error);
+      setUser(null);
+      clearAuthState();
+      
+      if (redirectTo) {
+        router.push(redirectTo);
+      } else {
+        const currentPath = window.location.pathname;
+        const isOnProtectedRoute = PROTECTED_ROUTES.some(route => currentPath.startsWith(route));
+        
+        if (isOnProtectedRoute) {
+          router.push("/");
+        }
+      }
     }
-  };
+  }, [router, clearAuthState]);
 
+  // Initialize auth on mount
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        console.log("Initializing auth...");
-        
-        // First, check if we have a token for immediate feedback
+        // Check for cached user data first
         if (typeof window !== 'undefined') {
           const token = localStorage.getItem('better-auth.session_token');
           const cachedUser = localStorage.getItem('user');
@@ -262,25 +234,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           
           if (cachedUser && cacheTime && token) {
             const cacheAge = Date.now() - parseInt(cacheTime);
-            if (cacheAge < 5 * 60 * 1000) { // 5 minutes
-              console.log("Using cached user data for fast loading");
+            if (cacheAge < CACHE_DURATION) {
               const user = JSON.parse(cachedUser);
               setUser(user);
-              setIsLoading(false); // Stop loading immediately with cached data
+              setIsLoading(false);
               
-              // Then refresh with fresh data in background
-              setTimeout(async () => {
-                try {
-                  await refreshUser(); // Force refresh
-                } catch (error) {
-                  console.error("Background auth refresh failed:", error);
-                }
-              }, 100);
+              // Refresh in background
+              setTimeout(refreshUser, 100);
               return;
             }
           }
           
-          // If no token, immediately show as not authenticated
+          // No token = not authenticated
           if (!token) {
             setUser(null);
             setIsLoading(false);
@@ -288,26 +253,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           }
         }
         
-        // If we have a token but no cached data, do full auth check
-        const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Auth timeout')), 8000)
-        );
-        
-        await Promise.race([refreshUser(), timeoutPromise]);
-        console.log("Auth initialization completed");
+        // Full auth check
+        await refreshUser();
       } catch (error) {
-        console.error("Failed to initialize auth:", error);
-        // Don't set user to null on timeout, just stop loading
-        if (error instanceof Error && error.message !== 'Auth timeout') {
-          setUser(null);
-        }
+        console.error("Auth initialization failed:", error);
+        clearAuthState();
       } finally {
         setIsLoading(false);
       }
     };
 
     initializeAuth();
-  }, [refreshUser]);
+  }, [refreshUser, clearAuthState]);
 
   const value: AuthContextType = {
     user,

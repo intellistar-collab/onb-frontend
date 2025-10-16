@@ -1,3 +1,5 @@
+import { getAuthHeaders, authenticatedFetch, handleApiError } from './auth-utils';
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:8000';
 
 export interface Box {
@@ -59,30 +61,11 @@ export interface BoxStats {
 }
 
 class BoxesAPI {
-  private async getAuthHeaders(): Promise<HeadersInit> {
-    // Get the session token from cookies
-    const allCookies = document.cookie;
-    
-    const token = allCookies
-      .split('; ')
-      .find(row => row.startsWith('better-auth.session_token='))
-      ?.split('=')[1];
-
-    const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-    };
-
-    // Only add Authorization header if token exists
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-
-    return headers;
-  }
+  // Using centralized getAuthHeaders from auth-utils
 
   async getAllBoxes(): Promise<Box[]> {
     try {
-      const headers = await this.getAuthHeaders();
+      const headers = await getAuthHeaders();
       
       const response = await fetch(`${API_BASE_URL}/boxes`, {
         method: 'GET',
@@ -113,7 +96,7 @@ class BoxesAPI {
 
   async getBoxById(id: string): Promise<Box> {
     try {
-      const headers = await this.getAuthHeaders();
+      const headers = await getAuthHeaders();
       
       const response = await fetch(`${API_BASE_URL}/boxes/${id}`, {
         method: 'GET',
@@ -145,7 +128,7 @@ class BoxesAPI {
     try {
       const response = await fetch(`${API_BASE_URL}/boxes`, {
         method: 'POST',
-        headers: await this.getAuthHeaders(),
+        headers: await getAuthHeaders(),
         credentials: 'include',
         body: JSON.stringify(data),
       });
@@ -166,7 +149,7 @@ class BoxesAPI {
     try {
       const response = await fetch(`${API_BASE_URL}/boxes/${id}`, {
         method: 'PUT',
-        headers: await this.getAuthHeaders(),
+        headers: await getAuthHeaders(),
         credentials: 'include',
         body: JSON.stringify(data),
       });
@@ -195,7 +178,7 @@ class BoxesAPI {
     try {
       const response = await fetch(`${API_BASE_URL}/boxes/${id}`, {
         method: 'DELETE',
-        headers: await this.getAuthHeaders(),
+        headers: await getAuthHeaders(),
         credentials: 'include',
       });
 
@@ -221,7 +204,7 @@ class BoxesAPI {
 
   async getBoxStats(): Promise<BoxStats> {
     try {
-      const headers = await this.getAuthHeaders();
+      const headers = await getAuthHeaders();
       
       const response = await fetch(`${API_BASE_URL}/boxes/stats`, {
         method: 'GET',
@@ -255,7 +238,7 @@ class BoxesAPI {
       formData.append('image', file);
 
       // Get auth headers but remove Content-Type to let browser set it for FormData
-      const authHeaders = await this.getAuthHeaders() as Record<string, string>;
+      const authHeaders = await getAuthHeaders() as Record<string, string>;
       delete authHeaders['Content-Type'];
 
       const response = await fetch(`${API_BASE_URL}/boxes/upload`, {

@@ -1,5 +1,5 @@
 
-import { authClient } from "@/lib/auth-client";
+import { getAuthHeaders, authenticatedFetch, handleApiError } from './auth-utils';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:8000';
 
@@ -116,47 +116,13 @@ export interface UpdatePreferencesData {
   };
 }
 
-const getAuthHeaders = async (): Promise<HeadersInit> => {
-  const headers: HeadersInit = {
-    'Content-Type': 'application/json',
-  };
-
-  try {
-    const session = await authClient.getSession();
-    const token = session.data?.session?.token;
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-  } catch (_err) {
-    // Fallback to cookie parsing if session fetch fails (best-effort)
-    try {
-      if (typeof window !== 'undefined') {
-        const lsToken = localStorage.getItem('better-auth.session_token');
-        if (lsToken) {
-          headers['Authorization'] = `Bearer ${lsToken}`;
-          return headers;
-        }
-      }
-      if (typeof document !== 'undefined') {
-        const cookies = document.cookie.split(';');
-        const sessionCookie = cookies.find(cookie => cookie.trim().startsWith('better-auth.session_token='));
-        if (sessionCookie) {
-          const token = sessionCookie.split('=')[1];
-          headers['Authorization'] = `Bearer ${token}`;
-        }
-      }
-    } catch (_e) {}
-  }
-
-  return headers;
-};
-
 // Profile API
 export const profileAPI = {
   async getProfile(): Promise<UserProfile> {
+    const headers = await getAuthHeaders();
     const response = await fetch(`${API_BASE_URL}/api/account/profile`, {
       method: 'GET',
-      headers: await getAuthHeaders(),
+      headers,
       credentials: 'include',
     });
 
@@ -175,9 +141,10 @@ export const profileAPI = {
   },
 
   async updateProfile(data: UpdateProfileData): Promise<UserProfile> {
+    const headers = await getAuthHeaders();
     const response = await fetch(`${API_BASE_URL}/api/account/profile`, {
       method: 'PUT',
-      headers: await getAuthHeaders(),
+      headers,
       credentials: 'include',
       body: JSON.stringify(data),
     });
@@ -205,10 +172,11 @@ export const securityAPI = {
       currentPassword: data.currentPassword,
       newPassword: data.newPassword,
     };
+    const headers = await getAuthHeaders();
 
     const response = await fetch(`${API_BASE_URL}/api/account/change-password`, {
       method: 'PUT',
-      headers: await getAuthHeaders(),
+      headers,
       credentials: 'include',
       body: JSON.stringify(requestData),
     });
@@ -228,9 +196,10 @@ export const securityAPI = {
   },
 
   async enable2FA(): Promise<{ qrCode: string; secret: string }> {
+    const headers = await getAuthHeaders();
     const response = await fetch(`${API_BASE_URL}/api/account/security/enable-2fa`, {
       method: 'POST',
-      headers: await getAuthHeaders(),
+      headers,
       credentials: 'include',
     });
 
@@ -249,9 +218,10 @@ export const securityAPI = {
   },
 
   async verify2FA(token: string): Promise<{ message: string }> {
+    const headers = await getAuthHeaders();
     const response = await fetch(`${API_BASE_URL}/api/account/security/verify-2fa`, {
       method: 'POST',
-      headers: await getAuthHeaders(),
+      headers,
       credentials: 'include',
       body: JSON.stringify({ token }),
     });
@@ -274,9 +244,10 @@ export const securityAPI = {
 // Wallet API
 export const walletAPI = {
   async getWallet(): Promise<WalletData> {
+    const headers = await getAuthHeaders();
     const response = await fetch(`${API_BASE_URL}/api/account/wallet`, {
       method: 'GET',
-      headers: await getAuthHeaders(),
+      headers,
       credentials: 'include',
     });
 
@@ -295,9 +266,10 @@ export const walletAPI = {
   },
 
   async updateWalletSettings(data: Partial<WalletData>): Promise<WalletData> {
+    const headers = await getAuthHeaders();
     const response = await fetch(`${API_BASE_URL}/api/account/wallet`, {
       method: 'PUT',
-      headers: await getAuthHeaders(),
+      headers,
       credentials: 'include',
       body: JSON.stringify(data),
     });
@@ -317,9 +289,10 @@ export const walletAPI = {
   },
 
   async getTransactions(page = 1, limit = 10): Promise<{ transactions: WalletTransaction[]; total: number; page: number; limit: number }> {
+    const headers = await getAuthHeaders();
     const response = await fetch(`${API_BASE_URL}/api/account/wallet/transactions?page=${page}&limit=${limit}`, {
       method: 'GET',
-      headers: await getAuthHeaders(),
+      headers,
       credentials: 'include',
     });
 
@@ -338,9 +311,10 @@ export const walletAPI = {
   },
 
   async addFunds(amount: number, paymentMethod: string): Promise<{ message: string; transactionId: string }> {
+    const headers = await getAuthHeaders();
     const response = await fetch(`${API_BASE_URL}/api/account/wallet/add-funds`, {
       method: 'POST',
-      headers: await getAuthHeaders(),
+      headers,
       credentials: 'include',
       body: JSON.stringify({ amount, paymentMethod }),
     });
@@ -360,9 +334,10 @@ export const walletAPI = {
   },
 
   async withdraw(amount: number, paymentMethod: string): Promise<{ message: string; transactionId: string }> {
+    const headers = await getAuthHeaders();
     const response = await fetch(`${API_BASE_URL}/api/account/wallet/withdraw`, {
       method: 'POST',
-      headers: await getAuthHeaders(),
+      headers,
       credentials: 'include',
       body: JSON.stringify({ amount, paymentMethod }),
     });
@@ -385,9 +360,10 @@ export const walletAPI = {
 // Preferences API
 export const preferencesAPI = {
   async getPreferences(): Promise<UserPreferences> {
+    const headers = await getAuthHeaders();
     const response = await fetch(`${API_BASE_URL}/api/account/preferences`, {
       method: 'GET',
-      headers: await getAuthHeaders(),
+      headers,
       credentials: 'include',
     });
 
@@ -406,9 +382,10 @@ export const preferencesAPI = {
   },
 
   async updatePreferences(data: UpdatePreferencesData): Promise<UserPreferences> {
+    const headers = await getAuthHeaders();
     const response = await fetch(`${API_BASE_URL}/api/account/preferences`, {
       method: 'PUT',
-      headers: await getAuthHeaders(),
+      headers,
       credentials: 'include',
       body: JSON.stringify(data),
     });
@@ -446,9 +423,10 @@ export interface WalletScoreData {
 
 export const walletScoreAPI = {
   async getWalletAndScore(): Promise<WalletScoreData> {
+    const headers = await getAuthHeaders();
     const response = await fetch(`${API_BASE_URL}/api/account/wallet-score`, {
       method: 'GET',
-      headers: await getAuthHeaders(),
+      headers,
       credentials: 'include',
     });
 

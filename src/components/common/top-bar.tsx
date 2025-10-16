@@ -173,7 +173,7 @@ const TopBar = () => {
 
             {isLoading ? (
               <div className="flex items-center gap-2">
-                <div className="h-8 w-8 bg-muted rounded-full rounded" />
+                <div className="h-8 w-8 bg-muted rounded-full animate-pulse rounded" />
                 <div className="h-4 w-20 bg-muted rounded animate-pulse" />
               </div>
             ) : isAuthenticated ? (

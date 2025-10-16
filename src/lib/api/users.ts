@@ -1,3 +1,5 @@
+import { getAuthHeaders, authenticatedFetch, handleApiError } from './auth-utils';
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:8000';
 
 export interface User {
@@ -75,30 +77,11 @@ export interface UpdateUserData {
 }
 
 class UsersAPI {
-  private async getAuthHeaders(): Promise<HeadersInit> {
-    // Get the session token from cookies
-    const allCookies = document.cookie;
-    
-    const token = allCookies
-      .split('; ')
-      .find(row => row.startsWith('better-auth.session_token='))
-      ?.split('=')[1];
-
-    const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-    };
-
-    // Only add Authorization header if token exists
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-
-    return headers;
-  }
+  // Using centralized getAuthHeaders from auth-utils
 
   async getAllUsers(): Promise<User[]> {
     try {
-      const headers = await this.getAuthHeaders();
+      const headers = await getAuthHeaders();
       
       const response = await fetch(`${API_BASE_URL}/users`, {
         method: 'GET',
@@ -129,9 +112,10 @@ class UsersAPI {
 
   async createUser(userData: CreateUserData): Promise<User> {
     try {
+      const headers = await getAuthHeaders();
       const response = await fetch(`${API_BASE_URL}/users`, {
         method: 'POST',
-        headers: await this.getAuthHeaders(),
+        headers,
         credentials: 'include',
         body: JSON.stringify(userData),
       });
@@ -150,9 +134,10 @@ class UsersAPI {
 
   async updateUser(id: string, userData: UpdateUserData): Promise<User> {
     try {
+      const headers = await getAuthHeaders();
       const response = await fetch(`${API_BASE_URL}/users/${id}`, {
         method: 'PUT',
-        headers: await this.getAuthHeaders(),
+        headers,
         credentials: 'include',
         body: JSON.stringify(userData),
       });
@@ -179,9 +164,10 @@ class UsersAPI {
 
   async deleteUser(id: string): Promise<{ message: string }> {
     try {
+      const headers = await getAuthHeaders();
       const response = await fetch(`${API_BASE_URL}/users/${id}`, {
         method: 'DELETE',
-        headers: await this.getAuthHeaders(),
+        headers,
         credentials: 'include',
       });
 

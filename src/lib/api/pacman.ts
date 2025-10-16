@@ -1,3 +1,5 @@
+import { getAuthHeaders, authenticatedFetch, handleApiError } from './auth-utils';
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:8000';
 
 export interface PacmanScore {
@@ -23,14 +25,11 @@ export interface PacmanScoreResponse {
  */
 export const submitPacmanScore = async (scoreData: PacmanScore): Promise<PacmanScoreResponse> => {
   try {
-    const token = localStorage.getItem('better-auth.session_token');
+    const headers = await getAuthHeaders();
     
     const response = await fetch(`${API_BASE_URL}/pacman/scores`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': token ? `Bearer ${token}` : '',
-      },
+      headers,
       body: JSON.stringify({
         userId: scoreData.userId,
         score: scoreData.score,
