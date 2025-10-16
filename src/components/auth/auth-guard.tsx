@@ -24,12 +24,6 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
 
   // Simple, single-purpose redirect logic
   useEffect(() => {
-    // Don't redirect while loading
-    if (isLoading) return;
-    
-    // Don't redirect multiple times
-    if (hasRedirected) return;
-
     console.log("🔍 AuthGuard check:", { 
       isLoading, 
       isAuthenticated, 
@@ -38,6 +32,12 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
       requireAdmin, 
       pathname 
     });
+
+    // Don't redirect while loading
+    if (isLoading) return;
+    
+    // Don't redirect multiple times
+    if (hasRedirected) return;
 
     // Check authentication requirements
     if (requireAuth && !isAuthenticated) {
@@ -75,24 +75,8 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
   }, [pathname]);
 
   // Show loading state
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
-
-  // Show nothing while redirecting
-  if (hasRedirected) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Redirecting...</p>
-        </div>
-      </div>
-    );
+  if (isLoading || hasRedirected) {
+    return <>{children}</>;
   }
 
   // Show content if all checks pass
