@@ -383,15 +383,39 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [router, clearAuthState, isClient]);
 
-  // Initialize auth on mount
+  // Initialize auth on mount and when component re-mounts (e.g., after page reload)
   useEffect(() => {
     isMountedRef.current = true;
     
+    // Listen for storage changes (e.g., when auth state changes in another tab)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === STORAGE_KEYS.SESSION_TOKEN || e.key === STORAGE_KEYS.USER_DATA) {
+        console.log("🔄 Storage change detected, re-initializing auth...");
+        initializeAuth();
+      }
+    };
+
+    // Listen for page visibility changes (e.g., when user comes back to tab)
+    const handleVisibilityChange = () => {
+      if (!document.hidden && isMountedRef.current) {
+        console.log("🔄 Page became visible, checking auth state...");
+        // Small delay to ensure any pending auth operations complete
+        setTimeout(() => {
+          if (isMountedRef.current) {
+            refreshUser();
+          }
+        }, 100);
+      }
+    };
+
     const initializeAuth = async () => {
       try {
+        console.log("🔄 Initializing auth context...");
+        
         // Check for cached user data first
         const cachedUser = getCachedUser();
         if (cachedUser) {
+          console.log("📦 Found cached user, setting immediately");
           if (isMountedRef.current) {
             setUser(cachedUser);
             setIsLoading(false);
@@ -400,6 +424,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           // Refresh in background
           setTimeout(() => {
             if (isMountedRef.current) {
+              console.log("🔄 Refreshing user data in background...");
               refreshUser();
             }
           }, REFRESH_DELAY);
@@ -410,6 +435,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if (isClient()) {
           const token = localStorage.getItem(STORAGE_KEYS.SESSION_TOKEN);
           if (!token) {
+            console.log("❌ No token found, setting user to null");
             if (isMountedRef.current) {
               setUser(null);
               setIsLoading(false);
@@ -417,9 +443,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             return;
           }
           
+          console.log("🔑 Token found, attempting to refresh...");
           // Try to refresh token first if we have one
           const refreshed = await refreshToken();
           if (!refreshed) {
+            console.log("❌ Token refresh failed, clearing auth state");
             // Token is invalid, clear auth state
             if (isMountedRef.current) {
               clearAuthState();
@@ -430,16 +458,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
         
         // Full auth check
+        console.log("🔄 Performing full auth check...");
         if (isMountedRef.current) {
           await refreshUser();
         }
       } catch (error) {
-        console.error("Auth initialization failed:", error);
+        console.error("❌ Auth initialization failed:", error);
         if (isMountedRef.current) {
           clearAuthState();
         }
       } finally {
         if (isMountedRef.current) {
+          console.log("✅ Auth initialization complete");
           setIsLoading(false);
         }
       }
@@ -447,13 +477,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     initializeAuth();
     
+    // Add event listeners
+    if (isClient()) {
+      window.addEventListener('storage', handleStorageChange);
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+    }
+    
     return () => {
       isMountedRef.current = false;
       if (refreshTimeoutRef.current) {
         clearTimeout(refreshTimeoutRef.current);
       }
+      
+      // Remove event listeners
+      if (isClient()) {
+        window.removeEventListener('storage', handleStorageChange);
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+      }
     };
-  }, [getCachedUser, refreshUser, clearAuthState, isClient, refreshToken]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty dependency array - run on every mount/re-mount
 
   // Memoized context value
   const value = useMemo<AuthContextType>(() => ({

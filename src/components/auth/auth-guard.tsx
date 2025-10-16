@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
 
@@ -20,66 +20,82 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
   const { user, isLoading, isAuthenticated, isAdmin } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+  const [hasRedirected, setHasRedirected] = useState(false);
 
+  // Simple, single-purpose redirect logic
   useEffect(() => {
+    // Don't redirect while loading
     if (isLoading) return;
-
-    // Add a small delay to allow authentication state to settle after login
-    const checkAuth = () => {
-      // If authentication is required but user is not authenticated
-      if (requireAuth && !isAuthenticated) {
-        const loginUrl = redirectTo || "/login";
-        const redirectParam = encodeURIComponent(pathname);
-        router.push(`${loginUrl}?redirect=${redirectParam}`);
-        return;
-      }
-
-      // If admin access is required but user is not admin
-      if (requireAdmin && (!isAuthenticated || !isAdmin)) {
-        router.push(redirectTo || "/");
-        return;
-      }
-
-      // If user is authenticated but trying to access auth pages
-      if (isAuthenticated && (pathname === "/login" || pathname === "/signup")) {
-        // Redirect admin users to admin dashboard, others to home
-        const redirectPath = isAdmin ? "/admin/dashboard" : "/";
-        router.push(redirectPath);
-        return;
-      }
-    };
-
-    // Check immediately, but also add a small delay for cases where auth state is still updating
-    checkAuth();
     
-    // If we're on a protected route and not authenticated, give a small delay for auth state to update
+    // Don't redirect multiple times
+    if (hasRedirected) return;
+
+    console.log("🔍 AuthGuard check:", { 
+      isLoading, 
+      isAuthenticated, 
+      isAdmin, 
+      requireAuth, 
+      requireAdmin, 
+      pathname 
+    });
+
+    // Check authentication requirements
     if (requireAuth && !isAuthenticated) {
-      const timeoutId = setTimeout(checkAuth, 500);
-      return () => clearTimeout(timeoutId);
+      console.log("❌ Auth required but not authenticated, redirecting to login");
+      const loginUrl = redirectTo || "/login";
+      const redirectParam = encodeURIComponent(pathname);
+      setHasRedirected(true);
+      router.push(`${loginUrl}?redirect=${redirectParam}`);
+      return;
     }
-  }, [isLoading, isAuthenticated, isAdmin, requireAuth, requireAdmin, pathname, router, redirectTo]);
 
-  // Show page content with loading states while checking authentication
-  // This allows individual components to show their own skeleton loading
+    // Check admin requirements
+    if (requireAdmin && (!isAuthenticated || !isAdmin)) {
+      console.log("❌ Admin required but not admin, redirecting");
+      setHasRedirected(true);
+      router.push(redirectTo || "/");
+      return;
+    }
+
+    // Redirect authenticated users away from auth pages
+    if (isAuthenticated && (pathname === "/login" || pathname === "/signup")) {
+      console.log("✅ Authenticated user on auth page, redirecting");
+      const redirectPath = isAdmin ? "/admin/dashboard" : "/";
+      setHasRedirected(true);
+      router.push(redirectPath);
+      return;
+    }
+
+    console.log("✅ AuthGuard check passed");
+  }, [isLoading, isAuthenticated, isAdmin, requireAuth, requireAdmin, pathname, router, redirectTo, hasRedirected]);
+
+  // Reset redirect flag when pathname changes
+  useEffect(() => {
+    setHasRedirected(false);
+  }, [pathname]);
+
+  // Show loading state
   if (isLoading) {
-    return <>{children}</>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
   }
 
-  // If authentication is required but user is not authenticated
-  if (requireAuth && !isAuthenticated) {
-    return null; // Will redirect in useEffect
+  // Show nothing while redirecting
+  if (hasRedirected) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Redirecting...</p>
+        </div>
+      </div>
+    );
   }
 
-  // If admin access is required but user is not admin
-  if (requireAdmin && (!isAuthenticated || !isAdmin)) {
-    return null; // Will redirect in useEffect
-  }
-
-  // If user is authenticated but trying to access auth pages
-  if (isAuthenticated && (pathname === "/login" || pathname === "/signup")) {
-    return null; // Will redirect in useEffect
-  }
-
+  // Show content if all checks pass
   return <>{children}</>;
 };
 
@@ -92,13 +108,6 @@ export const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }
   <AuthGuard requireAuth requireAdmin>{children}</AuthGuard>
 );
 
-export const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isLoading } = useAuth();
-  
-  // For public routes, don't wait for auth check to complete
-  if (isLoading) {
-    return <>{children}</>;
-  }
-  
-  return <>{children}</>;
-};
+export const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <>{children}</>
+);
