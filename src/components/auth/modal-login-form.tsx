@@ -43,10 +43,6 @@ const ModalLoginForm: React.FC<ModalLoginFormProps> = ({ onSuccess }) => {
       console.log("Login result:", result);
 
       const userRole = (result.data?.user as any)?.role;
-      
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('login_redirect');
-      }
 
       toast({
         title: "Welcome back!",
@@ -56,9 +52,12 @@ const ModalLoginForm: React.FC<ModalLoginFormProps> = ({ onSuccess }) => {
       });
       
       
-      // If user is ADMIN and no specific redirect, go to admin dashboard
+      // If user is ADMIN, redirect to admin dashboard
       if (userRole === 'ADMIN') {
         router.push('/admin/dashboard');
+      } else {
+        // For regular users, close the modal and stay on current page
+        onSuccess?.();
       }
     } catch (err) {
       let errorMessage = "An unexpected error occurred";

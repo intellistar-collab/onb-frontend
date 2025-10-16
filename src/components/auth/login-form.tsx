@@ -22,14 +22,6 @@ const LoginForm = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Store redirect parameter in localStorage as backup when component mounts
-  React.useEffect(() => {
-    const redirectParam = searchParams.get('redirect');
-    if (redirectParam && typeof window !== 'undefined') {
-      localStorage.setItem('login_redirect', redirectParam);
-    }
-  }, [searchParams]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -53,14 +45,8 @@ const LoginForm = () => {
 
       // Check user role and redirect accordingly
       const userRole = (result.data?.user as any)?.role;
-      const redirectParam = searchParams.get('redirect') || 
-                           (typeof window !== 'undefined' ? localStorage.getItem('login_redirect') : null);      
+      const redirectParam = searchParams.get('redirect') || null;      
       let redirectTo = redirectParam || '/';
-      
-      // Clear stored redirect after successful login
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('login_redirect');
-      }
       
       // If user is ADMIN and no specific redirect, go to admin dashboard
       if (userRole === 'ADMIN' && !redirectParam) {
@@ -91,17 +77,6 @@ const LoginForm = () => {
       
       setError(errorMessage);
       
-      // Preserve redirect parameter in URL even on error
-      const redirectParam = searchParams.get('redirect') || 
-                           (typeof window !== 'undefined' ? localStorage.getItem('login_redirect') : null);
-      if (redirectParam && typeof window !== 'undefined') {
-        const currentUrl = new URL(window.location.href);
-        if (!currentUrl.searchParams.has('redirect')) {
-          currentUrl.searchParams.set('redirect', redirectParam);
-          window.history.replaceState({}, '', currentUrl.toString());
-        }
-      }
-      
       toast({
         title: "Sign in failed",
         description: errorMessage,
@@ -114,8 +89,7 @@ const LoginForm = () => {
 
   const handleGoogleSignIn = async () => {
     try {
-      const redirectTo = searchParams.get('redirect') || 
-                        (typeof window !== 'undefined' ? localStorage.getItem('login_redirect') : null) || '/';
+      const redirectTo = searchParams.get('redirect') || '/';
       
       // For Google sign-in, we'll handle role-based redirect after successful authentication
       // The redirect will be processed by the callback URL
