@@ -130,14 +130,51 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return null;
   }, [isClient]);
 
+  const refreshToken = useCallback(async (): Promise<boolean> => {
+    try {
+      const baseURL = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:8000";
+      const response = await fetch(`${baseURL}/api/auth/refresh`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        if (result.token && isClient()) {
+          localStorage.setItem(STORAGE_KEYS.SESSION_TOKEN, result.token);
+          return true;
+        }
+      }
+      return false;
+    } catch (error) {
+      console.error("Failed to refresh token:", error);
+      return false;
+    }
+  }, [isClient]);
+
   const fetchWalletAndScore = useCallback(async () => {
     try {
       return await walletScoreAPI.getWalletAndScore();
     } catch (error) {
-      console.error("Failed to fetch wallet and score:", error);
+      // Try to refresh token and retry once
+      if (error instanceof Error && error.message.includes('Unauthorized')) {
+        const refreshed = await refreshToken();
+        if (refreshed) {
+          try {
+            return await walletScoreAPI.getWalletAndScore();
+          } catch (retryError) {
+            console.error("Failed to fetch wallet and score after refresh:", retryError);
+          }
+        }
+      }
+      
       return null;
     }
-  }, []);
+  }, [refreshToken]);
 
   const createUserFromData = useCallback(async (userData: any): Promise<User> => {
     const walletScoreData = await fetchWalletAndScore();
@@ -189,7 +226,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         } catch (error) {
           console.error("Failed to refresh user:", error);
           if (error instanceof Error && (error.message.includes('Unauthorized') || error.message.includes('401'))) {
-            if (isMountedRef.current) {
+            // Try to refresh token before clearing auth state
+            const refreshed = await refreshToken();
+            if (!refreshed && isMountedRef.current) {
               clearAuthState();
             }
           }
@@ -198,7 +237,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
       }, DEBOUNCE_DELAY);
     });
-  }, [createUserFromData, storeUserData, clearAuthState]);
+  }, [createUserFromData, storeUserData, clearAuthState, refreshToken]);
 
   // Authentication functions
   const login = useCallback(async (email: string, password: string, rememberMe = false) => {
