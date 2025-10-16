@@ -30,7 +30,6 @@ export default function ConditionalLayout({ children }: ConditionalLayoutProps) 
   return (
     <ToastProvider>
       <TopBar />
-      <ExperienceBanner />
       {children}
       <Footer />
       <FloatingUsersSidebar />

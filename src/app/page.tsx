@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { boxCategoriesAPI, BoxCategory } from "@/lib/api/box-categories";
 import { boxesAPI, Box } from "@/lib/api/boxes";
 import Hero from "@/components/home/hero";
+import ExperienceBanner from "@/components/common/experience-banner";
 import HomeTabs from "@/components/home/home-tabs";
 import HomeTabsSkeleton from "@/components/home/home-tabs-skeleton";
 import PimpCatcher from "@/components/pimp-catcher-game/pimp-catcher";
@@ -80,6 +81,7 @@ const HomeScreen = () => {
 
   return (
     <main>
+      <ExperienceBanner />
       {/* Unified Hero Component with integrated WhatWeDo functionality */}
       <section className="mb-8">
         <Hero />

@@ -68,8 +68,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   }, []);
 
   const handleLogout = async () => {
-    await logout();
-    router.push("/");
+    await logout("/"); // Admin users should go to home after logout
   };
 
   return (

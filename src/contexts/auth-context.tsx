@@ -37,7 +37,7 @@ interface AuthContextType {
   loginWithGoogle: (callbackURL?: string) => Promise<any>;
   signup: (email: string, password: string, name: string) => Promise<any>;
   signupWithGoogle: (callbackURL?: string) => Promise<any>;
-  logout: () => Promise<void>;
+  logout: (redirectTo?: string) => Promise<void>;
   refreshUser: () => Promise<void>;
 }
 
@@ -229,7 +229,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const logout = async () => {
+  const logout = async (redirectTo?: string) => {
     try {
       await authClient.signOut();
       
@@ -238,7 +238,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         localStorage.removeItem('better-auth.session_token');
         localStorage.removeItem('user');
       }
-      router.push("/");
+      
+      // If redirectTo is provided, use it; otherwise stay on current page
+      if (redirectTo) {
+        router.push(redirectTo);
+      }
+      // If no redirect specified, don't navigate - user stays on current page
     } catch (error) {
       console.error("Logout failed:", error);
     }
