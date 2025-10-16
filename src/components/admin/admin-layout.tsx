@@ -157,7 +157,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="admin-text-primary text-sm font-medium truncate">
-                    {user?.name || user?.username || "Admin"}
+                    {user?.username || "Admin"}
                   </p>
                   <p className="admin-text-tertiary text-xs truncate">
                     {user?.email}
@@ -246,7 +246,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 <DropdownMenuContent className="admin-bg-secondary admin-border-primary" align="end">
                   <div className="px-3 py-2 text-sm admin-text-secondary border-b admin-border-primary">
                     <div className="font-medium admin-text-primary">
-                      {user?.name || user?.username}
+                      {user?.username}
                     </div>
                     <div className="text-xs admin-text-tertiary">
                       {user?.email}
