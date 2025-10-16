@@ -2,9 +2,8 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  const { pathname, searchParams } = request.nextUrl;
+  const { pathname } = request.nextUrl;
   const referer = request.headers.get('referer');
-  const isRecentLogin = searchParams.get('_recent_login') === 'true';
   
   // Define protected routes
   const protectedRoutes = ['/account', '/admin'];
@@ -36,11 +35,18 @@ export function middleware(request: NextRequest) {
     // Check for any authentication-related headers or cookies
     const hasAuthHeaders = request.headers.get('authorization') || 
                           request.headers.get('x-auth-token');
+
+    console.log("======Middleware====== Session Cookie: ", sessionCookie)
+    console.log("======Middleware====== Session Cookie Value: ", sessionCookie?.value)
+    console.log("======Middleware====== Session Cookie Exists: ", !!sessionCookie)
+    console.log("======Middleware====== Session Cookie Value Exists: ", !!sessionCookie?.value)
+    console.log("======Middleware====== Session Cookie Value: ", sessionCookie?.value)
+    console.log("======Middleware====== Session Cookie Value: ", sessionCookie?.value)
     
     if (!sessionCookie || !sessionCookie.value) {
-      // If coming from login page, has auth headers, or is recent login, allow access temporarily
-      if (isFromLogin || hasAuthHeaders || isRecentLogin) {
-        console.log(`[Middleware] Allowing access temporarily (from login: ${isFromLogin}, auth headers: ${!!hasAuthHeaders}, recent login: ${isRecentLogin})`);
+      // If coming from login page or has auth headers, allow access temporarily
+      if (isFromLogin || hasAuthHeaders) {
+        console.log(`[Middleware] Allowing access temporarily (from login: ${isFromLogin}, auth headers: ${!!hasAuthHeaders})`);
         // Allow access but let client-side auth handle the actual protection
         return NextResponse.next();
       }
@@ -58,12 +64,6 @@ export function middleware(request: NextRequest) {
     // since we can't easily verify the user's role from the cookie in middleware
   }
   
-  // If this is a recent login redirect, clean up the query parameter
-  if (isRecentLogin) {
-    const cleanUrl = new URL(request.url);
-    cleanUrl.searchParams.delete('_recent_login');
-    return NextResponse.redirect(cleanUrl);
-  }
   
   return NextResponse.next();
 }

@@ -123,18 +123,9 @@ const LoginForm = () => {
       console.log("Waiting for authentication to be fully established...");
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      // Store a flag in localStorage to indicate recent login (for middleware bypass)
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('recent_login', Date.now().toString());
-      }
-      
       // Use window.location.href for a full page reload to ensure middleware sees the cookies
-      // Add a query parameter to indicate recent login for middleware bypass
-      const redirectUrl = new URL(redirectTo, window.location.origin);
-      redirectUrl.searchParams.set('_recent_login', 'true');
-      
-      console.log("Redirecting to:", redirectUrl.toString());
-      window.location.href = redirectUrl.toString();
+      console.log("Redirecting to:", redirectTo);
+      window.location.href = redirectTo;
     } catch (err) {
       // Extract error message from the error object
       let errorMessage = "An unexpected error occurred";

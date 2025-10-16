@@ -133,11 +133,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const refreshToken = useCallback(async (): Promise<boolean> => {
     try {
       const baseURL = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:8000";
+      const currentToken = isClient() ? localStorage.getItem(STORAGE_KEYS.SESSION_TOKEN) : null;
+      
+      if (!currentToken) {
+        console.log("No token found for refresh");
+        return false;
+      }
+
+      console.log("Attempting to refresh token...");
       const response = await fetch(`${baseURL}/api/auth/refresh`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Accept": "application/json",
+          "Authorization": `Bearer ${currentToken}`,
         },
         credentials: "include",
       });
@@ -146,8 +155,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const result = await response.json();
         if (result.token && isClient()) {
           localStorage.setItem(STORAGE_KEYS.SESSION_TOKEN, result.token);
+          console.log("Token refreshed successfully");
           return true;
         }
+      } else {
+        console.log("Token refresh failed with status:", response.status);
       }
       return false;
     } catch (error) {
@@ -158,26 +170,47 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const fetchWalletAndScore = useCallback(async () => {
     try {
+      console.log("Fetching wallet and score data...");
       return await walletScoreAPI.getWalletAndScore();
     } catch (error) {
+      console.log("Wallet and score fetch failed:", error);
       // Try to refresh token and retry once
-      if (error instanceof Error && error.message.includes('Unauthorized')) {
+      if (error instanceof Error && (error.message.includes('Unauthorized') || error.message.includes('401'))) {
+        console.log("Attempting token refresh for wallet/score...");
         const refreshed = await refreshToken();
         if (refreshed) {
           try {
+            console.log("Retrying wallet and score fetch after refresh...");
             return await walletScoreAPI.getWalletAndScore();
           } catch (retryError) {
             console.error("Failed to fetch wallet and score after refresh:", retryError);
+            // If still failing after refresh, clear auth state
+            if (isMountedRef.current) {
+              clearAuthState();
+            }
+          }
+        } else {
+          console.log("Token refresh failed, clearing auth state");
+          // If refresh failed, clear auth state
+          if (isMountedRef.current) {
+            clearAuthState();
           }
         }
       }
       
       return null;
     }
-  }, [refreshToken]);
+  }, [refreshToken, clearAuthState]);
 
   const createUserFromData = useCallback(async (userData: any): Promise<User> => {
-    const walletScoreData = await fetchWalletAndScore();
+    let walletScoreData = null;
+    
+    try {
+      walletScoreData = await fetchWalletAndScore();
+    } catch (error) {
+      console.warn("Failed to fetch wallet and score data:", error);
+      // Continue without wallet/score data rather than failing completely
+    }
     
     return {
       id: userData.id,
@@ -383,6 +416,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             }
             return;
           }
+          
+          // Try to refresh token first if we have one
+          const refreshed = await refreshToken();
+          if (!refreshed) {
+            // Token is invalid, clear auth state
+            if (isMountedRef.current) {
+              clearAuthState();
+              setIsLoading(false);
+            }
+            return;
+          }
         }
         
         // Full auth check
@@ -409,7 +453,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         clearTimeout(refreshTimeoutRef.current);
       }
     };
-  }, [getCachedUser, refreshUser, clearAuthState, isClient]);
+  }, [getCachedUser, refreshUser, clearAuthState, isClient, refreshToken]);
 
   // Memoized context value
   const value = useMemo<AuthContextType>(() => ({
