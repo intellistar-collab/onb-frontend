@@ -252,7 +252,7 @@ const TopBar = () => {
                   <DropdownMenuSeparator className="bg-gray-700" />
                   <DropdownMenuItem 
                     className="text-white hover:bg-gray-700 text-xs md:text-sm cursor-pointer"
-                    onClick={logout}
+                    onClick={() => logout()}
                   >
                     <LogOut className="mr-2 h-4 w-4" suppressHydrationWarning />
                     Sign Out
