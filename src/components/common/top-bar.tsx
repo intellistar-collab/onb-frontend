@@ -75,11 +75,7 @@ const TopBar = () => {
               onClick={() => isMobileMenuOpen ? closeMobileMenu() : setIsMobileMenuOpen(true)}
               className="text-white hover:bg-gray-800 p-1 sm:p-2"
             >
-              {isMobileMenuOpen ? (
-                <X className="h-5 w-5 sm:h-6 sm:w-6" suppressHydrationWarning />
-              ) : (
-                <Menu className="h-5 w-5 sm:h-6 sm:w-6" suppressHydrationWarning />
-              )}
+              <Menu className="h-5 w-5 sm:h-6 sm:w-6" suppressHydrationWarning />
             </Button>
           </div>
 

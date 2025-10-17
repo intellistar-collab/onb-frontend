@@ -7,13 +7,14 @@ interface LogoProps {
 }
 
 const sizeClasses = {
-  sm: "h-6 w-auto",
-  md: "h-8 w-auto sm:h-10",
-  lg: "h-8 w-auto sm:h-10 md:h-12",
-  xl: "h-8 w-auto sm:h-10 md:h-12 lg:h-16",
+  sm: "h-12 w-auto",
+  md: "h-12 w-auto sm:h-12",
+  lg: "h-12 w-auto sm:h-12 md:h-14",
+  xl: "h-12 w-auto sm:h-12 md:h-14 lg:h-16",
 };
 
 export default function Logo({ className, size = "xl" }: LogoProps) {
+
   return (
     <div className="flex-shrink-0">
       <Image 
@@ -22,7 +23,7 @@ export default function Logo({ className, size = "xl" }: LogoProps) {
         width={150} 
         alt="logo" 
         className={cn(sizeClasses[size], className)}
-        style={{ width: "auto", height: "auto" }}
+        style={{ width: "auto" }}
         suppressHydrationWarning
       />
     </div>
