@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Package, Star, Trophy, Clock, Zap } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
+import { cn, formatPrice } from "@/lib/utils";
 import SmartImage from "@/components/box-page/loading-image";
 import { itemsAPI, Item } from "@/lib/api/items";
 import { boxesAPI, Box } from "@/lib/api/boxes";
@@ -226,7 +226,7 @@ const ItemDetailPage = ({ params }: ItemDetailPageProps) => {
                       {item.status.replace('_', ' ')}
                     </Badge>
                     <span className="text-2xl font-bold text-amber-400">
-                      {item.price ? `$${Number(item.price).toFixed(2)}` : "N/A"}
+                      {item.price ? formatPrice(item.price) : "N/A"}
                     </span>
                   </div>
                   

@@ -3,7 +3,7 @@
 import React from "react";
 import { cn } from "@/lib/utils";
 
-const HomeTabsSkeleton = () => {
+const HomeBoxesSkeleton = () => {
   return (
     <section className="overflow-hidden">
       <div className="grid md:grid-cols-[280px_1fr] gap-6 w-full h-fit">
@@ -135,4 +135,4 @@ const HomeTabsSkeleton = () => {
   );
 };
 
-export default HomeTabsSkeleton;
+export default HomeBoxesSkeleton;

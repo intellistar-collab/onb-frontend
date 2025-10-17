@@ -30,18 +30,18 @@ const BoxCategoriesList = ({ boxes, categories }: BoxCategoriesListProps) => {
   }
 
   return (
-    <section className="space-y-12">
+    <section className="space-y-8 sm:space-y-12">
       {groupedCategories.map((category) => (
-        <div key={category.id} className="space-y-6">
+        <div key={category.id} className="space-y-4 sm:space-y-6">
           <header className="flex items-center justify-between">
             <div>
               <p className="text-xs font-suisse uppercase tracking-[0.3em] text-white/40">Category</p>
-              <h3 className="text-2xl md:text-3xl font-pricedown text-white">
+              <h3 className="text-xl sm:text-2xl md:text-3xl font-pricedown text-white">
                 {category.name}
               </h3>
             </div>
             <div
-              className="h-2 w-24 rounded-full"
+              className="h-2 w-16 sm:w-24 rounded-full"
               style={{ backgroundColor: `${category.color}33` }}
               aria-hidden
             />
@@ -50,23 +50,23 @@ const BoxCategoriesList = ({ boxes, categories }: BoxCategoriesListProps) => {
           {category.boxes.length > 0 ? (
             <div className="relative">
               <Carousel className="group/carousel">
-                <CarouselContent className="-ml-3">
+                <CarouselContent className="-ml-2 sm:-ml-3">
                   {category.boxes.map((box) => (
                     <CarouselItem
                       key={box.id}
-                      className="basis-[85%] pl-3 sm:basis-[45%] md:basis-[28%] lg:basis-[20%]"
+                      className="basis-[95%] pl-2 sm:basis-[85%] sm:pl-3 md:basis-[50%] lg:basis-[33.333%] xl:basis-[25%]"
                     >
                       <BoxCard box={box} />
                     </CarouselItem>
                   ))}
                 </CarouselContent>
-                <CarouselPrevious className="-left-4 border-white/10 bg-white/10 text-white opacity-0 transition-opacity group-hover/carousel:opacity-100" />
-                <CarouselNext className="-right-4 border-white/10 bg-white/10 text-white opacity-0 transition-opacity group-hover/carousel:opacity-100" />
+                <CarouselPrevious className="-left-2 sm:-left-4 border-white/10 bg-white/10 text-white opacity-100" />
+                <CarouselNext className="-right-2 sm:-right-4 border-white/10 bg-white/10 text-white opacity-100" />
               </Carousel>
             </div>
           ) : (
-            <div className="text-center py-8">
-              <p className="text-white/50">No boxes in this category yet.</p>
+            <div className="text-center py-6 sm:py-8">
+              <p className="text-white/50 text-sm sm:text-base">No boxes in this category yet.</p>
             </div>
           )}
         </div>

@@ -91,19 +91,19 @@ export default function ItemActionDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-sm bg-gradient-to-br from-gray-900 via-black to-gray-900 border-white/15">
-        <DialogHeader>
-          <DialogTitle className="text-white text-center text-xl font-pricedown">
+      <DialogContent className="max-w-sm mx-auto bg-gradient-to-br from-gray-900 via-black to-gray-900 border-white/15 sm:max-w-sm w-[95vw] sm:w-auto">
+        <DialogHeader className="text-center">
+          <DialogTitle className="text-white text-xl font-pricedown">
             {item.name}
           </DialogTitle>
-          <DialogDescription className="text-white/70 text-center font-suisse">
+          <DialogDescription className="text-white/70 font-suisse">
             What would you like to do with this item?
           </DialogDescription>
         </DialogHeader>
         
-        <div className="space-y-4">
+        <div className="space-y-4 text-center px-2 sm:px-0">
           {/* Item Image */}
-          <div className="relative w-40 h-40 mx-auto overflow-hidden rounded-lg border-2 bg-white/5"
+          <div className="relative w-32 h-32 sm:w-40 sm:h-40 mx-auto overflow-hidden rounded-lg bg-white/5"
                style={{ borderColor: getTierBorderColor(item.tier) }}>
             {!imagePreloaded ? (
               <div className="absolute inset-0 flex items-center justify-center">
@@ -123,7 +123,7 @@ export default function ItemActionDialog({
           
           {/* Item Details */}
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-center gap-2 sm:gap-4">
               <Badge 
                 className={cn(
                   "text-xs font-bold uppercase tracking-wider bg-gradient-to-r",
@@ -132,24 +132,24 @@ export default function ItemActionDialog({
               >
                 {item.tier}
               </Badge>
-              <span className="text-base font-bold text-amber-400 font-pricedown">{formatPrice(item.price)}</span>
+              <span className="text-sm sm:text-base font-bold text-amber-400 font-pricedown">{formatPrice(item.price)}</span>
             </div>
           </div>
 
           {/* Action Buttons */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="flex justify-center gap-2 sm:gap-3">
             {/* Sell Button */}
             <Button
               onClick={handleSell}
               disabled={isSelling || isKeeping}
-              className="h-10 flex items-center px-4 bg-black hover:bg-gray-800 text-white font-pricedown font-bold border border-gray-600 hover:border-gray-500 transition-all duration-300"
+              className="h-10 w-20 sm:w-24 flex items-center justify-center px-1 sm:px-2 bg-black hover:bg-gray-800 text-white font-pricedown font-bold border border-gray-600 hover:border-gray-500 transition-all duration-300"
             >
               {isSelling ? (
-                <Loader2 className="h-8 w-8 animate-spin text-green-400" />
+                <Loader2 className="h-5 w-5 sm:h-6 sm:w-6 animate-spin text-green-400" />
               ) : (
                 <>
-                  <DollarSign className="h-8 w-8 text-green-400" />
-                  <span className="text-2xl">SELL</span>
+                  <DollarSign className="h-5 w-5 sm:h-6 sm:w-6 text-green-400" />
+                  <span className="text-sm sm:text-lg">SELL</span>
                 </>
               )}
             </Button>
@@ -158,14 +158,14 @@ export default function ItemActionDialog({
             <Button
               onClick={handleKeep}
               disabled={isSelling || isKeeping}
-              className="h-10 flex items-center px-4 bg-gray-800 hover:bg-gray-700 text-white font-pricedown font-bold border border-gray-600 hover:border-gray-500 transition-all duration-300"
+              className="h-10 w-20 sm:w-24 flex items-center justify-center px-1 sm:px-2 bg-gray-800 hover:bg-gray-700 text-white font-pricedown font-bold border border-gray-600 hover:border-gray-500 transition-all duration-300"
             >
               {isKeeping ? (
-                <Loader2 className="h-8 w-8 animate-spin text-blue-400" />
+                <Loader2 className="h-5 w-5 sm:h-6 sm:w-6 animate-spin text-blue-400" />
               ) : (
                 <>
-                  <Package className="h-8 w-8 text-blue-400" />
-                  <span className="text-2xl">KEEP</span>
+                  <Package className="h-5 w-5 sm:h-6 sm:w-6 text-blue-400" />
+                  <span className="text-sm sm:text-lg">KEEP</span>
                 </>
               )}
             </Button>

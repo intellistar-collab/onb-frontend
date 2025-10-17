@@ -333,17 +333,17 @@ const BoxDetail: React.FC<BoxDetailProps> = ({ box }) => {
 
   return (
     <>
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8 overflow-hidden">
       <Card className="border-white/15 bg-white/5">
-        <CardHeader>
-          <CardTitle className="text-2xl font-pricedown text-white">
+        <CardHeader className="pb-4 sm:pb-6">
+          <CardTitle className="text-xl sm:text-2xl font-pricedown text-white">
             Open Mystery Box
           </CardTitle>
-          <p className="text-sm font-suisse text-white/60">
+          <p className="text-xs sm:text-sm font-suisse text-white/60">
             Spin the carousel to reveal what you secure from this drop.
           </p>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-0">
           <RewardSpinner
             rewards={box.rewards}
             disabled={box.status !== "OPEN"}
@@ -367,21 +367,21 @@ const BoxDetail: React.FC<BoxDetailProps> = ({ box }) => {
         </CardContent>
       </Card>
 
-      <div className="grid gap-8 lg:grid-cols-[1.6fr_1fr]">
+      <div className="grid gap-6 sm:gap-8 lg:grid-cols-[1.6fr_1fr]">
         <Card className="border-white/15 bg-white/5">
-          <CardHeader>
-            <CardTitle className="text-2xl font-pricedown text-white">
+          <CardHeader className="pb-4 sm:pb-6">
+            <CardTitle className="text-xl sm:text-2xl font-pricedown text-white">
               Box Information
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="flex flex-col gap-6 lg:flex-row">
-              <div className="relative mx-auto h-80 w-full max-w-2xl overflow-hidden rounded-2xl lg:mx-0 lg:w-96">
+          <CardContent className="space-y-4 sm:space-y-6 pt-0">
+            <div className="flex flex-col gap-4 sm:gap-6 lg:flex-row">
+              <div className="relative mx-auto h-64 sm:h-80 w-full max-w-sm sm:max-w-2xl overflow-hidden rounded-2xl lg:mx-0 lg:w-96">
                 <Image
                   src={box.heroImage}
                   alt={box.title}
                   fill
-                  sizes="400px"
+                  sizes="(max-width: 640px) 320px, (max-width: 1024px) 400px, 400px"
                   className="object-cover hover:scale-105 transition-transform duration-500"
                 />
                 <div
@@ -390,29 +390,29 @@ const BoxDetail: React.FC<BoxDetailProps> = ({ box }) => {
                 />
               </div>
 
-              <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center lg:items-start lg:text-left">
+              <div className="flex flex-1 flex-col items-center justify-center gap-3 sm:gap-4 text-center lg:items-start lg:text-left">
                 <div className="flex items-center justify-center gap-1 lg:justify-start">
                   {Array.from({ length: RATING_STARS }).map((_, idx) => (
                     <Star
                       key={idx}
                       className={cn(
-                        "h-5 w-5",
+                        "h-4 w-4 sm:h-5 sm:w-5",
                         idx < box.star ? "fill-current text-white" : "text-white/20"
                       )}
                     />
                   ))}
                 </div>
 
-                <div className="flex flex-wrap items-center justify-center gap-3 lg:justify-start">
+                <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 lg:justify-start">
                   <Badge
                     variant="outline"
-                    className="border-white/30 bg-white/10 font-suisse text-sm uppercase tracking-wider text-white"
+                    className="border-white/30 bg-white/10 font-suisse text-xs sm:text-sm uppercase tracking-wider text-white"
                   >
                     {box.tag}
                   </Badge>
                   <span
                     className={cn(
-                      "rounded-full px-3 py-1 text-sm font-semibold uppercase",
+                      "rounded-full px-2 sm:px-3 py-1 text-xs sm:text-sm font-semibold uppercase",
                       box.status === "OPEN"
                         ? "bg-emerald-500/20 text-emerald-300"
                         : "bg-amber-500/20 text-amber-200"
@@ -423,65 +423,65 @@ const BoxDetail: React.FC<BoxDetailProps> = ({ box }) => {
                 </div>
 
                 <div className="space-y-1">
-                  <p className="text-lg font-pricedown text-white">{box.title.replace('\n', ' ')}</p>
-                  <p className="text-sm font-suisse text-white/60">Mystery Box #{box.location}</p>
+                  <p className="text-base sm:text-lg font-pricedown text-white break-words">{box.title.replace('\n', ' ')}</p>
+                  <p className="text-xs sm:text-sm font-suisse text-white/60">Mystery Box #{box.location}</p>
                 </div>
               </div>
             </div>
 
-            <p className="text-white/80 font-suisse leading-relaxed">
+            <p className="text-sm sm:text-base text-white/80 font-suisse leading-relaxed">
               {box.description}
             </p>
 
             <Separator className="bg-white/10" />
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <p className="text-sm font-suisse text-white/50">Entry Price</p>
-                <p className="text-2xl font-pricedown text-white">{formatPrice(box.price)}</p>
+            <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-2">
+              <div className="space-y-1 sm:space-y-2">
+                <p className="text-xs sm:text-sm font-suisse text-white/50">Entry Price</p>
+                <p className="text-lg sm:text-xl lg:text-2xl font-pricedown text-white">{formatPrice(box.price)}</p>
               </div>
-              <div className="space-y-2">
-                <p className="text-sm font-suisse text-white/50">Win Odds</p>
-                <p className="text-2xl font-pricedown text-white">{box.percentage}</p>
+              <div className="space-y-1 sm:space-y-2">
+                <p className="text-xs sm:text-sm font-suisse text-white/50">Win Odds</p>
+                <p className="text-lg sm:text-xl lg:text-2xl font-pricedown text-white">{box.percentage}</p>
               </div>
-              <div className="space-y-2">
-                <p className="text-sm font-suisse text-white/50">Experience</p>
-                <p className="text-xl font-pricedown text-white">+{box.experience.toLocaleString()} XP</p>
+              <div className="space-y-1 sm:space-y-2">
+                <p className="text-xs sm:text-sm font-suisse text-white/50">Experience</p>
+                <p className="text-base sm:text-lg lg:text-xl font-pricedown text-white">+{box.experience.toLocaleString()} XP</p>
               </div>
-              <div className="space-y-2">
-                <p className="text-sm font-suisse text-white/50">Location</p>
-                <p className="text-xl font-pricedown text-white">{box.location}</p>
+              <div className="space-y-1 sm:space-y-2">
+                <p className="text-xs sm:text-sm font-suisse text-white/50">Location</p>
+                <p className="text-base sm:text-lg lg:text-xl font-pricedown text-white">{box.location}</p>
               </div>
             </div>
 
             <Separator className="bg-white/10" />
 
-            <div className="space-y-2">
-              <p className="text-sm font-suisse text-white/50">Shipping Info</p>
-              <p className="text-white/80 font-suisse">{box.shippingInfo}</p>
+            <div className="space-y-1 sm:space-y-2">
+              <p className="text-xs sm:text-sm font-suisse text-white/50">Shipping Info</p>
+              <p className="text-sm sm:text-base text-white/80 font-suisse">{box.shippingInfo}</p>
             </div>
           </CardContent>
         </Card>
 
         <Card className="border-white/15 bg-white/5">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-xl font-pricedown text-white">
-              <Trophy className="h-5 w-5" />
+          <CardHeader className="pb-4 sm:pb-6">
+            <CardTitle className="flex items-center gap-2 text-lg sm:text-xl font-pricedown text-white">
+              <Trophy className="h-4 w-4 sm:h-5 sm:w-5" />
               Box Statistics
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-6">
+          <CardContent className="pt-0">
+            <div className="grid grid-cols-2 gap-4 sm:gap-6">
               {box.stats.map((stat, index) => (
-                <div key={index} className="text-center space-y-2">
+                <div key={index} className="text-center space-y-1 sm:space-y-2">
                   <div className="flex items-center justify-center">
-                    {index === 0 && <Clock className="h-5 w-5 text-white/60" />}
-                    {index === 1 && <Package className="h-5 w-5 text-white/60" />}
-                    {index === 2 && <Trophy className="h-5 w-5 text-white/60" />}
-                    {index === 3 && <Zap className="h-5 w-5 text-white/60" />}
+                    {index === 0 && <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-white/60" />}
+                    {index === 1 && <Package className="h-4 w-4 sm:h-5 sm:w-5 text-white/60" />}
+                    {index === 2 && <Trophy className="h-4 w-4 sm:h-5 sm:w-5 text-white/60" />}
+                    {index === 3 && <Zap className="h-4 w-4 sm:h-5 sm:w-5 text-white/60" />}
                   </div>
-                  <p className="text-sm font-suisse text-white/50">{stat.label}</p>
-                  <p className="text-lg font-pricedown text-white">{stat.value}</p>
+                  <p className="text-xs sm:text-sm font-suisse text-white/50">{stat.label}</p>
+                  <p className="text-sm sm:text-base lg:text-lg font-pricedown text-white">{stat.value}</p>
                 </div>
               ))}
             </div>
@@ -491,25 +491,25 @@ const BoxDetail: React.FC<BoxDetailProps> = ({ box }) => {
 
       {/* All Items Section */}
       <Card className="border-white/15 bg-white/5">
-        <CardHeader>
-          <CardTitle className="text-2xl font-pricedown text-white">
+        <CardHeader className="pb-4 sm:pb-6">
+          <CardTitle className="text-xl sm:text-2xl font-pricedown text-white">
             All Items
           </CardTitle>
-          <p className="text-sm font-suisse text-white/60">
+          <p className="text-xs sm:text-sm font-suisse text-white/60">
             All possible items you could win from this mystery box
           </p>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-0 overflow-hidden">
           {box.rewards && box.rewards.length > 0 ? (
-            <div className="grid gap-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10">
+            <div className="grid gap-2 sm:gap-3 grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8">
               {box.rewards.map((reward) => (
                 <RewardCard key={reward.id} reward={reward} />
               ))}
             </div>
           ) : (
-            <div className="text-center py-12">
-              <Package className="h-12 w-12 text-white/40 mx-auto mb-4" />
-              <p className="text-white/60">No items available in this box yet.</p>
+            <div className="text-center py-8 sm:py-12">
+              <Package className="h-8 w-8 sm:h-12 sm:w-12 text-white/40 mx-auto mb-3 sm:mb-4" />
+              <p className="text-sm sm:text-base text-white/60">No items available in this box yet.</p>
             </div>
           )}
         </CardContent>

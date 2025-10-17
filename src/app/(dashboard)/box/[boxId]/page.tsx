@@ -120,32 +120,32 @@ const BoxDetailPage = ({ params }: BoxDetailPageProps) => {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900">
+    <main className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 overflow-x-hidden">
       {/* Header */}
-      <section className="relative py-6">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center gap-4 mb-6">
+      <section className="relative py-4 sm:py-6">
+        <div className="container mx-auto px-3 sm:px-4">
+          <div className="flex items-start gap-3 sm:gap-4 mb-4 sm:mb-6">
             <Link href="/box">
-              <Button variant="outline" size="icon" className="bg-white/10 border-white/20 hover:bg-white/20">
-                <ArrowLeft className="w-5 h-5 text-white" />
+              <Button variant="outline" size="icon" className="bg-white/10 border-white/20 hover:bg-white/20 flex-shrink-0">
+                <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </Button>
             </Link>
-            <div>
-              <h1 className="text-3xl md:text-4xl font-pricedown text-white">
+            <div className="min-w-0 flex-1">
+              <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-pricedown text-white break-words">
                 {box.title.replace('\n', ' ')}
               </h1>
               {(boxCategory || box?.tag) && (
                 <div className="flex items-center gap-2 mt-2 mb-1">
                   <div 
-                    className="w-3 h-3 rounded-full border border-white/20"
+                    className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full border border-white/20 flex-shrink-0"
                     style={{ backgroundColor: boxCategory?.color || box?.color || '#3b82f6' }}
                   />
-                  <span className="text-white/80 font-suisse text-sm">
+                  <span className="text-white/80 font-suisse text-xs sm:text-sm">
                     {boxCategory?.name || box?.tag || 'Mystery'}
                   </span>
                 </div>
               )}
-              <p className="text-white/60 font-suisse">
+              <p className="text-white/60 font-suisse text-xs sm:text-sm">
                 Mystery Box #{box.location} - {box.price}
               </p>
             </div>
@@ -154,8 +154,8 @@ const BoxDetailPage = ({ params }: BoxDetailPageProps) => {
       </section>
 
       {/* Box Detail Content */}
-      <section className="py-8">
-        <div className="container mx-auto px-4">
+      <section className="py-6 sm:py-8">
+        <div className="container mx-auto px-3 sm:px-4 overflow-x-hidden">
           <BoxDetail box={box} />
         </div>
       </section>

@@ -124,7 +124,9 @@ const HomeCardGroup = ({
         <div className={cn(
           "grid gap-3 h-fit",
           className,
-          isRecommended ? "grid-cols-2 sm:grid-cols-3 md:grid-cols-5" : "grid-cols-3"
+          isRecommended 
+            ? "grid-cols-2 sm:grid-cols-3 md:grid-cols-5" 
+            : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
         )}>
           {visibleCards.map((card, index) => (
             <div key={`${card.title}-${index}`} className="h-fit">

@@ -5,8 +5,8 @@ import { boxCategoriesAPI, BoxCategory } from "@/lib/api/box-categories";
 import { boxesAPI, Box } from "@/lib/api/boxes";
 import Hero from "@/components/home/hero";
 import ExperienceBanner from "@/components/common/experience-banner";
-import HomeTabs from "@/components/home/home-tabs";
-import HomeTabsSkeleton from "@/components/home/home-tabs-skeleton";
+import HomeBoxes from "@/components/home/home-boxes";
+import HomeBoxesSkeleton from "@/components/home/home-boxes-skeleton";
 import PimpCatcher from "@/components/pimp-catcher-game/pimp-catcher";
 import Leaderboard from "@/components/common/leaderboard";
 import EngagementSection from "@/components/common/engagement-section";
@@ -66,12 +66,12 @@ const HomeScreen = () => {
       <MobileInfoCards />
       
       {!loading && !error? (
-        <HomeTabs 
+        <HomeBoxes 
           categories={categories}
           boxesByCategory={boxesByCategory}
         />
       ) : ( 
-        <HomeTabsSkeleton /> 
+        <HomeBoxesSkeleton /> 
       )}
 
       {/* Pimp Catcher + Leaderboard Section*/}
