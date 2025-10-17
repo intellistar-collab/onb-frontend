@@ -16,6 +16,7 @@ import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/toast";
 import { boxesAPI, type Box, type CreateBoxData, type UpdateBoxData } from "@/lib/api/boxes";
 import { boxCategoriesAPI, type BoxCategory } from "@/lib/api/box-categories";
+import { formatPrice } from "@/lib/utils";
 
 export default function AdminBoxes() {
   const router = useRouter();
@@ -274,7 +275,7 @@ export default function AdminBoxes() {
     },
     {
       label: "Total Revenue",
-      value: `$${boxes.reduce((sum, b) => sum + Number(b.totalRevenue), 0).toLocaleString()}`,
+      value: formatPrice(boxes.reduce((sum, b) => sum + Number(b.totalRevenue), 0)),
       icon: <DollarSign className="h-8 w-8 text-yellow-600" />,
     },
     {
@@ -375,7 +376,7 @@ export default function AdminBoxes() {
       label: "Price",
       className: "w-20",
       render: (value: any) => (
-        <span className="admin-text-primary font-medium">${Number(value).toFixed(2)}</span>
+        <span className="admin-text-primary font-medium">{formatPrice(value)}</span>
       ),
     },
     {

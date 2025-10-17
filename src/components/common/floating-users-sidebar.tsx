@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { Users, Eye, ChevronLeft, ChevronRight, Wifi, WifiOff } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Users, Eye, ChevronLeft, ChevronRight, Wifi, WifiOff, GripVertical } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface User {
@@ -20,8 +20,12 @@ const FloatingUsersSidebar = () => {
   const [isVisible, setIsVisible] = useState(true);
   const [users, setUsers] = useState<User[]>([]);
   const [onlineCount, setOnlineCount] = useState(0);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const sidebarRef = useRef<HTMLDivElement>(null);
 
-  // Mock data for current users
+  // Mock data for current users with dynamic online status
   useEffect(() => {
     const mockUsers: User[] = [
       {
@@ -96,7 +100,70 @@ const FloatingUsersSidebar = () => {
 
     setUsers(mockUsers);
     setOnlineCount(mockUsers.filter(user => user.isOnline).length);
+
+    // Random timer for online users (simulate users coming online/offline)
+    const interval = setInterval(() => {
+      setUsers(prevUsers => {
+        const updatedUsers = prevUsers.map(user => {
+          // Random chance to change online status (5% chance every 30 seconds)
+          if (Math.random() < 0.05) {
+            return { ...user, isOnline: !user.isOnline };
+          }
+          return user;
+        });
+        
+        // Update online count
+        const newOnlineCount = updatedUsers.filter(user => user.isOnline).length;
+        setOnlineCount(newOnlineCount);
+        
+        return updatedUsers;
+      });
+    }, 30000); // Check every 30 seconds
+
+    return () => clearInterval(interval);
   }, []);
+
+  // Drag functionality
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (e.target instanceof HTMLElement && e.target.closest('[data-drag-handle]')) {
+      setIsDragging(true);
+      setDragStart({
+        x: e.clientX - position.x,
+        y: e.clientY - position.y
+      });
+    }
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (isDragging) {
+      const newX = e.clientX - dragStart.x;
+      const newY = e.clientY - dragStart.y;
+      
+      // Constrain to viewport
+      const maxX = window.innerWidth - (sidebarRef.current?.offsetWidth || 0);
+      const maxY = window.innerHeight - (sidebarRef.current?.offsetHeight || 0);
+      
+      setPosition({
+        x: Math.max(0, Math.min(newX, maxX)),
+        y: Math.max(0, Math.min(newY, maxY))
+      });
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, [isDragging, dragStart]);
 
   const handleToggle = () => {
     setIsExpanded(!isExpanded);
@@ -109,14 +176,32 @@ const FloatingUsersSidebar = () => {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-1/2 right-4 z-50 transform translate-y-1/2">
+    <div 
+      ref={sidebarRef}
+      className="fixed z-50"
+      style={{
+        left: position.x || 'auto',
+        right: position.x ? 'auto' : '1rem',
+        top: position.y || '50%',
+        transform: position.y ? 'none' : 'translateY(-50%)',
+        cursor: isDragging ? 'grabbing' : 'default'
+      }}
+      onMouseDown={handleMouseDown}
+    >
       <div className={cn(
         "bg-black/95 border border-gray-700 rounded-lg shadow-lg transition-all duration-300 hover:shadow-xl",
-        isExpanded ? "w-64" : "w-16"
+        isExpanded ? "w-64" : "w-16",
+        isDragging && "shadow-2xl"
       )}>
         {/* Header */}
         <div className="flex items-center justify-between p-3 border-b border-gray-700">
           <div className="flex items-center gap-2">
+            <div 
+              data-drag-handle
+              className="cursor-grab active:cursor-grabbing p-1 rounded hover:bg-gray-800 transition-colors"
+            >
+              <GripVertical className="w-3 h-3 text-gray-400" />
+            </div>
             <Users className="w-4 h-4 text-gray-300 animate-pulse" />
             {isExpanded && (
               <div>

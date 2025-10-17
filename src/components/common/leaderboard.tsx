@@ -20,7 +20,7 @@ interface LeaderboardProps {
 const Leaderboard = ({ entries, className }: LeaderboardProps) => {
   // Mock data for demonstration
   const defaultEntries: LeaderboardEntry[] = [
-    { id: "1", username: "PacmanMaster", score: 15420, rank: 1 },
+    { id: "1", username: "PimpCatcherPro", score: 15420, rank: 1 },
     { id: "2", username: "GhostHunter", score: 12850, rank: 2 },
     { id: "3", username: "DotCollector", score: 11200, rank: 3 },
     { id: "4", username: "MazeRunner", score: 9850, rank: 4 },
@@ -28,6 +28,8 @@ const Leaderboard = ({ entries, className }: LeaderboardProps) => {
     { id: "6", username: "CherryPicker", score: 7200, rank: 6 },
     { id: "7", username: "FruitFinder", score: 6800, rank: 7 },
     { id: "8", username: "BonusSeeker", score: 5400, rank: 8 },
+    { id: "9", username: "SpeedDemon", score: 5200, rank: 9 },
+    { id: "10", username: "HighScoreKing", score: 4800, rank: 10 },
   ];
 
   const leaderboardData = entries || defaultEntries;
@@ -69,11 +71,11 @@ const Leaderboard = ({ entries, className }: LeaderboardProps) => {
           <Trophy className="w-6 h-6 text-yellow-400" />
           <h3 className="text-xl font-pricedown text-white">Leaderboard</h3>
         </div>
-        <p className="text-sm text-white/70">Top Pacman players this week</p>
+        <p className="text-sm text-white/70">Today's top pimp catchers</p>
       </div>
 
       {/* Leaderboard entries */}
-      <div className="relative z-10 p-4 space-y-2 max-h-[400px] overflow-y-auto custom-scrollbar">
+      <div className="relative z-10 p-4 space-y-2 max-h-[500px] overflow-y-auto custom-scrollbar">
         {leaderboardData.map((entry, index) => (
           <div
             key={entry.id}
@@ -120,11 +122,16 @@ const Leaderboard = ({ entries, className }: LeaderboardProps) => {
       {/* Footer */}
       <div className="relative z-10 p-4 border-t border-white/10">
         <div className="text-center">
-          <p className="text-xs text-white/60 mb-2">Play Pacman to climb the leaderboard!</p>
-          <div className="flex items-center justify-center gap-2 text-xs text-white/50">
-            <span>Updated every hour</span>
+          <p className="text-xs text-white/60 mb-2">WIN daily prizes! Play Pimp Catcher to climb the leaderboard!</p>
+          <div className="flex items-center justify-center gap-2 text-xs text-white/50 mb-2">
+            <span>1 token per game</span>
             <div className="w-1 h-1 rounded-full bg-white/30" />
-            <span>Weekly reset</span>
+            <span>Live updates</span>
+          </div>
+          <div className="flex items-center justify-center gap-2 text-xs text-white/50">
+            <span>Daily reset</span>
+            <div className="w-1 h-1 rounded-full bg-white/30" />
+            <span>Daily prizes</span>
           </div>
         </div>
       </div>

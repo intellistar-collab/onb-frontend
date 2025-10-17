@@ -9,10 +9,15 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Separator } from "@/components/ui/separator"
-import { cn } from "@/lib/utils"
+import { cn, formatPrice } from "@/lib/utils"
 import type { MysteryBox, BoxReward } from "@/constant/box-data"
 import RewardSpinner from "@/components/box-page/reward-spinner"
 import SmartImage from "@/components/box-page/loading-image"
+import { useAuth } from "@/contexts/auth-context"
+import { useToast } from "@/components/ui/toast"
+import AuthDialogs from "@/components/auth/auth-dialogs"
+import ItemActionDialog from "@/components/box-page/item-action-dialog"
+import { inventoryAPI } from "@/lib/api/inventory"
 
 interface BoxDetailProps {
   box: MysteryBox
@@ -119,7 +124,7 @@ const RewardCard: React.FC<{ reward: BoxReward }> = ({ reward }) => {
           <div className="flex items-center justify-center gap-1">
             <span className="text-xs text-white/70">{reward.odds}</span>
             <span className="text-xs text-white/50">•</span>
-            <span className="text-xs font-bold text-amber-400">{reward.price}</span>
+            <span className="text-xs font-bold text-amber-400">{formatPrice(reward.price)}</span>
           </div>
         </div>
       </div>
@@ -167,7 +172,7 @@ const RewardCard: React.FC<{ reward: BoxReward }> = ({ reward }) => {
                 >
                   {reward.tier}
                 </Badge>
-                <span className="text-base font-bold text-amber-400">{reward.price}</span>
+                <span className="text-base font-bold text-amber-400">{formatPrice(reward.price)}</span>
               </div>
               
               <div className="text-center">
@@ -197,6 +202,44 @@ const RewardCard: React.FC<{ reward: BoxReward }> = ({ reward }) => {
 
 const BoxDetail: React.FC<BoxDetailProps> = ({ box }) => {
   const RATING_STARS = 5
+  const { user, isAuthenticated, isLoading } = useAuth()
+  const { toast } = useToast()
+  const [showAuthDialog, setShowAuthDialog] = useState(false)
+  const [showItemActionDialog, setShowItemActionDialog] = useState(false)
+  const [selectedItem, setSelectedItem] = useState<BoxReward | null>(null)
+  const [isProcessingItem, setIsProcessingItem] = useState(false)
+
+  const handleBoxOpen = useCallback(async () => {
+    // Check if user is authenticated
+    if (!isAuthenticated || !user) {
+      console.log("🔐 User not authenticated, showing auth dialog")
+      setShowAuthDialog(true)
+      return false // Don't proceed with spin
+    }
+
+    // Check if user has sufficient balance
+    const boxPrice = parseFloat(box.price.replace(/[^0-9.-]+/g, ""))
+    const userBalance = user.wallet?.balance || 0
+
+    console.log("💰 Balance check:", { 
+      boxPrice, 
+      userBalance, 
+      hasWallet: !!user.wallet 
+    })
+
+    if (userBalance < boxPrice) {
+      toast({
+        title: "Insufficient Balance",
+        description: "You don't have enough balance to open this box. Please check your wallet balance.",
+        variant: "destructive",
+      })
+      return false // Don't proceed with spin
+    }
+
+    // If all checks pass, allow the spin to proceed
+    console.log("✅ All checks passed, allowing box opening")
+    return true
+  }, [isAuthenticated, user, box.price, toast])
 
   const handleSpin = useCallback(async () => {
     const weights = box.rewards.map(reward => {
@@ -223,7 +266,73 @@ const BoxDetail: React.FC<BoxDetailProps> = ({ box }) => {
     return box.rewards[box.rewards.length - 1]
   }, [box.rewards])
 
+  const handleItemClick = useCallback((item: BoxReward) => {
+    setSelectedItem(item)
+    setShowItemActionDialog(true)
+  }, [])
+
+  const handleSellItem = useCallback(async (item: BoxReward) => {
+    setIsProcessingItem(true)
+    try {
+      // First add item to inventory with SOLD status
+      await inventoryAPI.addToInventory({
+        itemId: item.id,
+        boxId: box.id,
+        status: 'SOLD'
+      })
+      
+      toast({
+        title: "Item Sold!",
+        description: `${item.name} has been sold for ${formatPrice(item.price)}. The amount has been added to your wallet balance.`,
+        variant: "default",
+      })
+      
+      setShowItemActionDialog(false)
+      setSelectedItem(null)
+    } catch (error) {
+      console.error("Error selling item:", error)
+      toast({
+        title: "Error",
+        description: "Failed to sell item. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsProcessingItem(false)
+    }
+  }, [toast, box.id])
+
+  const handleKeepItem = useCallback(async (item: BoxReward) => {
+    setIsProcessingItem(true)
+    try {
+      // Add item to inventory
+      await inventoryAPI.addToInventory({
+        itemId: item.id,
+        boxId: box.id,
+        status: 'KEPT'
+      })
+      
+      toast({
+        title: "Item Kept!",
+        description: `${item.name} has been added to your inventory. You can view and manage it in your inventory page.`,
+        variant: "default",
+      })
+      
+      setShowItemActionDialog(false)
+      setSelectedItem(null)
+    } catch (error) {
+      console.error("Error keeping item:", error)
+      toast({
+        title: "Error",
+        description: "Failed to keep item. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsProcessingItem(false)
+    }
+  }, [toast, box.id])
+
   return (
+    <>
     <div className="space-y-8">
       <Card className="border-white/15 bg-white/5">
         <CardHeader>
@@ -238,8 +347,10 @@ const BoxDetail: React.FC<BoxDetailProps> = ({ box }) => {
           <RewardSpinner
             rewards={box.rewards}
             disabled={box.status !== "OPEN"}
-            ctaLabel={box.status === "OPEN" ? `Open Box - ${box.price}` : "Coming Soon"}
+            ctaLabel={box.status === "OPEN" ? `Open Box - ${formatPrice(box.price)}` : "Coming Soon"}
             experience={box.experience}
+            onButtonClick={handleBoxOpen}
+            onItemClick={handleItemClick}
             onSpin={async () => {
               await new Promise(resolve => setTimeout(resolve, 400))
               return handleSpin()
@@ -247,6 +358,11 @@ const BoxDetail: React.FC<BoxDetailProps> = ({ box }) => {
             className="w-full"
             showSpeedControls={true}
             defaultSpeed="1x"
+            showTryForFree={box.status === "OPEN"}
+            tryForFreeLabel="Try for Free"
+            onTryForFree={() => {
+              console.log("🎮 User clicked Try for Free - no authentication required")
+            }}
           />
         </CardContent>
       </Card>
@@ -322,7 +438,7 @@ const BoxDetail: React.FC<BoxDetailProps> = ({ box }) => {
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <p className="text-sm font-suisse text-white/50">Entry Price</p>
-                <p className="text-2xl font-pricedown text-white">{box.price}</p>
+                <p className="text-2xl font-pricedown text-white">{formatPrice(box.price)}</p>
               </div>
               <div className="space-y-2">
                 <p className="text-sm font-suisse text-white/50">Win Odds</p>
@@ -399,6 +515,27 @@ const BoxDetail: React.FC<BoxDetailProps> = ({ box }) => {
         </CardContent>
       </Card>
     </div>
+
+    {/* Authentication Dialog */}
+    <AuthDialogs
+      isOpen={showAuthDialog}
+      onClose={() => setShowAuthDialog(false)}
+      defaultTab="login"
+    />
+
+    {/* Item Action Dialog */}
+    <ItemActionDialog
+      isOpen={showItemActionDialog}
+      onClose={() => {
+        setShowItemActionDialog(false)
+        setSelectedItem(null)
+      }}
+      item={selectedItem}
+      onSell={handleSellItem}
+      onKeep={handleKeepItem}
+      isProcessing={isProcessingItem}
+    />
+    </>
   )
 }
 

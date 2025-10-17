@@ -10,6 +10,7 @@ import HomeTabsSkeleton from "@/components/home/home-tabs-skeleton";
 import PimpCatcher from "@/components/pimp-catcher-game/pimp-catcher";
 import Leaderboard from "@/components/common/leaderboard";
 import EngagementSection from "@/components/common/engagement-section";
+import MobileInfoCards from "@/components/home/mobile-info-cards";
 
 const HomeScreen = () => {
   const [categories, setCategories] = useState<BoxCategory[]>([]);
@@ -57,9 +58,12 @@ const HomeScreen = () => {
     <main>
       <ExperienceBanner />
       {/* Unified Hero Component with integrated WhatWeDo functionality */}
-      <section className="mb-8">
+      <section className="mb-4 sm:mb-6 md:mb-8">
         <Hero />
       </section>
+      
+      {/* Mobile Info Cards - Only visible on mobile */}
+      <MobileInfoCards />
       
       {!loading && !error? (
         <HomeTabs 
@@ -71,14 +75,14 @@ const HomeScreen = () => {
       )}
 
       {/* Pimp Catcher + Leaderboard Section*/}
-      <section className="mt-8">
-        <div className="grid grid-cols-1 md:grid-cols-[7fr_3fr] gap-6 min-h-[400px] md:h-[600px]">
+      <section className="mt-4 sm:mt-6 md:mt-8">
+        <div className="grid grid-cols-1 md:grid-cols-[7fr_3fr] gap-4 sm:gap-6 min-h-[300px] sm:min-h-[400px] md:h-[600px]">
           <PimpCatcher/>
           <Leaderboard />
         </div>
       </section>
       
-      <section className="mt-8">
+      <section className="mt-4 sm:mt-6 md:mt-8">
         <EngagementSection />
       </section>
     </main>

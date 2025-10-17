@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Lock, Star, Zap, Crown } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { cn } from "@/lib/utils";
+import { cn, formatPrice } from "@/lib/utils";
 
 type HomeCardProps = HomeCard;
 
@@ -102,27 +102,36 @@ const HomeCard = ({ title, location, image, price, locked, requiredOpens, href }
         
         {/* Image section - flexible area keeps aspect ratio */}
         <div className="flex items-center justify-center px-3 pb-2 flex-1">
-          <div className="relative w-full max-w-[120px] md:max-w-[140px] group/image">
+          <div className="relative w-full max-w-[140px] sm:max-w-[160px] md:max-w-[180px] lg:max-w-[200px] group/image">
             <div className={cn(
               "relative overflow-hidden rounded-2xl",
               "shadow-2xl border-2 border-white/20 group-hover:border-primary/50",
               "aspect-square transition-all duration-300 group-hover:scale-105"
             )}>
+              {/* GTA Map Background */}
+              <div 
+                className="absolute inset-0 opacity-10 bg-cover bg-center bg-no-repeat"
+                style={{
+                  backgroundImage: "url('/gta-map-bg.jpg')",
+                  filter: "grayscale(100%) brightness(0.3)"
+                }}
+              />
+              
               <Image 
                 src={image} 
                 alt={title} 
                 fill
                 className={cn(
-                  "object-cover transition-all duration-300",
+                  "object-cover transition-all duration-300 relative z-10",
                   imageLoaded ? "opacity-100" : "opacity-0"
                 )}
                 onLoad={() => setImageLoaded(true)}
               />
               {!imageLoaded && (
-                <div className="absolute inset-0 bg-gradient-to-br from-zinc-800 to-zinc-900 animate-pulse" />
+                <div className="absolute inset-0 bg-gradient-to-br from-zinc-800 to-zinc-900 animate-pulse z-20" />
               )}
               {/* Hover overlay */}
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-secondary/20 opacity-0 group-hover/image:opacity-100 transition-opacity duration-300" />
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-secondary/20 opacity-0 group-hover/image:opacity-100 transition-opacity duration-300 z-30" />
             </div>
           </div>
         </div>
@@ -131,7 +140,7 @@ const HomeCard = ({ title, location, image, price, locked, requiredOpens, href }
         <div className="mt-auto bg-gradient-to-t from-black/60 via-black/30 to-transparent p-3 space-y-2 backdrop-blur-sm flex-shrink-0">
           {/* Price display */}
           <div className="text-center">
-            <div className="text-lg sm:text-xl font-bold text-white drop-shadow-lg">${price}</div>
+            <div className="text-lg sm:text-xl font-bold text-white drop-shadow-lg">{formatPrice(price)}</div>
             <div className="text-xs text-white/70 uppercase tracking-wider font-medium">Per Box</div>
           </div>
           
@@ -140,26 +149,32 @@ const HomeCard = ({ title, location, image, price, locked, requiredOpens, href }
             disabled={!!locked} 
             onClick={handleClick}
             className={cn(
-              "w-full h-8 sm:h-9 font-bold text-xs sm:text-sm transition-all duration-300",
+              "w-full h-8 sm:h-9 font-bold text-xs sm:text-sm transition-all duration-300 relative overflow-hidden group/button",
               "bg-gradient-to-r from-primary via-primary/95 to-primary",
-              "hover:from-primary/90 hover:via-primary hover:to-primary/90",
-              "shadow-lg hover:shadow-2xl hover:shadow-primary/40",
-              "border-2 border-primary/30 hover:border-primary/60",
+              "hover:from-yellow-400 hover:via-orange-500 hover:to-red-500",
+              "shadow-lg hover:shadow-2xl hover:shadow-orange-400/50",
+              "border-2 border-primary/30 hover:border-orange-400/60",
               "hover:scale-105 active:scale-95",
               locked && "opacity-50 cursor-not-allowed hover:scale-100"
             )}
           >
-            {locked ? (
-              <div className="flex items-center justify-center gap-1.5">
-                <Lock className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                <span className="truncate">LOCKED</span>
-              </div>
-            ) : (
-              <div className="flex items-center justify-center gap-1.5">
-                <Star className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current" />
-                <span className="truncate">OPEN NOW</span>
-              </div>
-            )}
+            {/* Shimmer effect on hover */}
+            <div className="absolute inset-0 -translate-x-full group-hover/button:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+            
+            {/* Button content */}
+            <span className="relative z-10 flex items-center justify-center gap-1.5">
+              {locked ? (
+                <>
+                  <Lock className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <span className="truncate">LOCKED</span>
+                </>
+              ) : (
+                <>
+                  <Star className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current" />
+                  <span className="truncate">OPEN NOW</span>
+                </>
+              )}
+            </span>
           </Button>
         </div>
       </div>

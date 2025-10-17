@@ -89,7 +89,7 @@ const BoxDetailPage = ({ params }: BoxDetailPageProps) => {
     fetchBox();
   }, [boxId]);
 
-  if (loading) {
+  if (loading || error) {
     return (
       <main className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900">
         {/* Header Skeleton */}
@@ -111,31 +111,6 @@ const BoxDetailPage = ({ params }: BoxDetailPageProps) => {
             <BoxDetailSkeleton />
           </div>
         </section>
-      </main>
-    );
-  }
-
-  if (error) {
-    return (
-      <main className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900">
-        <div className="container mx-auto px-4 py-20">
-          <div className="text-center">
-            <p className="text-red-400 mb-4">Error: {error}</p>
-            <div className="flex gap-4 justify-center">
-              <Button 
-                onClick={() => window.location.reload()} 
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                Retry
-              </Button>
-              <Link href="/box">
-                <Button variant="outline" className="px-4 py-2 border-white/20 text-white hover:bg-white/10">
-                  Back to Boxes
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
       </main>
     );
   }

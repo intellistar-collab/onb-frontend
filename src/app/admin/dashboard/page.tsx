@@ -26,6 +26,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { usersAPI, type User } from "@/lib/api/users";
 import { boxesAPI, type Box } from "@/lib/api/boxes";
+import { formatPrice } from "@/lib/utils";
 
 export default function AdminDashboard() {
   const [users, setUsers] = useState<User[]>([]);
@@ -131,7 +132,7 @@ export default function AdminDashboard() {
       },
       {
         label: "Total Revenue",
-        value: `$${totalRevenue.toFixed(2)}`,
+        value: formatPrice(totalRevenue),
         icon: <DollarSign className="h-8 w-8 text-yellow-600" />,
         trend: { value: "From box sales", isPositive: true },
       },
@@ -310,7 +311,7 @@ export default function AdminDashboard() {
       className: "w-20",
       render: (value: string) => (
         <span className="admin-text-primary font-medium">
-          {value ? `$${Number(value).toFixed(2)}` : "N/A"}
+          {value ? formatPrice(value) : "N/A"}
         </span>
       ),
     },

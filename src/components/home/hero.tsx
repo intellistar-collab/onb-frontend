@@ -52,7 +52,7 @@ const Hero = () => {
   };
 
   return (
-    <section className="h-[35vh] md:h-[42vh] lg:h-[48vh] w-full relative overflow-hidden rounded-2xl border border-white/10 shadow-2xl">
+    <section className="h-[30vh] sm:h-[35vh] md:h-[42vh] lg:h-[48vh] w-full relative overflow-hidden rounded-2xl border border-white/10 shadow-2xl">
       {/* Main Background - Full Stretch */}
       <div
         className="absolute inset-0 w-full h-full"
@@ -87,8 +87,8 @@ const Hero = () => {
       </div> */}
 
       {/* Horizontal ticker category tags */}
-      <div className="absolute bottom-6 left-0 right-0 h-12 overflow-hidden">
-        <div className="flex items-center gap-4 whitespace-nowrap animate-ticker">
+      <div className="absolute bottom-3 sm:bottom-4 md:bottom-6 left-0 right-0 h-10 sm:h-12 overflow-hidden">
+        <div className="flex items-center gap-2 sm:gap-3 md:gap-4 whitespace-nowrap animate-ticker">
           {/* Duplicate array for seamless loop */}
           {[...allTitles, ...allTitles, ...allTitles].map((title, index) => (
             <div key={index} className="flex-shrink-0">
@@ -98,8 +98,8 @@ const Hero = () => {
         </div>
       </div>
 
-      {/* What We Do Card - Integrated with Background */}
-      <div className="absolute top-4 left-4 md:top-8 md:left-6 w-64 md:w-72">
+      {/* What We Do Card - Desktop Only */}
+      <div className="hidden md:block absolute top-8 left-6 lg:top-8 lg:left-6 w-64 lg:w-72">
         <div className="group relative">
           <div className="absolute -inset-0.5 bg-gradient-to-r from-pink-500/20 to-purple-500/20 rounded-xl blur opacity-40 group-hover:opacity-60 transition duration-500"></div>
           <div className="relative bg-black/30 backdrop-blur-sm rounded-xl p-5 border border-white/10 hover:border-pink-400/30 transition-all duration-300 group-hover:scale-102 shadow-sm">
@@ -107,9 +107,9 @@ const Hero = () => {
               <div className="p-2.5 bg-gradient-to-r from-pink-500/80 to-purple-500/80 rounded-lg shadow-sm">
                 <Gift className="h-5 w-5 text-white" />
               </div>
-              <h2 className="text-base md:text-lg font-oswald text-white font-bold drop-shadow-lg">What We Do</h2>
+              <h2 className="text-base lg:text-lg font-oswald text-white font-bold drop-shadow-lg">What We Do</h2>
             </div>
-            <div className="text-xs md:text-sm text-white/90 leading-relaxed drop-shadow-md space-y-1">
+            <div className="text-xs lg:text-sm text-white/90 leading-relaxed drop-shadow-md space-y-1">
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 bg-pink-400 rounded-full animate-pulse"></span>
                 <span className="font-semibold text-pink-300">Experience life-changing trips</span>
@@ -130,8 +130,8 @@ const Hero = () => {
         </div>
       </div>
 
-      {/* What To Do Card with Integrated Adventure Button - Integrated with Background */}
-      <div className="absolute bottom-4 right-4 md:bottom-8 md:right-6 w-64 md:w-72">
+      {/* What To Do Card - Desktop Only */}
+      <div className="hidden md:block absolute bottom-8 right-6 lg:bottom-8 lg:right-6 w-64 lg:w-72">
         <div className="group relative">
           <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-xl blur opacity-40 group-hover:opacity-60 transition duration-500"></div>
           <div className="relative bg-black/30 backdrop-blur-sm rounded-xl p-5 border border-white/10 hover:border-blue-400/30 transition-all duration-300 group-hover:scale-102 shadow-sm">
@@ -139,9 +139,9 @@ const Hero = () => {
               <div className="p-2.5 bg-gradient-to-r from-blue-500/80 to-cyan-500/80 rounded-lg shadow-sm">
                 <Plane className="h-5 w-5 text-white" />
               </div>
-              <h2 className="text-base md:text-lg font-oswald text-white font-bold drop-shadow-lg">What To Do</h2>
+              <h2 className="text-base lg:text-lg font-oswald text-white font-bold drop-shadow-lg">What To Do</h2>
             </div>
-            <div className="text-xs md:text-sm text-white/90 leading-relaxed mb-4 drop-shadow-md space-y-1">
+            <div className="text-xs lg:text-sm text-white/90 leading-relaxed mb-4 drop-shadow-md space-y-1">
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></span>
                 <span className="font-semibold text-cyan-300">Win life-changing trips</span>
@@ -187,7 +187,7 @@ const Hero = () => {
                   w-full adventure-button relative overflow-hidden
                   bg-gradient-to-r from-blue-500/90 to-cyan-500/90 
                   hover:from-blue-600/90 hover:to-cyan-600/90 
-                  text-white font-bold px-3 py-2 rounded-lg 
+                  text-white font-bold px-3 py-2 rounded-lg text-sm 
                   shadow-lg hover:shadow-2xl 
                   transition-all duration-300 ease-out
                   hover:scale-110 hover:-translate-y-2

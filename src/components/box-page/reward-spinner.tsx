@@ -11,7 +11,7 @@ import React, {
 import Image from "next/image"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
+import { cn, formatPrice } from "@/lib/utils"
 import type { BoxReward } from "@/constant/box-data"
 import { Loader2, Sparkles, Zap, Gauge } from "lucide-react"
 import SmartImage from "./loading-image"
@@ -58,10 +58,16 @@ interface RewardSpinnerProps {
   ctaLabel?: string
   experience?: number
   onSpin?: () => Promise<BoxReward | null | undefined> | BoxReward | null | undefined
+  onButtonClick?: () => Promise<boolean> | boolean // Return true to proceed with spin, false to prevent
+  onItemClick?: (item: BoxReward) => void // Called when user clicks on selected item
   className?: string
   // Speed control props
   showSpeedControls?: boolean
   defaultSpeed?: string
+  // Try for free button
+  showTryForFree?: boolean
+  tryForFreeLabel?: string
+  onTryForFree?: () => void
 }
 
 const RewardSpinner = React.forwardRef<RewardSpinnerHandle, RewardSpinnerProps>(
@@ -71,9 +77,14 @@ const RewardSpinner = React.forwardRef<RewardSpinnerHandle, RewardSpinnerProps>(
     ctaLabel = "Open Mystery Box",
     experience,
     onSpin,
+    onButtonClick,
+    onItemClick,
     className,
     showSpeedControls = false,
     defaultSpeed = "1x",
+    showTryForFree = false,
+    tryForFreeLabel = "Try for Free",
+    onTryForFree,
   }, ref) => {
     // Preload all reward images for faster spinner performance
     React.useEffect(() => {
@@ -89,6 +100,7 @@ const RewardSpinner = React.forwardRef<RewardSpinnerHandle, RewardSpinnerProps>(
     const timeoutRef = useRef<NodeJS.Timeout | null>(null)
 
     const [isSpinning, setIsSpinning] = useState(false)
+    const [spinningButton, setSpinningButton] = useState<'try-for-free' | 'open-box' | null>(null)
     const [selectedReward, setSelectedReward] = useState<BoxReward | null>(null)
     const [currentSpeed, setCurrentSpeed] = useState(defaultSpeed)
 
@@ -103,7 +115,7 @@ const RewardSpinner = React.forwardRef<RewardSpinnerHandle, RewardSpinnerProps>(
       )
     }, [rewards])
 
-    const performSpin = useCallback(async () => {
+    const performSpin = useCallback(async (buttonType: 'try-for-free' | 'open-box' = 'open-box') => {
       if (isSpinning || disabled || !rewards.length) {
         return;
       }
@@ -115,6 +127,7 @@ const RewardSpinner = React.forwardRef<RewardSpinnerHandle, RewardSpinnerProps>(
       }
 
       setIsSpinning(true)
+      setSpinningButton(buttonType)
       setSelectedReward(null)
 
       const cardElement = track.firstElementChild as HTMLElement | null
@@ -189,6 +202,7 @@ const RewardSpinner = React.forwardRef<RewardSpinnerHandle, RewardSpinnerProps>(
         } else {
           setSelectedReward(winningReward!)
           setIsSpinning(false)
+          setSpinningButton(null)
         }
       }
 
@@ -207,7 +221,7 @@ const RewardSpinner = React.forwardRef<RewardSpinnerHandle, RewardSpinnerProps>(
       ref,
       () => ({
         spin: () => {
-          void performSpin()
+          void performSpin('open-box')
         },
       }),
       [performSpin]
@@ -285,7 +299,7 @@ const RewardSpinner = React.forwardRef<RewardSpinnerHandle, RewardSpinnerProps>(
 
                     <div className="space-y-1 text-center">
                       <p className="text-sm font-semibold text-white line-clamp-2">{reward.name}</p>
-                      <p className="text-lg font-pricedown text-white">{reward.price}</p>
+                      <p className="text-lg font-pricedown text-white">{formatPrice(reward.price)}</p>
                     </div>
                   </div>
                 )
@@ -305,7 +319,7 @@ const RewardSpinner = React.forwardRef<RewardSpinnerHandle, RewardSpinnerProps>(
             </>
           )}
           <div className={cn(
-            "flex items-center justify-center gap-3 font-suisse transition-all duration-500",
+            "flex items-center justify-center gap-3 font-suisse transition-all duration-500 mb-5",
             selectedReward 
               ? "text-lg font-bold text-amber-300 animate-pulse" 
               : "text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-yellow-400 animate-pulse"
@@ -313,21 +327,24 @@ const RewardSpinner = React.forwardRef<RewardSpinnerHandle, RewardSpinnerProps>(
             {!isSpinning && (
               <>
                 <Sparkles className="h-6 w-6 text-yellow-400 animate-bounce" />
-                <span className={cn(
+                <span className={`text-3xl font-pricedown ${cn(
                   selectedReward ? "" : "animate-pulse"
-                )}>{statusMessage}</span>
+                )}`}>{statusMessage}</span>
               </>
             )}
           </div>
 
-            {selectedReward && (
-              <div className="relative">
-                <div className="rounded-full border-2 border-amber-400 bg-gradient-to-r from-amber-500/30 to-yellow-500/30 px-6 py-3 text-lg font-bold uppercase tracking-widest text-amber-100 shadow-2xl animate-bounce">
-                  💰 {selectedReward.price} 💰
-                </div>
-                <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-amber-400 to-yellow-400 opacity-30 blur animate-pulse"></div>
-              </div>
-            )}
+          {selectedReward && (
+            <div className="relative">
+              <Button
+                onClick={() => onItemClick?.(selectedReward)}
+                className="relative z-10 rounded-full border-2 border-amber-400 bg-gradient-to-r from-amber-500/30 to-yellow-500/30 px-6 py-3 text-lg font-bold uppercase tracking-widest text-amber-100 shadow-2xl animate-bounce hover:from-amber-500/50 hover:to-yellow-500/50 hover:scale-105 transition-all duration-300"
+              >
+                💰 {formatPrice(selectedReward.price)} 💰
+              </Button>
+              <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-amber-400 to-yellow-400 opacity-30 blur animate-pulse pointer-events-none"></div>
+            </div>
+          )}
 
           {/* Simple Speed Controls */}
           {showSpeedControls && (
@@ -353,36 +370,118 @@ const RewardSpinner = React.forwardRef<RewardSpinnerHandle, RewardSpinnerProps>(
           )}
 
           <div className="flex flex-col items-center gap-1">
-            <div className="relative w-full">
-              <Button
-                size="lg"
-                className={cn(
-                  "relative z-10 w-full text-lg font-pricedown text-white shadow-2xl transition-all duration-500 ease-out",
-                  isSpinning || disabled || !rewards.length
-                    ? "bg-gradient-to-r from-gray-500 to-gray-600 cursor-not-allowed"
-                    : "bg-gradient-to-r from-purple-500 via-pink-500 to-yellow-500 hover:from-purple-600 hover:via-pink-600 hover:to-yellow-600 hover:scale-105 hover:shadow-purple-500/50 animate-pulse"
+            {showTryForFree ? (
+              // Two buttons layout
+              <div className="flex gap-3 w-full">
+                {/* Try for Free Button */}
+                <div className="relative flex-1">
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className={cn(
+                      "relative z-10 w-full text-lg font-pricedown text-white shadow-2xl transition-all duration-500 ease-out",
+                      isSpinning || disabled || !rewards.length
+                        ? "bg-gray-600/50 border-gray-500 cursor-not-allowed"
+                        : "bg-gray-600/30 border-gray-400 hover:bg-gray-600/50 hover:border-gray-300 hover:scale-105"
+                    )}
+                    disabled={isSpinning || disabled || !rewards.length}
+                    onClick={() => {
+                      if (onTryForFree) {
+                        onTryForFree();
+                      }
+                      void performSpin('try-for-free');
+                    }}
+                  >
+                    {isSpinning && spinningButton === 'try-for-free' ? (
+                      <div className="flex items-center gap-3">
+                        <Loader2 className="h-6 w-6 animate-spin text-white" />
+                        <span className="font-bold">SPINNING...</span>
+                      </div>
+                    ) : (
+                      tryForFreeLabel
+                    )}
+                  </Button>
+                </div>
+
+                {/* Open Box Button */}
+                <div className="relative flex-1">
+                  <Button
+                    size="lg"
+                    className={cn(
+                      "relative z-10 w-full text-lg font-pricedown text-white shadow-2xl transition-all duration-500 ease-out",
+                      isSpinning || disabled || !rewards.length
+                        ? "bg-gradient-to-r from-gray-500 to-gray-600 cursor-not-allowed"
+                        : "bg-gradient-to-r from-purple-500 via-pink-500 to-yellow-500 hover:from-purple-600 hover:via-pink-600 hover:to-yellow-600 hover:scale-105 hover:shadow-purple-500/50 animate-pulse"
+                    )}
+                    disabled={isSpinning || disabled || !rewards.length}
+                    onClick={async () => {
+                      // If onButtonClick is provided, call it first
+                      if (onButtonClick) {
+                        const shouldProceed = await onButtonClick();
+                        if (!shouldProceed) {
+                          return; // Don't start the spin
+                        }
+                      }
+                      void performSpin('open-box');
+                    }}
+                  >
+                    {isSpinning && spinningButton === 'open-box' ? (
+                      <div className="flex items-center gap-3">
+                        <Loader2 className="h-6 w-6 animate-spin text-white" />
+                        <span className="font-bold">SPINNING...</span>
+                      </div>
+                    ) : (
+                      ctaLabel
+                    )}
+                  </Button>
+                  {!isSpinning && !disabled && rewards.length > 0 && (
+                    <>
+                      <div className="absolute -inset-1 bg-gradient-to-r from-purple-500 via-pink-500 to-yellow-500 rounded-lg blur opacity-75 animate-pulse"></div>
+                      <div className="absolute -inset-2 bg-gradient-to-r from-purple-400 via-pink-400 to-yellow-400 rounded-lg blur-sm opacity-50 animate-ping"></div>
+                    </>
+                  )}
+                </div>
+              </div>
+            ) : (
+              // Single button layout (original)
+              <div className="relative w-full">
+                <Button
+                  size="lg"
+                  className={cn(
+                    "relative z-10 w-full text-lg font-pricedown text-white shadow-2xl transition-all duration-500 ease-out",
+                    isSpinning || disabled || !rewards.length
+                      ? "bg-gradient-to-r from-gray-500 to-gray-600 cursor-not-allowed"
+                      : "bg-gradient-to-r from-purple-500 via-pink-500 to-yellow-500 hover:from-purple-600 hover:via-pink-600 hover:to-yellow-600 hover:scale-105 hover:shadow-purple-500/50 animate-pulse"
+                  )}
+                  disabled={isSpinning || disabled || !rewards.length}
+                  onClick={async () => {
+                    // If onButtonClick is provided, call it first
+                    if (onButtonClick) {
+                      const shouldProceed = await onButtonClick();
+                      if (!shouldProceed) {
+                        return; // Don't start the spin
+                      }
+                    }
+                    void performSpin('open-box');
+                  }}
+                >
+                  {isSpinning && spinningButton === 'open-box' ? (
+                    <div className="flex items-center gap-3">
+                      <Loader2 className="h-6 w-6 animate-spin text-white" />
+                      <span className="font-bold">SPINNING...</span>
+                    </div>
+                  ) : (
+                    ctaLabel
+                  )}
+                </Button>
+                {!isSpinning && !disabled && rewards.length > 0 && (
+                  <>
+                    <div className="absolute -inset-1 bg-gradient-to-r from-purple-500 via-pink-500 to-yellow-500 rounded-lg blur opacity-75 animate-pulse"></div>
+                    <div className="absolute -inset-2 bg-gradient-to-r from-purple-400 via-pink-400 to-yellow-400 rounded-lg blur-sm opacity-50 animate-ping"></div>
+                  </>
                 )}
-                disabled={isSpinning || disabled || !rewards.length}
-                onClick={() => {
-                  void performSpin();
-                }}
-              >
-                {isSpinning ? (
-                  <div className="flex items-center gap-3">
-                    <Loader2 className="h-6 w-6 animate-spin text-white" />
-                    <span className="font-bold">SPINNING...</span>
-                  </div>
-                ) : (
-                  ctaLabel
-                )}
-              </Button>
-              {!isSpinning && !disabled && rewards.length > 0 && (
-                <>
-                  <div className="absolute -inset-1 bg-gradient-to-r from-purple-500 via-pink-500 to-yellow-500 rounded-lg blur opacity-75 animate-pulse"></div>
-                  <div className="absolute -inset-2 bg-gradient-to-r from-purple-400 via-pink-400 to-yellow-400 rounded-lg blur-sm opacity-50 animate-ping"></div>
-                </>
-              )}
-            </div>
+              </div>
+            )}
             {experience !== undefined && (
               <div className="flex items-center gap-2">
                 <span className="text-lg">⚡</span>

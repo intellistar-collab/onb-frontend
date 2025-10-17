@@ -65,18 +65,18 @@ const HomeTabs = ({ categories, boxesByCategory }: HomeTabsProps) => {
 
   return (
     <section className="overflow-hidden">
-      <div className="grid md:grid-cols-[280px_1fr] gap-6 w-full h-fit">
+      <div className="grid md:grid-cols-[280px_1fr] gap-4 sm:gap-6 w-full h-fit">
         <aside className="md:sticky md:top-24 h-max">
           <div className="space-y-4">
             {/* 🎰 EPIC Random Pick Button */}
-            <div className="relative group/random -mt-20">
+            <div className="relative group/random -mt-16 sm:-mt-20">
               {/* Animated glow rings */}
               <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 rounded-2xl opacity-0 group-hover/random:opacity-75 blur-xl transition-all duration-500 animate-pulse" />
               <div className="absolute -inset-0.5 bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-600 rounded-2xl opacity-0 group-hover/random:opacity-100 transition-all duration-300" />
               
               <Button 
                 className={cn(
-                  "relative w-full h-14 text-lg font-extrabold transition-all duration-300 overflow-hidden group",
+                  "relative w-full h-12 sm:h-14 text-sm sm:text-lg font-extrabold transition-all duration-300 overflow-hidden group",
                   "bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600",
                   "hover:from-purple-500 hover:via-pink-500 hover:to-orange-500",
                   "shadow-2xl hover:shadow-purple-500/50 hover:scale-[1.03] active:scale-[0.97]",
