@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Users, Shield, Edit, Trash2, MoreVertical, Plus, Save, X, CheckCircle, UserX, UserCheck } from "lucide-react";
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { useToast } from "@/components/ui/toast";
+import Image from "next/image";
 import { usersAPI, User, CreateUserData, UpdateUserData } from "@/lib/api/users";
 
 export default function AdminUsers() {
@@ -319,12 +320,40 @@ export default function AdminUsers() {
       key: "user",
       label: "User",
       className: "w-1/3", // 33% width for user column
-      render: (value: any, row: User) => (
-        <div>
-          <p className="admin-text-primary font-medium">{row.username}</p>
-          <p className="admin-text-tertiary text-sm">{row.email}</p>
-        </div>
-      ),
+      render: (value: any, row: User) => {
+        const fullName = [row.firstName, row.lastName].filter(Boolean).join(" ") || row.username;
+        const initialsSource = fullName || row.username || row.email;
+        const initials = (initialsSource || "?")
+          .split(" ")
+          .filter(Boolean)
+          .slice(0, 2)
+          .map(part => part[0]?.toUpperCase() || "")
+          .join("");
+        const hasAvatar = Boolean(row.avatar);
+        return (
+          <div className="flex items-center gap-3">
+            <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full border border-white/10 bg-white/5 flex items-center justify-center">
+              {hasAvatar ? (
+                <Image
+                  src={row.avatar as string}
+                  alt={fullName}
+                  fill
+                  sizes="36px"
+                  className="object-cover"
+                />
+              ) : (
+                <span className="text-xs font-semibold text-white/80">
+                  {initials || "?"}
+                </span>
+              )}
+            </div>
+            <div className="min-w-0">
+              <p className="admin-text-primary font-medium truncate">{fullName}</p>
+              <p className="admin-text-tertiary text-xs truncate">{row.email}</p>
+            </div>
+          </div>
+        );
+      },
     },
     {
       key: "status",
@@ -444,7 +473,7 @@ export default function AdminUsers() {
               <div className="flex gap-2">
                 <Button 
                   onClick={() => setIsAddModalOpen(true)}
-                  className="bg-slate-100 border border-slate-200 dark:bg-slate-800 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 hover:scale-105 transform transition-all duration-200 shadow-sm hover:shadow-md text-sm sm:text-base"
+                  className="admin-button-primary hover:scale-105 transform transition-all duration-200 shadow-sm hover:shadow-md text-sm sm:text-base"
                 >
                   <Users className="h-4 w-4 mr-1 sm:mr-2" />
                   <span className="hidden sm:inline">Add User</span>

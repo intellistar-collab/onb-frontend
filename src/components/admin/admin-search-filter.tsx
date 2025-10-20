@@ -93,13 +93,13 @@ export const AdminSearchFilter: React.FC<AdminSearchFilterProps> = ({
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="flex-1">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 dark:text-slate-500 h-4 w-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 admin-text-tertiary h-4 w-4" />
             <input
               type="text"
               placeholder={searchPlaceholder}
               value={searchValue}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full pl-10 pr-4 py-2 rounded-md admin-input"
             />
           </div>
         </div>
@@ -109,7 +109,7 @@ export const AdminSearchFilter: React.FC<AdminSearchFilterProps> = ({
               <button
                 type="button"
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="flex items-center justify-between w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-w-[140px]"
+                className="flex items-center justify-between w-full px-3 py-2 rounded-md admin-input min-w-[140px]"
               >
                 <div className="flex items-center gap-2">
                   {selectedConfig && (
@@ -123,7 +123,7 @@ export const AdminSearchFilter: React.FC<AdminSearchFilterProps> = ({
               </button>
               
               {isDropdownOpen && (
-                <div className="absolute z-10 w-full mt-1 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-md shadow-lg">
+                <div className="absolute z-10 w-full mt-1 admin-bg-secondary admin-border-primary border rounded-md admin-shadow">
                   <div className="py-1">
                     {filterOptions.map((option) => {
                       const config = getStatusConfig(option.value);
@@ -134,7 +134,7 @@ export const AdminSearchFilter: React.FC<AdminSearchFilterProps> = ({
                             onFilterChange(option.value);
                             setIsDropdownOpen(false);
                           }}
-                          className="w-full px-3 py-2 text-left text-sm hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2"
+                          className="w-full px-3 py-2 text-left text-sm admin-hover-bg flex items-center gap-2"
                         >
                           <div className={`w-2 h-2 rounded-full ${config.dotColor}`}></div>
                           <span className={config.textColor}>{option.label}</span>

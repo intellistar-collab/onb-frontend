@@ -18,6 +18,7 @@ import { useToast } from "@/components/ui/toast"
 import AuthDialogs from "@/components/auth/auth-dialogs"
 import ItemActionDialog from "@/components/box-page/item-action-dialog"
 import { inventoryAPI } from "@/lib/api/inventory"
+import { boxOpeningAPI } from "@/lib/api/box-opening"
 
 interface BoxDetailProps {
   box: MysteryBox
@@ -274,7 +275,8 @@ const BoxDetail: React.FC<BoxDetailProps> = ({ box }) => {
   const handleSellItem = useCallback(async (item: BoxReward) => {
     setIsProcessingItem(true)
     try {
-      // First add item to inventory with SOLD status
+      // Add item to inventory with SOLD status
+      // This will create transaction and update item stats
       await inventoryAPI.addToInventory({
         itemId: item.id,
         boxId: box.id,
@@ -304,7 +306,8 @@ const BoxDetail: React.FC<BoxDetailProps> = ({ box }) => {
   const handleKeepItem = useCallback(async (item: BoxReward) => {
     setIsProcessingItem(true)
     try {
-      // Add item to inventory
+      // Add item to inventory with KEPT status
+      // No transaction needed since user doesn't sell it yet
       await inventoryAPI.addToInventory({
         itemId: item.id,
         boxId: box.id,
@@ -352,8 +355,38 @@ const BoxDetail: React.FC<BoxDetailProps> = ({ box }) => {
             onButtonClick={handleBoxOpen}
             onItemClick={handleItemClick}
             onSpin={async () => {
-              await new Promise(resolve => setTimeout(resolve, 400))
-              return handleSpin()
+              try {
+                // Call the backend API to open the box
+                const result = await boxOpeningAPI.openBox(box.id)
+                
+                // Convert the selected item to BoxReward format for the spinner
+                const selectedReward: BoxReward = {
+                  id: result.selectedItem.id,
+                  name: result.selectedItem.name,
+                  price: result.selectedItem.price.toString(),
+                  image: result.selectedItem.imageUrl || "",
+                  odds: "100%", // Since it's already selected
+                  tier: "uncommon", // Default tier
+                  description: ""
+                }
+
+                // Show success message
+                toast({
+                  title: "Box Opened!",
+                  description: `You received ${result.selectedItem.name} worth ${formatPrice(result.selectedItem.price)}!`,
+                  variant: "default",
+                })
+
+                return selectedReward
+              } catch (error) {
+                console.error("Error opening box:", error)
+                toast({
+                  title: "Error",
+                  description: error instanceof Error ? error.message : "Failed to open box. Please try again.",
+                  variant: "destructive",
+                })
+                throw error
+              }
             }}
             className="w-full"
             showSpeedControls={true}

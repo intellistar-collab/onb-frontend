@@ -55,6 +55,16 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     setMounted(true);
   }, []);
 
+  // Force dark theme for admin area
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      localStorage.setItem('admin-theme', 'dark');
+    } catch {}
+    document.documentElement.setAttribute('data-theme', 'dark');
+    document.documentElement.classList.add('dark');
+  }, []);
+
 
   // Scroll detection effect
   useEffect(() => {
@@ -82,12 +92,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       )}
 
       {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-72 shadow-xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 admin-bg-secondary admin-border-primary border-r overflow-hidden ${
+      <div className={`fixed inset-y-0 left-0 z-50 w-72 shadow-xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 admin-bg-primary admin-border-primary border-r overflow-hidden ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
         <div className="flex flex-col h-full">
           {/* Sidebar header */}
-          <div className="flex items-center justify-between h-16 px-6 admin-border-primary border-b admin-bg-tertiary">
+          <div className="flex items-center justify-between h-16 px-6 admin-border-primary border-b admin-bg-primary">
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center transition-transform duration-200 hover:scale-110 hover:rotate-3">
                 <span className="text-sm font-bold text-white">A</span>
@@ -105,7 +115,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
+          <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto admin-bg-primary">
             {navigationItems.map((item) => {
               const isActive = pathname === item.href;
               return (
@@ -116,14 +126,14 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   )}
                   
                   {/* Hover indicator */}
-                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-300 dark:bg-blue-600 rounded-r-full opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-600 rounded-r-full opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
                   
                   <Button
                     variant="ghost"
                     className={`w-full justify-start transition-all duration-200 ease-in-out transform hover:scale-[1.02] active:scale-95 ${
                       isActive 
-                        ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 shadow-sm border-l-4 border-blue-500 ml-0' 
-                        : 'admin-button-ghost admin-text-secondary hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-100'
+                        ? 'admin-bg-tertiary text-blue-300 shadow-sm border-l-4 border-blue-500 ml-0' 
+                        : 'admin-button-ghost admin-text-secondary admin-hover-bg'
                     }`}
                     onClick={() => {
                       router.push(item.href);
@@ -132,13 +142,13 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   >
                     <item.icon className={`mr-3 h-5 w-5 transition-all duration-200 ${
                       isActive 
-                        ? 'text-blue-600 dark:text-blue-400 transform scale-110' 
-                        : 'text-gray-500 dark:text-gray-400 group-hover:scale-105'
+                        ? 'text-blue-400 transform scale-110' 
+                        : 'admin-text-tertiary group-hover:scale-105'
                     }`} suppressHydrationWarning />
                     <span className={`font-medium transition-all duration-200 ${
                       isActive 
-                        ? 'text-blue-700 dark:text-blue-300 transform translate-x-1' 
-                        : 'text-gray-700 dark:text-gray-300 group-hover:translate-x-0.5'
+                        ? 'text-blue-300 transform translate-x-1' 
+                        : 'admin-text-secondary group-hover:translate-x-0.5'
                     }`}>
                       {item.name}
                     </span>
@@ -179,7 +189,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       </div>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
+      <div className="flex-1 flex flex-col min-h-screen overflow-hidden lg:ml-72">
         {/* Topbar */}
         <header className={`fixed top-0 left-0 lg:left-72 right-0 z-40 h-16 border-b px-4 transition-all duration-300 ease-in-out ${
           isScrolled 

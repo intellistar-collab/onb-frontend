@@ -97,16 +97,16 @@ export const AdminTable: React.FC<AdminTableProps> = ({
     setCurrentPage(Math.max(1, Math.min(page, totalPages)));
   };
   return (
-    <div className={cn("bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm", className)}>
+    <div className={cn("admin-card", className)}>
       {/* Header */}
-      <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
+      <div className="px-6 py-4 border-b admin-border-primary">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+            <h3 className="text-lg font-semibold admin-text-primary">
               {title}
             </h3>
             {description && (
-              <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
+              <p className="text-sm admin-text-tertiary mt-1">
                 {description}
               </p>
             )}
@@ -115,13 +115,13 @@ export const AdminTable: React.FC<AdminTableProps> = ({
             <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
               {searchable && (
                 <div className="relative w-full sm:w-64">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 admin-text-tertiary" />
                   <Input
                     type="text"
                     placeholder={searchPlaceholder}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="pl-10 admin-input"
                   />
                 </div>
               )}
@@ -130,7 +130,7 @@ export const AdminTable: React.FC<AdminTableProps> = ({
                   <select
                     value={statusFilter.value}
                     onChange={(e) => statusFilter.onChange(e.target.value)}
-                    className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 rounded-md admin-input text-sm"
                   >
                     {statusFilter.options.map((option) => (
                       <option key={option.value} value={option.value}>
@@ -154,12 +154,12 @@ export const AdminTable: React.FC<AdminTableProps> = ({
         ) : (
           <table className="w-full table-fixed">
             <thead>
-              <tr className="bg-slate-50 dark:bg-slate-800/50">
+              <tr className="admin-bg-secondary">
                 {columns.map((column) => (
                   <th 
                     key={column.key} 
                     className={cn(
-                      "text-left py-4 px-6 text-sm font-medium text-slate-700 dark:text-slate-300",
+                      "text-left py-4 px-6 text-sm font-medium admin-text-primary",
                       "first:rounded-tl-xl last:rounded-tr-xl",
                       column.className
                     )}
@@ -168,22 +168,22 @@ export const AdminTable: React.FC<AdminTableProps> = ({
                   </th>
                 ))}
                 {actions && actions.length > 0 && (
-                  <th className="text-left py-4 px-6 text-sm font-medium text-slate-700 dark:text-slate-300 last:rounded-tr-xl w-32">
+                  <th className="text-left py-4 px-6 text-sm font-medium admin-text-primary last:rounded-tr-xl w-32">
                     Actions
                   </th>
                 )}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
+            <tbody className="divide-y admin-border-primary">
               {paginatedData.length === 0 ? (
                 <tr>
                   <td
                     colSpan={columns.length + (actions ? 1 : 0)}
-                    className="text-center py-12 text-slate-500 dark:text-slate-400"
+                    className="text-center py-12 admin-text-tertiary"
                   >
                     <div className="flex flex-col items-center gap-2">
-                      <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
-                        <svg className="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div className="w-12 h-12 rounded-full admin-bg-tertiary flex items-center justify-center">
+                        <svg className="w-6 h-6 admin-text-tertiary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                         </svg>
                       </div>
@@ -197,12 +197,12 @@ export const AdminTable: React.FC<AdminTableProps> = ({
                 paginatedData.map((row, index) => (
                   <tr 
                     key={index} 
-                    className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors duration-150"
+                    className="transition-colors duration-150 hover:bg-white/5"
                   >
                     {columns.map((column) => (
                       <td 
                         key={column.key} 
-                        className="py-4 px-6 text-sm text-slate-900 dark:text-slate-100"
+                        className="py-4 px-6 text-sm admin-text-primary"
                       >
                         {column.render
                           ? column.render(row[column.key], row)

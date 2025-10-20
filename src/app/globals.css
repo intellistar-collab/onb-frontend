@@ -106,19 +106,19 @@
 }
 
 [data-theme="dark"] {
-  /* Dark Theme Variables */
-  --admin-bg-primary: #111827;
-  --admin-bg-secondary: #1f2937;
-  --admin-bg-tertiary: #374151;
-  --admin-border-primary: #374151;
-  --admin-border-secondary: #4b5563;
-  --admin-text-primary: #f9fafb;
-  --admin-text-secondary: #e5e7eb;
-  --admin-text-tertiary: #d1d5db;
-  --admin-text-muted: #9ca3af;
-  --admin-hover-bg: #374151;
-  --admin-focus-ring: #3b82f6;
-  --admin-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.3), 0 1px 2px -1px rgb(0 0 0 / 0.3);
+  /* Admin theme mapped to account/profile page tokens for visual parity */
+  --admin-bg-primary: var(--background);
+  --admin-bg-secondary: var(--card);
+  --admin-bg-tertiary: var(--popover);
+  --admin-border-primary: var(--border);
+  --admin-border-secondary: var(--border);
+  --admin-text-primary: var(--foreground);
+  --admin-text-secondary: var(--muted-foreground);
+  --admin-text-tertiary: var(--muted-foreground);
+  --admin-text-muted: var(--muted-foreground);
+  --admin-hover-bg: var(--accent);
+  --admin-focus-ring: var(--ring);
+  --admin-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.25), 0 1px 2px -1px rgb(0 0 0 / 0.25);
 }
 
 @layer base {
@@ -259,6 +259,60 @@
 }
 
 .admin-shadow { box-shadow: var(--admin-shadow); }
+
+/* Ensure admin cards use the dark blue card surface across the app (avoid @apply to prevent build/style issues) */
+.admin-card {
+  background-color: var(--admin-bg-secondary);
+  border-color: var(--admin-border-primary);
+  box-shadow: var(--admin-shadow);
+  border-radius: 0.5rem; /* rounded-lg */
+  border-width: 1px;
+}
+
+/* Admin Buttons aligned with account/profile tokens */
+.admin-button-primary {
+  /* Match stats card background */
+  background-color: var(--admin-bg-secondary);
+  color: var(--admin-text-primary);
+  border: 1px solid var(--admin-border-primary);
+}
+.admin-button-primary:hover {
+  filter: brightness(1.08);
+}
+
+.admin-button-secondary {
+  /* Match stats card background */
+  background-color: var(--admin-bg-secondary);
+  color: var(--admin-text-primary);
+  border: 1px solid var(--admin-border-primary);
+}
+.admin-button-secondary:hover {
+  background-color: var(--accent);
+}
+
+.admin-button-ghost {
+  background-color: transparent;
+  color: var(--muted-foreground);
+}
+.admin-button-ghost:hover {
+  background-color: var(--accent);
+  color: var(--foreground);
+}
+
+/* Admin input aligned with tokens */
+.admin-input {
+  background-color: var(--card);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+}
+.admin-input::placeholder {
+  color: var(--muted-foreground);
+}
+.admin-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--ring);
+  border-color: var(--ring);
+}
 
 @layer utilities {
   /* Site-wide banner marquee animation */

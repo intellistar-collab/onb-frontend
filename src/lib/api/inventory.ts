@@ -1,6 +1,6 @@
 import { getAuthHeaders } from './auth-utils';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3001';
+const API_BASE_URL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:8000';
 
 export interface InventoryItem {
   id: string;
@@ -53,11 +53,11 @@ export const inventoryAPI = {
     }
   },
 
-  // Add item to inventory (keep item)
+  // Add item to inventory (keep or sell item)
   async addToInventory(itemData: CreateInventoryItemData): Promise<InventoryItem> {
     try {
       const headers = await getAuthHeaders();
-      const response = await fetch(`${API_BASE_URL}/api/inventory`, {
+      const response = await fetch(`${API_BASE_URL}/api/inventory/add`, {
         method: 'POST',
         headers: {
           ...headers,

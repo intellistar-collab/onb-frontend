@@ -137,6 +137,31 @@ const RewardSpinner = React.forwardRef<RewardSpinnerHandle, RewardSpinnerProps>(
       setCurrentMobileIndex(prev => (prev < rewards.length - 1 ? prev + 1 : 0))
     }, [rewards.length])
 
+    // Desktop navigation helpers: scroll one card width
+    const scrollDesktopByStep = useCallback((direction: -1 | 1) => {
+      if (!containerRef.current || !trackRef.current || isSpinning) return
+      const track = trackRef.current
+      const firstChild = track.firstElementChild as HTMLElement | null
+      const secondChild = track.children.item(1) as HTMLElement | null
+      // Fallback step if layout metrics are unavailable
+      let step = 244 // ~220px card + 24px gap
+      if (firstChild && secondChild) {
+        const rect1 = firstChild.getBoundingClientRect()
+        const rect2 = secondChild.getBoundingClientRect()
+        const delta = Math.abs(rect2.left - rect1.left)
+        if (delta > 0) step = delta
+      }
+      containerRef.current.scrollBy({ left: direction * step, behavior: 'smooth' })
+    }, [isSpinning])
+
+    const goToPreviousDesktop = useCallback(() => {
+      scrollDesktopByStep(-1)
+    }, [scrollDesktopByStep])
+
+    const goToNextDesktop = useCallback(() => {
+      scrollDesktopByStep(1)
+    }, [scrollDesktopByStep])
+
     const performSpin = useCallback(async (buttonType: 'try-for-free' | 'open-box' = 'open-box') => {
       if (isSpinning || disabled || !rewards.length) {
         return;
@@ -474,6 +499,26 @@ const RewardSpinner = React.forwardRef<RewardSpinnerHandle, RewardSpinnerProps>(
                   )
                 })}
               </div>
+            </div>
+
+            {/* Desktop navigation arrows */}
+            <div className="pointer-events-none" aria-hidden="true">
+              <button
+                type="button"
+                onClick={goToPreviousDesktop}
+                disabled={isSpinning}
+                className="pointer-events-auto absolute top-1/2 -translate-y-1/2 left-2 z-20 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/10 border border-white/20 text-white hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+              <button
+                type="button"
+                onClick={goToNextDesktop}
+                disabled={isSpinning}
+                className="pointer-events-auto absolute top-1/2 -translate-y-1/2 right-2 z-20 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/10 border border-white/20 text-white hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
             </div>
           </div>
         )}
