@@ -58,6 +58,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   // Force dark theme for admin area
   useEffect(() => {
     if (typeof window === 'undefined') return;
+    
     try {
       localStorage.setItem('admin-theme', 'dark');
     } catch {}
@@ -82,7 +83,20 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   };
 
   return (
-    <div className="min-h-screen flex admin-bg-primary">
+    <>
+      {/* Immediate dark theme script - runs before content renders */}
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+            (function() {
+              // Apply dark theme immediately for admin pages
+              document.documentElement.setAttribute('data-theme', 'dark');
+              document.documentElement.classList.add('dark');
+            })();
+          `,
+        }}
+      />
+      <div className="min-h-screen flex admin-bg-primary">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div 
@@ -269,5 +283,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         </main>
       </div>
     </div>
+    </>
   );
 }

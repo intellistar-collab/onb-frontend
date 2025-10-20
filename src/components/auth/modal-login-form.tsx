@@ -17,7 +17,7 @@ interface ModalLoginFormProps {
 const ModalLoginForm: React.FC<ModalLoginFormProps> = ({ onSuccess }) => {
   const router = useRouter();
   const { toast } = useToast();
-  const { login, loginWithGoogle } = useAuth();
+  const { login, loginWithGoogle, user, isAdmin } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
@@ -42,21 +42,23 @@ const ModalLoginForm: React.FC<ModalLoginFormProps> = ({ onSuccess }) => {
       const result = await login(email, password, rememberMe);
       console.log("Login result:", result);
 
-      const userRole = (result.data?.user as any)?.role;
+      // Try multiple ways to get the user role
+      const userRole = (result.data?.user as any)?.role || (result.user as any)?.role;
+      const finalUserRole = userRole || user?.role;
+      const isUserAdmin = finalUserRole === 'ADMIN' || isAdmin;
 
       toast({
         title: "Welcome back!",
-        description: userRole === 'ADMIN' ? "Welcome back, Admin!" : "You're now signed in.",
+        description: isUserAdmin ? "Welcome back, Admin!" : "You're now signed in.",
         variant: "success",
         durationMs: 2000,
       });
       
       
       // If user is ADMIN, redirect to admin dashboard
-      if (userRole === 'ADMIN') {
-        router.push('/admin/dashboard');
+      if (isUserAdmin) {
+        window.location.href = '/admin/dashboard';
       } else {
-        // For regular users, close the modal and stay on current page
         onSuccess?.();
       }
     } catch (err) {

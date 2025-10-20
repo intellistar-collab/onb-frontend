@@ -354,15 +354,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       await authClient.signOut();
       
       // Handle redirect
-      if (redirectTo) {
-        router.push(redirectTo);
-      } else if (isClient()) {
-        const currentPath = window.location.pathname;
-        const isOnProtectedRoute = PROTECTED_ROUTES.some(route => currentPath && currentPath.startsWith(route));
-        
-        if (isOnProtectedRoute) {
-          router.push("/");
-        }
+      const redirectPath = redirectTo || "/";
+      
+      // Use window.location.href for a full page reload to ensure clean state
+      if (isClient()) {
+        window.location.href = redirectPath;
       }
     } catch (error) {
       console.error("Logout failed:", error);
@@ -370,18 +366,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       clearAuthState();
       
       // Fallback redirect
-      if (redirectTo) {
-        router.push(redirectTo);
-      } else if (isClient()) {
-        const currentPath = window.location.pathname;
-        const isOnProtectedRoute = PROTECTED_ROUTES.some(route => currentPath && currentPath.startsWith(route));
-        
-        if (isOnProtectedRoute) {
-          router.push("/");
-        }
+      const redirectPath = redirectTo || "/";
+      
+      if (isClient()) {
+        window.location.href = redirectPath;
       }
     }
-  }, [router, clearAuthState, isClient]);
+  }, [clearAuthState, isClient]);
 
   // Initialize auth on mount and when component re-mounts (e.g., after page reload)
   useEffect(() => {
