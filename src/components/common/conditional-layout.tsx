@@ -15,7 +15,7 @@ export default function ConditionalLayout({ children }: ConditionalLayoutProps) 
   const pathname = usePathname();
   
   // Check if we're in the admin panel
-  const isAdminRoute = pathname.startsWith('/admin');
+  const isAdminRoute = pathname && pathname.startsWith('/admin');
   
   if (isAdminRoute) {
     // For admin routes, only render the children with ToastProvider

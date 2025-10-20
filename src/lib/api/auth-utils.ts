@@ -26,7 +26,7 @@ export const getAuthHeaders = async (): Promise<HeadersInit> => {
       const allCookies = document.cookie;
       const token = allCookies
         .split('; ')
-        .find(row => row.startsWith('better-auth.session_token='))
+        .find(row => row && typeof row === 'string' && row.startsWith('better-auth.session_token='))
         ?.split('=')[1];
 
       if (token) {

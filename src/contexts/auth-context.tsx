@@ -358,7 +358,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         router.push(redirectTo);
       } else if (isClient()) {
         const currentPath = window.location.pathname;
-        const isOnProtectedRoute = PROTECTED_ROUTES.some(route => currentPath.startsWith(route));
+        const isOnProtectedRoute = PROTECTED_ROUTES.some(route => currentPath && currentPath.startsWith(route));
         
         if (isOnProtectedRoute) {
           router.push("/");
@@ -374,7 +374,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         router.push(redirectTo);
       } else if (isClient()) {
         const currentPath = window.location.pathname;
-        const isOnProtectedRoute = PROTECTED_ROUTES.some(route => currentPath.startsWith(route));
+        const isOnProtectedRoute = PROTECTED_ROUTES.some(route => currentPath && currentPath.startsWith(route));
         
         if (isOnProtectedRoute) {
           router.push("/");
