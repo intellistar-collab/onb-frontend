@@ -270,24 +270,35 @@
 }
 
 /* Admin Buttons aligned with account/profile tokens */
+button.admin-button-primary,
 .admin-button-primary {
-  /* Match stats card background */
-  background-color: var(--admin-bg-secondary);
-  color: var(--admin-text-primary);
-  border: 1px solid var(--admin-border-primary);
+  /* Primary action buttons - dark blue */
+  background-color: #1e40af !important; /* dark blue */
+  color: white !important;
+  border: 1px solid #1e40af !important;
+  font-weight: 600 !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
 }
+button.admin-button-primary:hover,
 .admin-button-primary:hover {
-  filter: brightness(1.08);
+  background-color: #1d4ed8 !important; /* slightly lighter dark blue */
+  border-color: #1d4ed8 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
 }
 
+button.admin-button-secondary,
 .admin-button-secondary {
-  /* Match stats card background */
-  background-color: var(--admin-bg-secondary);
-  color: var(--admin-text-primary);
-  border: 1px solid var(--admin-border-primary);
+  /* Secondary/cancel buttons - also dark blue but with outline style */
+  background-color: transparent !important;
+  color: #1e40af !important; /* dark blue text */
+  border: 1px solid #1e40af !important; /* dark blue border */
+  font-weight: 500 !important;
 }
+button.admin-button-secondary:hover,
 .admin-button-secondary:hover {
-  background-color: var(--accent);
+  background-color: #1e40af !important; /* dark blue background on hover */
+  color: white !important;
 }
 
 .admin-button-ghost {
@@ -312,6 +323,17 @@
   outline: none;
   box-shadow: 0 0 0 2px var(--ring);
   border-color: var(--ring);
+}
+
+/* Admin quick action tiles - match stats card background */
+.admin-quick-action {
+  background-color: var(--admin-bg-secondary);
+  border: 1px solid var(--admin-border-primary);
+  color: var(--admin-text-primary);
+  border-radius: 0.5rem;
+}
+.admin-quick-action:hover {
+  background-color: var(--admin-hover-bg);
 }
 
 @layer utilities {

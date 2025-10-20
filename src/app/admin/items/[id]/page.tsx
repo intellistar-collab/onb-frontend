@@ -243,7 +243,7 @@ export default function ItemDetailPage() {
             <Button
               onClick={() => router.push("/admin/items")}
               variant="outline"
-              className="flex items-center space-x-2"
+              className="admin-button-secondary flex items-center space-x-2"
             >
               <ArrowLeft className="h-4 w-4" />
               <span>Back to Items</span>
@@ -251,7 +251,7 @@ export default function ItemDetailPage() {
             <div className="flex space-x-2">
               <Button
                 onClick={() => setIsEditModalOpen(true)}
-                className="flex items-center space-x-2"
+                className="admin-button-primary flex items-center space-x-2"
               >
                 <Edit className="h-4 w-4 mr-2" />
                 Edit Item
@@ -259,7 +259,7 @@ export default function ItemDetailPage() {
               <Button
                 onClick={() => setDeleteConfirmOpen(true)}
                 variant="destructive"
-                className="flex items-center space-x-2"
+                className="admin-button-primary flex items-center space-x-2"
               >
                 <Package className="h-4 w-4 mr-2" />
                 Delete Item
@@ -498,12 +498,14 @@ export default function ItemDetailPage() {
                   <Button
                     variant="outline"
                     onClick={() => setIsEditModalOpen(false)}
+                    className="admin-button-secondary"
                   >
                     Cancel
                   </Button>
                   <Button
                     onClick={handleEditItem}
                     disabled={!formData.name || !formData.percentage}
+                    className="admin-button-primary"
                   >
                     Update Item
                   </Button>
@@ -526,12 +528,14 @@ export default function ItemDetailPage() {
                   <Button
                     variant="outline"
                     onClick={() => setDeleteConfirmOpen(false)}
+                    className="admin-button-secondary"
                   >
                     Cancel
                   </Button>
                   <Button
                     variant="destructive"
                     onClick={handleDeleteItem}
+                    className="admin-button-primary"
                   >
                     Delete
                   </Button>

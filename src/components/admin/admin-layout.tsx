@@ -158,32 +158,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             })}
           </nav>
 
-          {/* User info */}
-          <div className="p-4 admin-border-primary border-t">
-            <div className="admin-card p-3 transition-all duration-200 hover:shadow-md">
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center transition-transform duration-200 hover:scale-110">
-                  <User className="h-4 w-4 text-white" suppressHydrationWarning />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="admin-text-primary text-sm font-medium truncate">
-                    {user?.username || "Admin"}
-                  </p>
-                  <p className="admin-text-tertiary text-xs truncate">
-                    {user?.email}
-                  </p>
-                </div>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-full mt-2 admin-button-ghost transition-all duration-200 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 hover:scale-[1.02] group"
-                onClick={handleLogout}
-              >
-                <LogOut className="mr-2 h-4 w-4 transition-transform duration-200 group-hover:rotate-12" suppressHydrationWarning />
-                Sign Out
-              </Button>
-            </div>
+          {/* Sidebar footer */}
+          <div className="mt-auto p-4 admin-border-primary border-t">
+            <p className="text-[11px] admin-text-tertiary text-center">
+              © {new Date().getFullYear()} OneNightBox. All rights reserved.
+            </p>
           </div>
         </div>
       </div>

@@ -606,6 +606,7 @@ export default function AdminItems() {
                     Cancel
                   </Button>
                   <Button
+                    className="bg-slate-100 border border-slate-200 dark:bg-slate-800 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 hover:scale-105 transform transition-all duration-200 shadow-sm hover:shadow-md text-sm sm:text-base"
                     onClick={handleAddItem}
                     disabled={isLoading || !formData.name || !formData.percentage}
                   >
@@ -755,6 +756,7 @@ export default function AdminItems() {
                     Cancel
                   </Button>
                   <Button
+                    className="bg-slate-100 border border-slate-200 dark:bg-slate-800 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 hover:scale-105 transform transition-all duration-200 shadow-sm hover:shadow-md text-sm sm:text-base"
                     onClick={handleEditItem}
                     disabled={isLoading || !formData.name || !formData.percentage}
                   >
@@ -787,6 +789,7 @@ export default function AdminItems() {
                   </Button>
                   <Button
                     variant="destructive"
+                    className="bg-slate-100 border border-slate-200 dark:bg-slate-800 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 hover:scale-105 transform transition-all duration-200 shadow-sm hover:shadow-md text-sm sm:text-base"
                     onClick={handleDeleteItem}
                     disabled={isLoading}
                   >

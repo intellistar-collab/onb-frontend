@@ -479,7 +479,11 @@ export default function AdminBoxCategories() {
                 >
                   Cancel
                 </Button>
-                <Button onClick={handleAddCategory} disabled={isLoading || !formData.name.trim()}>
+                <Button 
+                  onClick={handleAddCategory} 
+                  disabled={isLoading || !formData.name.trim()}
+                  className="bg-slate-100 border border-slate-200 dark:bg-slate-800 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 hover:scale-105 transform transition-all duration-200 shadow-sm hover:shadow-md text-sm sm:text-base"
+                >
                   {isLoading ? "Creating..." : "Create"}
                 </Button>
               </div>
@@ -588,7 +592,11 @@ export default function AdminBoxCategories() {
                 >
                   Cancel
                 </Button>
-                <Button onClick={handleEditCategory} disabled={isLoading || !formData.name.trim()}>
+                <Button 
+                  onClick={handleEditCategory} 
+                  disabled={isLoading || !formData.name.trim()}
+                  className="bg-slate-100 border border-slate-200 dark:bg-slate-800 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 hover:scale-105 transform transition-all duration-200 shadow-sm hover:shadow-md text-sm sm:text-base"
+                >
                   {isLoading ? "Updating..." : "Update"}
                 </Button>
               </div>
@@ -623,6 +631,7 @@ export default function AdminBoxCategories() {
                   variant="destructive"
                   onClick={handleDeleteCategory}
                   disabled={isLoading}
+                  className="bg-slate-100 border border-slate-200 dark:bg-slate-800 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 hover:scale-105 transform transition-all duration-200 shadow-sm hover:shadow-md text-sm sm:text-base"
                 >
                   {isLoading ? "Deleting..." : "Delete"}
                 </Button>

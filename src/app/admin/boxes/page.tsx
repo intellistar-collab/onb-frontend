@@ -640,7 +640,11 @@ export default function AdminBoxes() {
                 >
                   Cancel
                 </Button>
-                <Button onClick={handleAddBox} disabled={isLoading || !formData.title.trim() || !formData.location.trim() || !formData.price || !formData.boxCategoryId}>
+                <Button 
+                  onClick={handleAddBox} 
+                  disabled={isLoading || !formData.title.trim() || !formData.location.trim() || !formData.price || !formData.boxCategoryId}
+                  className="bg-slate-100 border border-slate-200 dark:bg-slate-800 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 hover:scale-105 transform transition-all duration-200 shadow-sm hover:shadow-md text-sm sm:text-base"
+                >
                   {isLoading ? "Creating..." : "Create"}
                 </Button>
               </div>
@@ -805,7 +809,11 @@ export default function AdminBoxes() {
                 >
                   Cancel
                 </Button>
-                <Button onClick={handleEditBox} disabled={isLoading || !formData.title.trim() || !formData.location.trim() || !formData.price || !formData.boxCategoryId}>
+                <Button 
+                  onClick={handleEditBox} 
+                  disabled={isLoading || !formData.title.trim() || !formData.location.trim() || !formData.price || !formData.boxCategoryId}
+                  className="bg-slate-100 border border-slate-200 dark:bg-slate-800 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 hover:scale-105 transform transition-all duration-200 shadow-sm hover:shadow-md text-sm sm:text-base"
+                >
                   {isLoading ? "Updating..." : "Update"}
                 </Button>
               </div>
@@ -840,6 +848,7 @@ export default function AdminBoxes() {
                   variant="destructive"
                   onClick={handleDeleteBox}
                   disabled={isLoading}
+                  className="bg-slate-100 border border-slate-200 dark:bg-slate-800 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 hover:scale-105 transform transition-all duration-200 shadow-sm hover:shadow-md text-sm sm:text-base"
                 >
                   {isLoading ? "Deleting..." : "Delete"}
                 </Button>

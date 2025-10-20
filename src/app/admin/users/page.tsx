@@ -473,7 +473,7 @@ export default function AdminUsers() {
               <div className="flex gap-2">
                 <Button 
                   onClick={() => setIsAddModalOpen(true)}
-                  className="admin-button-primary hover:scale-105 transform transition-all duration-200 shadow-sm hover:shadow-md text-sm sm:text-base"
+                  className="bg-slate-100 border border-slate-200 dark:bg-slate-800 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 hover:scale-105 transform transition-all duration-200 shadow-sm hover:shadow-md text-sm sm:text-base"
                 >
                   <Users className="h-4 w-4 mr-1 sm:mr-2" />
                   <span className="hidden sm:inline">Add User</span>
@@ -588,7 +588,7 @@ export default function AdminUsers() {
                   <Button
                     onClick={handleAddUser}
                     disabled={isLoading || !formData.name || !formData.email || !formData.password}
-                    className="bg-slate-100 border border-slate-200 dark:bg-slate-800 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700"
+                    className="bg-slate-100 border border-slate-200 dark:bg-slate-800 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 hover:scale-105 transform transition-all duration-200 shadow-sm hover:shadow-md text-sm sm:text-base"
                   >
                     {isLoading ? "Adding..." : "Add User"}
                   </Button>
@@ -674,13 +674,14 @@ export default function AdminUsers() {
                       resetForm();
                     }}
                     disabled={isLoading}
+                    className="admin-button-secondary"
                   >
                     Cancel
                   </Button>
                   <Button
                     onClick={handleEditUser}
                     disabled={isLoading || !formData.name || !formData.email}
-                    className="bg-slate-100 border border-slate-200 dark:bg-slate-800 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700"
+                    className="bg-slate-100 border border-slate-200 dark:bg-slate-800 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 hover:scale-105 transform transition-all duration-200 shadow-sm hover:shadow-md text-sm sm:text-base"
                   >
                     {isLoading ? "Updating..." : "Update User"}
                   </Button>
@@ -715,6 +716,7 @@ export default function AdminUsers() {
                     variant="destructive"
                     onClick={handleDeleteUser}
                     disabled={isLoading}
+                    className="bg-slate-100 border border-slate-200 dark:bg-slate-800 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 hover:scale-105 transform transition-all duration-200 shadow-sm hover:shadow-md text-sm sm:text-base"
                   >
                     {isLoading ? "Deleting..." : "Delete User"}
                   </Button>
