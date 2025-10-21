@@ -23,10 +23,16 @@ const HomeCard = ({ title, location, image, price, locked, requiredOpens, href }
   return (
     <div 
       className={cn(
-        "group relative h-full border-white/15 bg-white/5 py-6 transition-transform hover:-translate-y-1 cursor-pointer",
+        "group relative h-full border-white/15 py-6 transition-transform hover:-translate-y-1 cursor-pointer",
         locked && "opacity-75"
       )}
-      style={{ boxShadow: `0 0 18px -6px #8b5cf6` }}
+      style={{ 
+        boxShadow: `0 0 18px -6px #8b5cf6`,
+        backgroundImage: 'url(/box/card-bg.png)',
+        backgroundSize: 'contain',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={handleClick}

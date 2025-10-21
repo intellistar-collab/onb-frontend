@@ -21,8 +21,14 @@ const BoxCard = ({ box, showOdds = true }: BoxCardProps) => {
 
   const cardBody = (
     <Card
-      className="group relative h-full border-white/15 bg-white/5 py-6 transition-transform hover:-translate-y-1"
-      style={{ boxShadow: `0 0 18px -6px ${box.color}` }}
+      className="group relative h-full border-white/15 py-6 transition-transform hover:-translate-y-1"
+      style={{ 
+        boxShadow: `0 0 18px -6px ${box.color}`,
+        backgroundImage: 'url(/box/card-bg.png)',
+        backgroundSize: 'contain',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
     >
       <CardContent className="space-y-4">
         <div className="flex items-center justify-between">

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Users, Eye, ChevronLeft, ChevronRight, Wifi, WifiOff, GripVertical } from 'lucide-react';
+import { Users, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface User {
@@ -9,7 +9,7 @@ interface User {
   firstName?: string;
   lastName?: string;
   username: string;
-  avatar: string;
+  avatar?: string;
   isOnline: boolean;
   lastSeen?: string;
   location?: string;
@@ -17,212 +17,106 @@ interface User {
 
 const FloatingUsersSidebar = () => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isVisible, setIsVisible] = useState(true);
-  const [users, setUsers] = useState<User[]>([]);
   const [onlineCount, setOnlineCount] = useState(0);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [displayedUsers, setDisplayedUsers] = useState<User[]>([]);
   const sidebarRef = useRef<HTMLDivElement>(null);
 
-  // Mock data for current users with dynamic online status
+  // Generate shuffled users for display
+  const generateDisplayedUsers = (users: User[], count: number): User[] => {
+    const shuffledUsers = [...users].sort(() => Math.random() - 0.5);
+    const result = [];
+    for (let i = 0; i < count; i++) {
+      result.push({
+        ...shuffledUsers[i % shuffledUsers.length],
+        id: `${shuffledUsers[i % shuffledUsers.length].id}-${i}`
+      });
+    }
+    return result;
+  };
+
+  // Initialize component
   useEffect(() => {
+    // Mock user data
     const mockUsers: User[] = [
-      {
-        id: '1',
-        username: 'Alex_Mystery',
-        avatar: '/api/placeholder/32/32',
-        isOnline: true,
-        location: 'New York'
-      },
-      {
-        id: '2',
-        username: 'BoxHunter99',
-        avatar: '/api/placeholder/32/32',
-        isOnline: true,
-        location: 'London'
-      },
-      {
-        id: '3',
-        username: 'LuckyWinner',
-        firstName: 'Yuki',
-        lastName: 'Tanaka',
-        avatar: '/api/placeholder/32/32',
-        isOnline: true,
-        location: 'Tokyo'
-      },
-      {
-        id: '4',
-        username: 'MysteryMaster',
-        firstName: 'Ahmed',
-        lastName: 'Al-Rashid',
-        avatar: '/api/placeholder/32/32',
-        isOnline: true,
-        location: 'Dubai'
-      },
-      {
-        id: '5',
-        username: 'BoxExplorer',
-        firstName: 'Sophie',
-        lastName: 'Anderson',
-        avatar: '/api/placeholder/32/32',
-        isOnline: true,
-        location: 'Sydney'
-      },
-      {
-        id: '6',
-        username: 'PrizeHunter',
-        firstName: 'Marie',
-        lastName: 'Dubois',
-        avatar: '/api/placeholder/32/32',
-        isOnline: true,
-        location: 'Paris'
-      },
-      {
-        id: '7',
-        username: 'LuckyStreak',
-        firstName: 'Klaus',
-        lastName: 'Mueller',
-        avatar: '/api/placeholder/32/32',
-        isOnline: true,
-        location: 'Berlin'
-      },
-      {
-        id: '8',
-        username: 'BoxAdventurer',
-        firstName: 'Carlos',
-        lastName: 'Rodriguez',
-        avatar: '/api/placeholder/32/32',
-        isOnline: true,
-        location: 'Miami'
-      }
+      { id: '1', username: 'Alex_Mystery', isOnline: true, location: 'New York' },
+      { id: '2', username: 'BoxHunter99', isOnline: true, location: 'London' },
+      { id: '3', username: 'LuckyWinner', firstName: 'Yuki', lastName: 'Tanaka', isOnline: true, location: 'Tokyo' },
+      { id: '4', username: 'MysteryMaster', firstName: 'Ahmed', lastName: 'Al-Rashid', isOnline: true, location: 'Dubai' },
+      { id: '5', username: 'BoxExplorer', firstName: 'Sophie', lastName: 'Anderson', isOnline: true, location: 'Sydney' },
+      { id: '6', username: 'PrizeHunter', firstName: 'Marie', lastName: 'Dubois', isOnline: true, location: 'Paris' },
+      { id: '7', username: 'LuckyStreak', firstName: 'Klaus', lastName: 'Mueller', isOnline: true, location: 'Berlin' },
+      { id: '8', username: 'BoxAdventurer', firstName: 'Carlos', lastName: 'Rodriguez', isOnline: true, location: 'Miami' }
     ];
 
-    setUsers(mockUsers);
-    setOnlineCount(mockUsers.filter(user => user.isOnline).length);
+    const initialCount = Math.floor(Math.random() * 900) + 100;
+    setOnlineCount(initialCount);
+    setDisplayedUsers(generateDisplayedUsers(mockUsers, initialCount));
 
-    // Random timer for online users (simulate users coming online/offline)
+    // Update online count and shuffle users every 10 seconds
     const interval = setInterval(() => {
-      setUsers(prevUsers => {
-        const updatedUsers = prevUsers.map(user => {
-          // Random chance to change online status (5% chance every 30 seconds)
-          if (Math.random() < 0.05) {
-            return { ...user, isOnline: !user.isOnline };
-          }
-          return user;
-        });
-        
-        // Update online count
-        const newOnlineCount = updatedUsers.filter(user => user.isOnline).length;
-        setOnlineCount(newOnlineCount);
-        
-        return updatedUsers;
-      });
-    }, 30000); // Check every 30 seconds
+      const newOnlineCount = Math.floor(Math.random() * 900) + 100;
+      setOnlineCount(newOnlineCount);
+      setDisplayedUsers(generateDisplayedUsers(mockUsers, newOnlineCount));
+    }, 10000);
 
     return () => clearInterval(interval);
   }, []);
 
-  // Drag functionality
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (e.target instanceof HTMLElement && e.target.closest('[data-drag-handle]')) {
-      setIsDragging(true);
-      setDragStart({
-        x: e.clientX - position.x,
-        y: e.clientY - position.y
-      });
-    }
-  };
-
-  const handleMouseMove = (e: MouseEvent) => {
-    if (isDragging) {
-      const newX = e.clientX - dragStart.x;
-      const newY = e.clientY - dragStart.y;
-      
-      // Constrain to viewport
-      const maxX = window.innerWidth - (sidebarRef.current?.offsetWidth || 0);
-      const maxY = window.innerHeight - (sidebarRef.current?.offsetHeight || 0);
-      
-      setPosition({
-        x: Math.max(0, Math.min(newX, maxX)),
-        y: Math.max(0, Math.min(newY, maxY))
-      });
-    }
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
-  useEffect(() => {
-    if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-      return () => {
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp);
-      };
-    }
-  }, [isDragging, dragStart]);
 
   const handleToggle = () => {
     setIsExpanded(!isExpanded);
   };
 
-  const handleHide = () => {
-    setIsVisible(false);
-  };
-
-  if (!isVisible) return null;
-
   return (
     <div 
       ref={sidebarRef}
-      className="fixed z-50"
-      style={{
-        left: position.x || 'auto',
-        right: position.x ? 'auto' : '1rem',
-        top: position.y || '50%',
-        transform: position.y ? 'none' : 'translateY(-50%)',
-        cursor: isDragging ? 'grabbing' : 'default'
-      }}
-      onMouseDown={handleMouseDown}
+      className="fixed right-4 top-1/2 transform -translate-y-1/2 z-50"
     >
       <div className={cn(
-        "bg-black/95 border border-gray-700 rounded-lg shadow-lg transition-all duration-300 hover:shadow-xl",
-        isExpanded ? "w-64" : "w-16",
-        isDragging && "shadow-2xl"
+        "bg-black/95 border border-gray-700 rounded-lg shadow-lg transition-all duration-500 ease-in-out hover:shadow-xl overflow-hidden",
+        isExpanded ? "w-64" : "w-20"
       )}>
         {/* Header */}
-        <div className="flex items-center justify-between p-3 border-b border-gray-700">
-          <div className="flex items-center gap-2">
-            <div 
-              data-drag-handle
-              className="cursor-grab active:cursor-grabbing p-1 rounded hover:bg-gray-800 transition-colors"
-            >
-              <GripVertical className="w-3 h-3 text-gray-400" />
-            </div>
-            <Users className="w-4 h-4 text-gray-300 animate-pulse" />
-            {isExpanded && (
-              <div>
-                <h3 className="text-white text-sm font-medium">Online Users</h3>
-                <p className="text-gray-400 text-xs">{onlineCount} active</p>
+        <div className="flex items-center justify-center p-3 border-b border-gray-700">
+          {isExpanded ? (
+            <div className="flex items-center justify-between w-full">
+              <div className="flex items-center gap-2 transition-all duration-500 ease-in-out">
+                <Users className="w-5 h-5 text-gray-300" />
+                <div className="transition-all duration-500 ease-in-out">
+                  <h3 className="text-white text-sm font-medium">Online Users</h3>
+                  <p className="text-gray-400 text-xs">{onlineCount} active</p>
+                </div>
               </div>
-            )}
-          </div>
-          
-          <button
-            onClick={handleToggle}
-            className="p-1 rounded hover:bg-gray-800 text-gray-400 hover:text-gray-200 transition-all duration-200 hover:scale-110"
-          >
-            {isExpanded ? <ChevronRight className="w-3 h-3" /> : <ChevronLeft className="w-3 h-3" />}
-          </button>
+              <button
+                onClick={handleToggle}
+                className="p-1 rounded hover:bg-gray-800 text-gray-400 hover:text-gray-200 transition-all duration-300 hover:scale-110"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1 transition-all duration-500 ease-in-out">
+              <button
+                onClick={handleToggle}
+                className="p-1 rounded hover:bg-gray-800 text-gray-400 hover:text-gray-200 transition-all duration-300 hover:scale-110"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <div className="relative transition-all duration-500 ease-in-out">
+                <Users className="w-5 h-5 text-gray-300" />
+                <div className="absolute -bottom-1 -right-1 w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Content */}
-        {isExpanded && (
+        <div className={cn(
+          "transition-all duration-500 ease-in-out overflow-hidden",
+          isExpanded ? "max-h-60 opacity-100 translate-y-0" : "max-h-0 opacity-0 -translate-y-2"
+        )}>
           <div className="p-3 space-y-1 max-h-60 overflow-y-auto custom-scrollbar">
-            {users.slice(0, 6).map((user, index) => (
+            {displayedUsers.map((user, index) => (
               <div
                 key={user.id}
                 className="flex items-center gap-2 p-2 rounded hover:bg-gray-800 transition-all duration-200 hover:scale-[1.02]"
@@ -243,21 +137,8 @@ const FloatingUsersSidebar = () => {
               </div>
             ))}
           </div>
-        )}
+        </div>
 
-        {/* Collapsed State - Single Element Only */}
-        {!isExpanded && (
-          <div className="p-4 flex items-center justify-center">
-            <div className="relative group">
-              <div className="w-8 h-8 bg-gray-800 rounded-lg flex items-center justify-center group-hover:bg-gray-700 transition-all duration-200 hover:scale-105">
-                <Users className="w-4 h-4 text-gray-300 group-hover:text-white transition-colors" />
-              </div>
-              <div className="absolute -top-2 -right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center shadow-lg animate-bounce">
-                <span className="text-xs font-bold text-black">{onlineCount}</span>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
       
       <style jsx>{`
