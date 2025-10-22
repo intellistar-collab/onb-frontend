@@ -7,3 +7,29 @@ export { AdminBadge } from "./admin-badge";
 export { AdminLoading, AdminPageLoading, AdminInlineLoading } from "./admin-loading";
 export { AdminQuickAction } from "./admin-quick-action";
 export { default as AdminLayout } from "./admin-layout";
+
+// Skeleton components
+export {
+  Skeleton,
+  AdminPageHeaderSkeleton,
+  AdminStatsSkeleton,
+  AdminTableSkeleton,
+  AdminCardSkeleton,
+  AdminQuickActionsSkeleton,
+  AdminDashboardSkeleton,
+  AdminUsersSkeleton,
+  AdminItemsSkeleton,
+  AdminBoxesSkeleton,
+  AdminBoxCategoriesSkeleton,
+  AdminSettingsSkeleton,
+} from "./admin-skeleton";
+
+// Analytics components
+export {
+  UserAnalytics,
+  BoxAnalytics,
+  FinancialAnalytics,
+  PrizeAnalytics,
+  SessionAnalytics,
+  QuickAlerts,
+} from "./admin-analytics";

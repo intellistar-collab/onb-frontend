@@ -6,6 +6,7 @@ import {
   AdminStats,
   AdminTable,
   AdminBadge,
+  AdminUsersSkeleton,
 } from "@/components/admin";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -461,6 +462,14 @@ export default function AdminUsers() {
     { value: "MODERATOR", label: "Moderator" },
     { value: "USER", label: "User" },
   ];
+
+  if (isInitialLoading) {
+    return (
+      <AdminRoute>
+        <AdminUsersSkeleton />
+      </AdminRoute>
+    );
+  }
 
   return (
     <AdminRoute>

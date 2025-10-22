@@ -37,7 +37,7 @@ export const AdminStats: React.FC<AdminStatsProps> = ({ stats, className }) => {
               </p>
               <p className="admin-text-primary text-lg sm:text-2xl font-bold">
                 {typeof stat.value === 'number' ? stat.value.toLocaleString() : stat.value}
-              </p>b
+              </p>
               {stat.trend && (
                 <p className={cn(
                   "text-xs font-medium mt-1",

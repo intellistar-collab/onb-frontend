@@ -5,6 +5,7 @@ import {
   AdminPageHeader,
   AdminStats,
   AdminTable,
+  AdminItemsSkeleton,
 } from "@/components/admin";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -410,14 +411,7 @@ export default function AdminItems() {
   if (isInitialLoading) {
     return (
       <AdminRoute>
-        <div className="p-4 sm:p-6">
-          <div className="flex items-center justify-center h-64">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <p className="admin-text-secondary">Loading items...</p>
-            </div>
-          </div>
-        </div>
+        <AdminItemsSkeleton />
       </AdminRoute>
     );
   }

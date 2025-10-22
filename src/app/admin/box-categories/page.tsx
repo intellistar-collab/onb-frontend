@@ -5,6 +5,7 @@ import {
   AdminPageHeader,
   AdminStats,
   AdminTable,
+  AdminBoxCategoriesSkeleton,
 } from "@/components/admin";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -344,6 +345,14 @@ export default function AdminBoxCategories() {
       variant: "destructive" as const,
     },
   ];
+
+  if (isInitialLoading) {
+    return (
+      <AdminRoute>
+        <AdminBoxCategoriesSkeleton />
+      </AdminRoute>
+    );
+  }
 
   return (
     <AdminRoute>

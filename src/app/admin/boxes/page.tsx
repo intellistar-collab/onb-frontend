@@ -5,6 +5,7 @@ import {
   AdminPageHeader,
   AdminStats,
   AdminTable,
+  AdminBoxesSkeleton,
 } from "@/components/admin";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -430,6 +431,14 @@ export default function AdminBoxes() {
     { value: "ACTIVE", label: "Active" },
     { value: "INACTIVE", label: "Inactive" },
   ];
+
+  if (isInitialLoading) {
+    return (
+      <AdminRoute>
+        <AdminBoxesSkeleton />
+      </AdminRoute>
+    );
+  }
 
   return (
     <AdminRoute>

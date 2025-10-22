@@ -1,7 +1,7 @@
 import React from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { ArrowUpRight, Star } from "lucide-react"
+import { ArrowUpRight, Star, Package } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
@@ -63,13 +63,19 @@ const BoxCard = ({ box, showOdds = true }: BoxCardProps) => {
         </div>
 
         <div className="relative mx-auto h-40 w-40 overflow-hidden rounded-xl group-hover:scale-105 transition-transform duration-300">
-          <Image
-            src={box.image}
-            alt={box.title}
-            fill
-            sizes="160px"
-            className="object-cover"
-          />
+          {box.image && box.image !== '' ? (
+            <Image
+              src={box.image}
+              alt={box.title}
+              fill
+              sizes="160px"
+              className="object-cover"
+            />
+          ) : (
+            <div className="absolute inset-0 bg-gradient-to-br from-zinc-800 to-zinc-900 flex items-center justify-center">
+              <Package className="h-16 w-16 text-zinc-400" />
+            </div>
+          )}
         </div>
 
         <div className="space-y-1 text-center">

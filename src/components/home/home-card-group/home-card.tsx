@@ -69,15 +69,22 @@ const HomeCard = ({ title, location, image, price, locked, requiredOpens, href }
 
         {/* Box image */}
         <div className="relative mx-auto h-40 w-40 overflow-hidden rounded-xl group-hover:scale-105 transition-transform duration-300">
-          <Image
-            src={image}
-            alt={title}
-            fill
-            sizes="160px"
-            className="object-cover"
-            onLoad={() => setImageLoaded(true)}
-          />
-          {!imageLoaded && (
+          {image && image !== '' ? (
+            <Image
+              src={image}
+              alt={title}
+              fill
+              sizes="160px"
+              className="object-cover"
+              onLoad={() => setImageLoaded(true)}
+              onError={() => setImageLoaded(false)}
+            />
+          ) : (
+            <div className="absolute inset-0 bg-gradient-to-br from-zinc-800 to-zinc-900 flex items-center justify-center">
+              <Package className="h-16 w-16 text-zinc-400" />
+            </div>
+          )}
+          {image && image !== '' && !imageLoaded && (
             <div className="absolute inset-0 bg-gradient-to-br from-zinc-800 to-zinc-900 animate-pulse" />
           )}
         </div>

@@ -24,15 +24,6 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
 
   // Simple, single-purpose redirect logic
   useEffect(() => {
-    console.log("🔍 AuthGuard check:", { 
-      isLoading, 
-      isAuthenticated, 
-      isAdmin, 
-      requireAuth, 
-      requireAdmin, 
-      pathname 
-    });
-
     // Don't redirect while loading
     if (isLoading) return;
     
@@ -41,7 +32,6 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
 
     // Check authentication requirements
     if (requireAuth && !isAuthenticated) {
-      console.log("❌ Auth required but not authenticated, redirecting to login");
       const loginUrl = redirectTo || "/login";
       const redirectParam = encodeURIComponent(pathname);
       setHasRedirected(true);
