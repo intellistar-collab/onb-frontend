@@ -31,6 +31,38 @@ export interface User {
     createdAt: Date;
     updatedAt: Date;
   };
+  // Referral and tracking properties
+  referralSource?: string | null;
+  affiliateCode?: string | null;
+  campaign?: string | null;
+  utmSource?: string | null;
+  utmMedium?: string | null;
+  utmCampaign?: string | null;
+  // Analytics properties
+  totalWinnings?: number;
+  tokensSpent?: number;
+  referralCount?: number;
+  // Activity tracking
+  lastLogin?: Date | null;
+  loginHistory?: Array<{
+    id: string;
+    ipAddress: string;
+    userAgent: string;
+    createdAt: Date;
+  }>;
+  activityLogs?: Array<{
+    id: string;
+    action: string;
+    details: string;
+    createdAt: Date;
+  }>;
+  transactions?: Array<{
+    id: string;
+    type: 'CREDIT' | 'DEBIT';
+    amount: number;
+    reason: string;
+    createdAt: Date;
+  }>;
 }
 
 export interface CreateUserData {
@@ -106,6 +138,39 @@ class UsersAPI {
       return data;
     } catch (error) {
       console.error('Error fetching users:', error);
+      throw error;
+    }
+  }
+
+  async getUserById(id: string): Promise<User> {
+    try {
+      const headers = await getAuthHeaders();
+      
+      const response = await fetch(`${API_BASE_URL}/users/${id}`, {
+        method: 'GET',
+        headers,
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.message || `Failed to fetch user: ${response.statusText}`;
+        
+        if (response.status === 401) {
+          throw new Error('Authentication required. Please log in as an admin user.');
+        } else if (response.status === 403) {
+          throw new Error('Access denied. Admin privileges required.');
+        } else if (response.status === 404) {
+          throw new Error('User not found.');
+        }
+        
+        throw new Error(errorMessage);
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error fetching user:', error);
       throw error;
     }
   }

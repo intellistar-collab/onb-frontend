@@ -41,7 +41,6 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
 
     // Check admin requirements
     if (requireAdmin && (!isAuthenticated || !isAdmin)) {
-      console.log("❌ Admin required but not admin, redirecting");
       setHasRedirected(true);
       router.push(redirectTo || "/");
       return;
@@ -49,14 +48,12 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
 
     // Redirect authenticated users away from auth pages
     if (isAuthenticated && (pathname === "/login" || pathname === "/signup")) {
-      console.log("✅ Authenticated user on auth page, redirecting");
       const redirectPath = isAdmin ? "/admin/dashboard" : "/";
       setHasRedirected(true);
       router.push(redirectPath);
       return;
     }
 
-    console.log("✅ AuthGuard check passed");
   }, [isLoading, isAuthenticated, isAdmin, requireAuth, requireAdmin, pathname, router, redirectTo, hasRedirected]);
 
   // Reset redirect flag when pathname changes
