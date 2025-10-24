@@ -9,14 +9,18 @@ interface AuthDialogsProps {
   isOpen: boolean;
   onClose: () => void;
   defaultTab?: "login" | "register";
+  disableClose?: boolean;
 }
 
-export default function AuthDialogs({ isOpen, onClose, defaultTab = "login" }: AuthDialogsProps) {
+export default function AuthDialogs({ isOpen, onClose, defaultTab = "login", disableClose = false }: AuthDialogsProps) {
   const [activeTab, setActiveTab] = useState(defaultTab);
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md w-full max-h-[85vh] overflow-y-auto">
+    <Dialog open={isOpen} onOpenChange={disableClose ? undefined : onClose}>
+      <DialogContent 
+        className="max-w-md w-full max-h-[85vh] overflow-y-auto"
+        hideCloseButton={disableClose}
+      >
         <DialogHeader className="pb-2">
           <DialogTitle className="text-xl font-bold text-center">
             Welcome to OneNightBox

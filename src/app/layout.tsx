@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Oswald } from "next/font/google";
 import localFont from "next/font/local";
-import { ToastProvider } from "@/components/ui/toast";
 import { AuthProvider } from "@/contexts/auth-context";
 import ConditionalLayout from "@/components/common/conditional-layout";
+import AuthMiddleware from "@/components/auth/auth-middleware";
 
 import "./globals.css";
 
@@ -43,9 +43,11 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <AuthProvider>
-          <ConditionalLayout>
-            {children}
-          </ConditionalLayout>
+          <AuthMiddleware>
+            <ConditionalLayout>
+              {children}
+            </ConditionalLayout>
+          </AuthMiddleware>
         </AuthProvider>
       </body>
     </html>
