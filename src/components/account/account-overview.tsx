@@ -17,21 +17,21 @@ export default function AccountOverview() {
   const [mounted, setMounted] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Mock stats for now - these would come from a separate API in the future
-  const [stats] = useState({
-    totalSpent: 1850.75,
-    totalWon: 3420.50,
-    winRate: 74,
-    favoriteBox: "Elite Gaming Box",
-    lastActivity: "1 hour ago",
-    currentStreak: 12,
-    bestStreak: 23,
-    totalBoxesOpened: 67,
+  // Mock user stats data
+  const stats = {
+    totalSpent: 1250.50,
+    totalWon: 2100.75,
+    winRate: 68,
+    favoriteBox: "Mystery Box Pro",
+    lastActivity: "2 hours ago",
+    currentStreak: 5,
+    bestStreak: 12,
+    totalBoxesOpened: 45,
     rareItemsWon: 8,
-  });
+  };
 
   useEffect(() => {
-    const fetchProfile = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
         const profileData = await profileAPI.getProfile();
@@ -44,7 +44,7 @@ export default function AccountOverview() {
     };
 
     if (authUser) {
-      fetchProfile();
+      fetchData();
     }
   }, [authUser]);
 

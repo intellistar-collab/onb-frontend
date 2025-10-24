@@ -2,8 +2,15 @@
 
 import { AccountOverview, AccountSettings, AccountLayout } from "@/components/account";
 import { ProtectedRoute } from "@/components/auth/auth-guard";
+import { playVisitAccountSound } from "@/lib/audio-utils";
+import { useEffect } from "react";
 
 export default function AccountPage() {
+  useEffect(() => {
+    // Play visit account sound when page loads
+    playVisitAccountSound();
+  }, []);
+
   return (
     <ProtectedRoute>
       <AccountLayout>

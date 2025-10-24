@@ -421,6 +421,7 @@ export interface WalletScoreData {
   };
 }
 
+
 export const walletScoreAPI = {
   async getWalletAndScore(): Promise<WalletScoreData> {
     const headers = await getAuthHeaders();
@@ -444,3 +445,4 @@ export const walletScoreAPI = {
     return response.json();
   },
 };
+

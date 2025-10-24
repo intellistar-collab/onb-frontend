@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Trophy, Star, Zap, Gamepad2, X } from "lucide-react";
 import styles from "./game.module.css";
 import playGame from "../mechanics/playGame";
+import { playGameSound } from "@/lib/audio-utils";
 
 interface GameProps {
   player?: any;
@@ -100,6 +101,9 @@ export default function Game({ player, callback = playGame }: GameProps) {
   }, []);
 
   const handleStartGame = () => {
+    // Play game start sound
+    playGameSound();
+    
     setGameStarted(true);
     // Focus the game container to ensure it receives keyboard events
     setTimeout(() => {

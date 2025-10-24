@@ -109,7 +109,11 @@ export const UserSearchFilters: React.FC<UserSearchFiltersProps> = ({
             />
           </div>
         </div>
-        <Button onClick={handleSearch} disabled={isLoading}>
+        <Button 
+          className="bg-slate-100 border border-slate-200 dark:bg-slate-800 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 hover:scale-105 transform transition-all duration-200 shadow-sm hover:shadow-md text-sm sm:text-base" 
+          onClick={handleSearch} 
+          disabled={isLoading}
+        >
           {isLoading ? "Searching..." : "Search"}
         </Button>
         <Button variant="outline" onClick={handleClear}>

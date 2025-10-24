@@ -9,6 +9,7 @@ import { Save, X, User, MapPin, Settings, Image as ImageIcon } from "lucide-reac
 import { useUserForm } from "@/lib/admin/user-form";
 import { useUserOperations } from "@/lib/admin/user-operations";
 import { Stepper } from "@/components/ui/stepper";
+import { AvatarUpload } from "@/components/ui/avatar-upload";
 
 interface AddUserModalProps {
   isOpen: boolean;
@@ -108,125 +109,105 @@ export const AddUserModal: React.FC<AddUserModalProps> = ({
     switch (currentStep) {
       case 0: // Avatar
         return (
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div className="text-center">
-              <div className="w-32 h-32 mx-auto mb-4 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
-                {formData.avatar ? (
-                  <Image 
-                    src={formData.avatar} 
-                    alt="Avatar preview" 
-                    width={128}
-                    height={128}
-                    className="w-full h-full rounded-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                      e.currentTarget.nextElementSibling?.classList.remove('hidden');
-                    }}
-                  />
-                ) : null}
-                <div className={`w-full h-full rounded-full flex items-center justify-center ${formData.avatar ? 'hidden' : ''}`}>
-                  <ImageIcon className="w-16 h-16 text-gray-400" />
-                </div>
-              </div>
-              <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">Profile Picture</h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+              <h3 className="text-base font-semibold text-slate-900 dark:text-white mb-1">Profile Picture</h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
                 Add a profile picture for the user (optional)
               </p>
             </div>
             
-            <div>
-              <label className="block text-sm font-medium mb-2">Avatar URL</label>
-              <Input
-                type="url"
-                value={formData.avatar}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('avatar', e.target.value)}
-                placeholder="https://example.com/avatar.jpg"
-                className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
-              />
-            </div>
+            <AvatarUpload
+              value={formData.avatar}
+              onChange={(value) => handleInputChange('avatar', value)}
+              className="mx-auto"
+            />
           </div>
         );
 
       case 1: // Basic Information
         return (
-          <div className="space-y-6">
-            <div className="text-center mb-6">
-              <User className="w-12 h-12 text-blue-500 mx-auto mb-2" />
-              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Basic Information</h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+          <div className="space-y-4">
+            <div className="text-center mb-4">
+              <User className="w-8 h-8 text-blue-500 mx-auto mb-1" />
+              <h3 className="text-base font-semibold text-slate-900 dark:text-white">Basic Information</h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
                 Enter the user's personal details
               </p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-2">First Name *</label>
+                <label className="block text-xs font-medium mb-1">First Name *</label>
                 <Input
                   type="text"
                   value={formData.firstName}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('firstName', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                  className="w-full px-2 py-1.5 text-sm border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Last Name *</label>
+                <label className="block text-xs font-medium mb-1">Last Name *</label>
                 <Input
                   type="text"
                   value={formData.lastName}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('lastName', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                  className="w-full px-2 py-1.5 text-sm border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Username *</label>
+                <label className="block text-xs font-medium mb-1">Username *</label>
                 <Input
                   type="text"
                   value={formData.username}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('username', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                  className="w-full px-2 py-1.5 text-sm border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Email *</label>
+                <label className="block text-xs font-medium mb-1">Email *</label>
                 <Input
                   type="email"
                   value={formData.email}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('email', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                  className="w-full px-2 py-1.5 text-sm border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Mobile</label>
+                <label className="block text-xs font-medium mb-1">Mobile</label>
                 <Input
                   type="tel"
                   value={formData.mobile}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('mobile', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                  className="w-full px-2 py-1.5 text-sm border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                  placeholder="Enter mobile number (10-15 digits)"
                 />
+                {formData.mobile && formData.mobile.trim() !== "" && (formData.mobile.length < 10 || formData.mobile.length > 15) && (
+                  <p className="text-sm text-red-500 mt-1">Mobile number must be between 10 and 15 characters</p>
+                )}
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Date of Birth</label>
+                <label className="block text-xs font-medium mb-1">Date of Birth</label>
                 <Input
                   type="date"
                   value={formData.dob}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('dob', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                  className="w-full px-2 py-1.5 text-sm border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                 />
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium mb-2">Gender</label>
+                <label className="block text-xs font-medium mb-1">Gender</label>
                 <select
                   value={formData.gender}
                   onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleInputChange('gender', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                  className="w-full px-2 py-1.5 text-sm border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                 >
-                  <option value="">Select Gender</option>
                   <option value="male">Male</option>
                   <option value="female">Female</option>
                   <option value="other">Other</option>
@@ -238,93 +219,93 @@ export const AddUserModal: React.FC<AddUserModalProps> = ({
 
       case 2: // Address
         return (
-          <div className="space-y-6">
-            <div className="text-center mb-6">
-              <MapPin className="w-12 h-12 text-green-500 mx-auto mb-2" />
-              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Address Information</h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+          <div className="space-y-4">
+            <div className="text-center mb-4">
+              <MapPin className="w-8 h-8 text-green-500 mx-auto mb-1" />
+              <h3 className="text-base font-semibold text-slate-900 dark:text-white">Address Information</h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
                 Enter the user's address details (optional)
               </p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium mb-2">Full Address</label>
+                <label className="block text-xs font-medium mb-1">Full Address</label>
                 <Input
                   type="text"
                   value={formData.address}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('address', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                  className="w-full px-2 py-1.5 text-sm border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Street Number/Name</label>
+                <label className="block text-xs font-medium mb-1">Street Number/Name</label>
                 <Input
                   type="text"
                   value={formData.streetNumberOrName}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('streetNumberOrName', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                  className="w-full px-2 py-1.5 text-sm border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Street</label>
+                <label className="block text-xs font-medium mb-1">Street</label>
                 <Input
                   type="text"
                   value={formData.street}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('street', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                  className="w-full px-2 py-1.5 text-sm border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">City</label>
+                <label className="block text-xs font-medium mb-1">City</label>
                 <Input
                   type="text"
                   value={formData.city}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('city', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                  className="w-full px-2 py-1.5 text-sm border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">State</label>
+                <label className="block text-xs font-medium mb-1">State</label>
                 <Input
                   type="text"
                   value={formData.state}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('state', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                  className="w-full px-2 py-1.5 text-sm border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">ZIP Code</label>
+                <label className="block text-xs font-medium mb-1">ZIP Code</label>
                 <Input
                   type="text"
                   value={formData.zipCode}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('zipCode', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                  className="w-full px-2 py-1.5 text-sm border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Country</label>
+                <label className="block text-xs font-medium mb-1">Country</label>
                 <Input
                   type="text"
                   value={formData.country}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('country', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                  className="w-full px-2 py-1.5 text-sm border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Location</label>
+                <label className="block text-xs font-medium mb-1">Location</label>
                 <Input
                   type="text"
                   value={formData.location}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('location', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                  className="w-full px-2 py-1.5 text-sm border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                 />
               </div>
             </div>
@@ -333,33 +314,33 @@ export const AddUserModal: React.FC<AddUserModalProps> = ({
 
       case 3: // Account
         return (
-          <div className="space-y-6">
-            <div className="text-center mb-6">
-              <Settings className="w-12 h-12 text-purple-500 mx-auto mb-2" />
-              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Account Information</h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+          <div className="space-y-4">
+            <div className="text-center mb-4">
+              <Settings className="w-8 h-8 text-purple-500 mx-auto mb-1" />
+              <h3 className="text-base font-semibold text-slate-900 dark:text-white">Account Information</h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
                 Set up login credentials and account settings
               </p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-2">Password *</label>
+                <label className="block text-xs font-medium mb-1">Password *</label>
                 <Input
                   type="password"
                   value={formData.password}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('password', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                  className="w-full px-2 py-1.5 text-sm border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Confirm Password *</label>
+                <label className="block text-xs font-medium mb-1">Confirm Password *</label>
                 <Input
                   type="password"
                   value={formData.confirmPassword}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('confirmPassword', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                  className="w-full px-2 py-1.5 text-sm border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                 />
                 {formData.password && formData.confirmPassword && formData.password !== formData.confirmPassword && (
                   <p className="text-sm text-red-500 mt-1">Passwords do not match</p>
@@ -367,11 +348,11 @@ export const AddUserModal: React.FC<AddUserModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Status</label>
+                <label className="block text-xs font-medium mb-1">Status</label>
                 <select
                   value={formData.status}
                   onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleInputChange('status', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                  className="w-full px-2 py-1.5 text-sm border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                 >
                   <option value="PENDING">Pending</option>
                   <option value="ACTIVE">Active</option>
@@ -380,11 +361,11 @@ export const AddUserModal: React.FC<AddUserModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Role</label>
+                <label className="block text-xs font-medium mb-1">Role</label>
                 <select
                   value={formData.role}
                   onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleInputChange('role', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                  className="w-full px-2 py-1.5 text-sm border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                 >
                   <option value="USER">User</option>
                   <option value="ADMIN">Admin</option>
@@ -401,12 +382,12 @@ export const AddUserModal: React.FC<AddUserModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Add New User</DialogTitle>
+      <DialogContent className="sm:max-w-3xl max-h-[85vh] overflow-y-auto">
+        <DialogHeader className="pb-3">
+          <DialogTitle className="text-lg">Add New User</DialogTitle>
         </DialogHeader>
         
-        <div className="space-y-6">
+        <div className="space-y-4">
           <Stepper
             steps={steps}
             currentStep={currentStep}
@@ -419,7 +400,7 @@ export const AddUserModal: React.FC<AddUserModalProps> = ({
             isLoading={isLoading}
           />
           
-          <div className="min-h-[400px]">
+          <div className="min-h-[300px]">
             {renderStepContent()}
           </div>
         </div>

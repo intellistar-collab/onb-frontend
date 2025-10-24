@@ -37,7 +37,7 @@ export const useUserForm = () => {
     email: "",
     mobile: "",
     dob: "",
-    gender: "",
+    gender: "male",
     avatar: "",
     
     // Address
@@ -101,7 +101,7 @@ export const useUserForm = () => {
       email: "",
       mobile: "",
       dob: "",
-      gender: "",
+      gender: "male",
       avatar: "",
       
       // Address

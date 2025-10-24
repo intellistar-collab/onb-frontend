@@ -26,14 +26,39 @@ export const useUserOperations = () => {
         return;
       }
       
+      // Validate mobile number if provided and not empty
+      if (formData.mobile && formData.mobile.trim() !== "" && (formData.mobile.length < 10 || formData.mobile.length > 15)) {
+        toast({
+          title: "Error",
+          description: "Mobile number must be between 10 and 15 characters",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const createUserData: CreateUserData = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
         email: formData.email,
-        username: formData.name,
-        role: "USER",
+        username: formData.username,
+        role: formData.role,
         status: formData.status,
         password: formData.password,
+        avatar: formData.avatar,
+        address: formData.address,
+        mobile: formData.mobile && formData.mobile.trim() !== "" ? formData.mobile : undefined,
+        location: formData.location,
+        dob: formData.dob ? new Date(formData.dob) : undefined,
+        gender: formData.gender,
+        streetNumberOrName: formData.streetNumberOrName,
+        street: formData.street,
+        city: formData.city,
+        state: formData.state,
+        zipCode: formData.zipCode,
+        country: formData.country,
       };
       
+      console.log('Creating user with data:', createUserData);
       await usersAPI.createUser(createUserData);
       
       toast({
@@ -74,10 +99,34 @@ export const useUserOperations = () => {
         }
       }
       
+      // Validate mobile number if provided and not empty
+      if (formData.mobile && formData.mobile.trim() !== "" && (formData.mobile.length < 10 || formData.mobile.length > 15)) {
+        toast({
+          title: "Error",
+          description: "Mobile number must be between 10 and 15 characters",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const updateUserData: UpdateUserData = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
         email: formData.email,
-        username: formData.name,
+        username: formData.username,
         status: formData.status,
+        avatar: formData.avatar,
+        address: formData.address,
+        mobile: formData.mobile && formData.mobile.trim() !== "" ? formData.mobile : undefined,
+        location: formData.location,
+        dob: formData.dob ? new Date(formData.dob) : undefined,
+        gender: formData.gender,
+        streetNumberOrName: formData.streetNumberOrName,
+        street: formData.street,
+        city: formData.city,
+        state: formData.state,
+        zipCode: formData.zipCode,
+        country: formData.country,
         ...(formData.password && { password: formData.password }),
       };
       

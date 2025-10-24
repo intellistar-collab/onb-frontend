@@ -9,6 +9,7 @@ import { useToast } from "@/components/ui/toast";
 import { Mail, Lock, Eye, EyeOff, AlertCircle } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
+import { playLoginSuccessSound } from "@/lib/audio-utils";
 
 const LoginForm = () => {
   const { toast } = useToast();
@@ -53,6 +54,9 @@ const LoginForm = () => {
         redirectTo = '/admin/dashboard';
         console.log("Admin user, redirecting to dashboard:", redirectTo);
       }
+      
+      // Play success sound
+      playLoginSuccessSound();
       
       toast({
         title: "Welcome back!",

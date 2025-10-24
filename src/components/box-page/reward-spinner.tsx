@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { cn, formatPrice } from "@/lib/utils"
 import type { BoxReward } from "@/constant/box-data"
+import { playRevealBoxPrizeSound, stopOpenBoxSound } from "@/lib/audio-utils"
 import { Loader2, Sparkles, Zap, Gauge, ChevronLeft, ChevronRight } from "lucide-react"
 import SmartImage from "./loading-image"
 
@@ -60,6 +61,9 @@ interface RewardSpinnerProps {
   onSpin?: () => Promise<BoxReward | null | undefined> | BoxReward | null | undefined
   onButtonClick?: () => Promise<boolean> | boolean // Return true to proceed with spin, false to prevent
   onItemClick?: (item: BoxReward) => void // Called when user clicks on selected item
+  onAnimationComplete?: (item: BoxReward) => void // Called when spinner animation completes
+  onItemProcessed?: (itemId: string) => void // Called when item has been processed (sold/kept)
+  onDialogClose?: () => void // Called when dialog closes
   className?: string
   // Speed control props
   showSpeedControls?: boolean
@@ -79,6 +83,9 @@ const RewardSpinner = React.forwardRef<RewardSpinnerHandle, RewardSpinnerProps>(
     onSpin,
     onButtonClick,
     onItemClick,
+    onAnimationComplete,
+    onItemProcessed,
+    onDialogClose,
     className,
     showSpeedControls = false,
     defaultSpeed = "1x",
@@ -99,12 +106,32 @@ const RewardSpinner = React.forwardRef<RewardSpinnerHandle, RewardSpinnerProps>(
     const trackRef = useRef<HTMLDivElement | null>(null)
     const timeoutRef = useRef<NodeJS.Timeout | null>(null)
 
-    const [isSpinning, setIsSpinning] = useState(false)
-    const [spinningButton, setSpinningButton] = useState<'try-for-free' | 'open-box' | null>(null)
-    const [selectedReward, setSelectedReward] = useState<BoxReward | null>(null)
-    const [currentSpeed, setCurrentSpeed] = useState(defaultSpeed)
-    const [currentMobileIndex, setCurrentMobileIndex] = useState(0)
-    const [isMobile, setIsMobile] = useState(false)
+  const [isSpinning, setIsSpinning] = useState(false)
+  const [spinningButton, setSpinningButton] = useState<'try-for-free' | 'open-box' | null>(null)
+  const [selectedReward, setSelectedReward] = useState<BoxReward | null>(null)
+  const [processedRewardId, setProcessedRewardId] = useState<string | null>(null)
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [currentSpeed, setCurrentSpeed] = useState(defaultSpeed)
+  const [currentMobileIndex, setCurrentMobileIndex] = useState(0)
+  const [isMobile, setIsMobile] = useState(false)
+
+  // Handle item processing
+  const handleItemProcessed = useCallback((itemId: string) => {
+    setProcessedRewardId(itemId)
+    onItemProcessed?.(itemId)
+  }, [onItemProcessed])
+
+  // Handle item click - disable button when dialog opens
+  const handleItemClick = useCallback((item: BoxReward) => {
+    setIsDialogOpen(true)
+    onItemClick?.(item)
+  }, [onItemClick])
+
+  // Handle dialog close - reset button state
+  const handleDialogClose = useCallback(() => {
+    setIsDialogOpen(false)
+    onDialogClose?.()
+  }, [onDialogClose])
 
     const repeatedRewards = useMemo<InternalReward[]>(() => {
       if (!rewards.length) return []
@@ -217,11 +244,18 @@ const RewardSpinner = React.forwardRef<RewardSpinnerHandle, RewardSpinnerProps>(
           if (progress < 1) {
             requestAnimationFrame(animateMobile)
           } else {
-            // Final result
+            // Stop open box sound to prevent overlap
+            stopOpenBoxSound();
+            
+            // Final result - play reveal sound
+            playRevealBoxPrizeSound();
             setCurrentMobileIndex(winningIndex)
             setSelectedReward(winningReward!)
             setIsSpinning(false)
             setSpinningButton(null)
+            
+            // Call the animation complete callback
+            onAnimationComplete?.(winningReward!)
           }
         }
         
@@ -293,9 +327,17 @@ const RewardSpinner = React.forwardRef<RewardSpinnerHandle, RewardSpinnerProps>(
         if (progress < 1) {
           animationId = requestAnimationFrame(animate)
         } else {
+          // Stop open box sound to prevent overlap
+          stopOpenBoxSound();
+          
+          // Play reveal sound when prize is revealed
+          playRevealBoxPrizeSound();
           setSelectedReward(winningReward!)
           setIsSpinning(false)
           setSpinningButton(null)
+          
+          // Call the animation complete callback
+          onAnimationComplete?.(winningReward!)
         }
       }
 
@@ -308,7 +350,7 @@ const RewardSpinner = React.forwardRef<RewardSpinnerHandle, RewardSpinnerProps>(
           cancelAnimationFrame(animationId)
         }
       }
-    }, [disabled, isSpinning, onSpin, repeatedRewards.length, rewards, currentSpeed, isMobile])
+    }, [disabled, isSpinning, onSpin, repeatedRewards.length, rewards, currentSpeed, isMobile, onAnimationComplete])
 
     useImperativeHandle(
       ref,
@@ -552,10 +594,18 @@ const RewardSpinner = React.forwardRef<RewardSpinnerHandle, RewardSpinnerProps>(
           {selectedReward && (
             <div className="relative">
               <Button
-                onClick={() => onItemClick?.(selectedReward)}
-                className="relative z-10 rounded-full border-2 border-amber-400 bg-gradient-to-r from-amber-500/30 to-yellow-500/30 px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-lg font-bold uppercase tracking-widest text-amber-100 shadow-2xl animate-bounce hover:from-amber-500/50 hover:to-yellow-500/50 hover:scale-105 transition-all duration-300"
+                onClick={() => handleItemClick(selectedReward)}
+                disabled={processedRewardId === selectedReward.id || isDialogOpen}
+                className={cn(
+                  "relative z-10 rounded-full border-2 border-amber-400 bg-gradient-to-r from-amber-500/30 to-yellow-500/30 px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-lg font-bold uppercase tracking-widest text-amber-100 shadow-2xl transition-all duration-300",
+                  (processedRewardId === selectedReward.id || isDialogOpen)
+                    ? "opacity-50 cursor-not-allowed" 
+                    : "animate-bounce hover:from-amber-500/50 hover:to-yellow-500/50 hover:scale-105"
+                )}
               >
-                💰 {formatPrice(selectedReward.price)} 💰
+                {processedRewardId === selectedReward.id 
+                  ? "✅ Processed" 
+                  : `💰 ${formatPrice(selectedReward.price)} 💰`}
               </Button>
               <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-amber-400 to-yellow-400 opacity-30 blur animate-pulse pointer-events-none"></div>
             </div>

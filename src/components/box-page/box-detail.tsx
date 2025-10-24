@@ -19,6 +19,7 @@ import AuthDialogs from "@/components/auth/auth-dialogs"
 import ItemActionDialog from "@/components/box-page/item-action-dialog"
 import { inventoryAPI } from "@/lib/api/inventory"
 import { boxOpeningAPI } from "@/lib/api/box-opening"
+import { playOpenBoxSound, playPurchaseBoxSound } from "@/lib/audio-utils"
 
 interface BoxDetailProps {
   box: MysteryBox
@@ -272,6 +273,11 @@ const BoxDetail: React.FC<BoxDetailProps> = ({ box }) => {
     setShowItemActionDialog(true)
   }, [])
 
+  const handleItemProcessed = useCallback((itemId: string) => {
+    // This will be called when an item is processed (sold/kept)
+    // The reward spinner will handle disabling the button
+  }, [])
+
   const handleSellItem = useCallback(async (item: BoxReward) => {
     setIsProcessingItem(true)
     try {
@@ -291,6 +297,9 @@ const BoxDetail: React.FC<BoxDetailProps> = ({ box }) => {
       
       setShowItemActionDialog(false)
       setSelectedItem(null)
+      
+      // Notify that the item has been processed
+      handleItemProcessed(item.id)
     } catch (error) {
       console.error("Error selling item:", error)
       toast({
@@ -301,7 +310,7 @@ const BoxDetail: React.FC<BoxDetailProps> = ({ box }) => {
     } finally {
       setIsProcessingItem(false)
     }
-  }, [toast, box.id])
+  }, [toast, box.id, handleItemProcessed])
 
   const handleKeepItem = useCallback(async (item: BoxReward) => {
     setIsProcessingItem(true)
@@ -322,6 +331,9 @@ const BoxDetail: React.FC<BoxDetailProps> = ({ box }) => {
       
       setShowItemActionDialog(false)
       setSelectedItem(null)
+      
+      // Notify that the item has been processed
+      handleItemProcessed(item.id)
     } catch (error) {
       console.error("Error keeping item:", error)
       toast({
@@ -332,7 +344,7 @@ const BoxDetail: React.FC<BoxDetailProps> = ({ box }) => {
     } finally {
       setIsProcessingItem(false)
     }
-  }, [toast, box.id])
+  }, [toast, box.id, handleItemProcessed])
 
   return (
     <>
@@ -356,6 +368,9 @@ const BoxDetail: React.FC<BoxDetailProps> = ({ box }) => {
             onItemClick={handleItemClick}
             onSpin={async () => {
               try {
+                // Play purchase sound when starting to open box
+                playPurchaseBoxSound();
+                
                 // Call the backend API to open the box
                 const result = await boxOpeningAPI.openBox(box.id)
                 
@@ -370,12 +385,8 @@ const BoxDetail: React.FC<BoxDetailProps> = ({ box }) => {
                   description: ""
                 }
 
-                // Show success message
-                toast({
-                  title: "Box Opened!",
-                  description: `You received ${result.selectedItem.name} worth ${formatPrice(result.selectedItem.price)}!`,
-                  variant: "default",
-                })
+                // Play box opening sound
+                playOpenBoxSound();
 
                 return selectedReward
               } catch (error) {
@@ -387,6 +398,20 @@ const BoxDetail: React.FC<BoxDetailProps> = ({ box }) => {
                 })
                 throw error
               }
+            }}
+            onAnimationComplete={(selectedReward) => {
+              // Show success message after spinner animation completes
+              toast({
+                title: "Box Opened!",
+                description: `You received ${selectedReward.name} worth ${formatPrice(selectedReward.price)}!`,
+                variant: "default",
+              })
+            }}
+            onItemProcessed={handleItemProcessed}
+            onDialogClose={() => {
+              // Reset dialog state when dialog closes
+              setShowItemActionDialog(false)
+              setSelectedItem(null)
             }}
             className="w-full"
             showSpeedControls={true}

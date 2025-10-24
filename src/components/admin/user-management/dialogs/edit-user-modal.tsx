@@ -10,6 +10,7 @@ import { User as UserType } from "@/lib/api/users";
 import { useUserForm } from "@/lib/admin/user-form";
 import { useUserOperations } from "@/lib/admin/user-operations";
 import { Stepper } from "@/components/ui/stepper";
+import { AvatarUpload } from "@/components/ui/avatar-upload";
 
 interface EditUserModalProps {
   isOpen: boolean;
@@ -123,40 +124,17 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
         return (
           <div className="space-y-6">
             <div className="text-center">
-              <div className="w-32 h-32 mx-auto mb-4 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
-                {formData.avatar ? (
-                  <Image 
-                    src={formData.avatar} 
-                    alt="Avatar preview" 
-                    width={128}
-                    height={128}
-                    className="w-full h-full rounded-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                      e.currentTarget.nextElementSibling?.classList.remove('hidden');
-                    }}
-                  />
-                ) : null}
-                <div className={`w-full h-full rounded-full flex items-center justify-center ${formData.avatar ? 'hidden' : ''}`}>
-                  <ImageIcon className="w-16 h-16 text-gray-400" />
-                </div>
-              </div>
               <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">Profile Picture</h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
                 Update the user's profile picture (optional)
               </p>
             </div>
             
-            <div>
-              <label className="block text-sm font-medium mb-2">Avatar URL</label>
-              <Input
-                type="url"
-                value={formData.avatar}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('avatar', e.target.value)}
-                placeholder="https://example.com/avatar.jpg"
-                className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
-              />
-            </div>
+            <AvatarUpload
+              value={formData.avatar}
+              onChange={(value) => handleInputChange('avatar', value)}
+              className="mx-auto"
+            />
           </div>
         );
 
@@ -219,7 +197,11 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
                   value={formData.mobile}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('mobile', e.target.value)}
                   className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                  placeholder="Enter mobile number (10-15 digits)"
                 />
+                {formData.mobile && formData.mobile.trim() !== "" && (formData.mobile.length < 10 || formData.mobile.length > 15) && (
+                  <p className="text-sm text-red-500 mt-1">Mobile number must be between 10 and 15 characters</p>
+                )}
               </div>
 
               <div>
