@@ -1,4 +1,4 @@
-import { User, LogOut, Settings, Wallet, Trophy, Package, ChevronDown } from "lucide-react";
+import { User, LogOut, Settings, Wallet, Trophy, Package, ChevronDown, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -8,14 +8,15 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
-import { cn } from "@/lib/utils";
-import Image from "next/image";
+import { cn, formatPrice } from "@/lib/utils";
+import WalletScoreSkeleton from "./wallet-score-skeleton";
+import UserAvatar from "@/components/ui/user-avatar";
 
 interface UserMenuProps {
   user: any;
   isAdmin: boolean;
   isLoading: boolean;
-  onLogout: () => void;
+  onLogout: (redirectTo?: string | false) => void;
   variant?: "desktop" | "mobile";
   className?: string;
 }
@@ -30,6 +31,10 @@ export default function UserMenu({
 }: UserMenuProps) {
   const router = useRouter();
   const isMobile = variant === "mobile";
+  
+  // Get wallet and score data from user object
+  const wallet = user?.wallet;
+  const score = user?.score;
 
   if (isLoading) {
     return (
@@ -74,21 +79,13 @@ export default function UserMenu({
         <div className="px-3 py-3 text-sm text-gray-300 border-b border-gray-600">
           {/* User Avatar */}
           <div className="flex items-center gap-3 mb-2">
-            {user?.avatar ? (
-              <Image 
-                src={user.avatar} 
-                alt="User Avatar" 
-                width={40}
-                height={40}
-                className="w-10 h-10 rounded-full object-cover"
-              />
-            ) : (
-              <div className="w-10 h-10 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-sm">
-                  {(user?.firstName || user?.username || 'U').charAt(0)}
-                </span>
-              </div>
-            )}
+            <UserAvatar
+              src={user?.avatar}
+              alt={user?.firstName || user?.username || 'User'}
+              fallback="U"
+              size="md"
+              showBorder={true}
+            />
             <div className="flex-1">
               <div className="font-medium text-white">
                 {user?.firstName && user?.lastName 
@@ -106,7 +103,7 @@ export default function UserMenu({
         
         {/* Wallet Balance and Score */}
         <div className="px-3 py-2 border-b border-gray-600">
-          {user?.wallet && user?.score ? (
+          {wallet && score ? (
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -114,7 +111,7 @@ export default function UserMenu({
                   <span className="text-xs text-gray-300">Balance</span>
                 </div>
                 <span className="text-sm font-medium text-green-400">
-                  ${Number(user.wallet.balance || 0).toFixed(2)}
+                  {formatPrice(wallet.balance || 0, "$")}
                 </span>
               </div>
               <div className="flex items-center justify-between">
@@ -123,13 +120,13 @@ export default function UserMenu({
                   <span className="text-xs text-gray-300">Score</span>
                 </div>
                 <span className="text-sm font-medium text-yellow-400">
-                  {Number(user.score.score || 0).toLocaleString()}
+                  {Number(score.score || 0).toLocaleString()}
                 </span>
               </div>
             </div>
           ) : (
             <div className="text-xs text-gray-500 text-center py-2">
-              Loading wallet data...
+              No wallet data available
             </div>
           )}
         </div>
@@ -187,7 +184,7 @@ export default function UserMenu({
             "text-white cursor-pointer",
             isMobile ? "hover:bg-gray-800 text-xs" : "hover:bg-gray-700 text-xs md:text-sm"
           )}
-          onClick={onLogout}
+          onClick={() => onLogout(false)}
         >
           <LogOut className="mr-2 h-4 w-4" suppressHydrationWarning />
           Sign Out

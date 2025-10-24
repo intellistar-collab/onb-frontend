@@ -4,6 +4,7 @@ import localFont from "next/font/local";
 import { AuthProvider } from "@/contexts/auth-context";
 import ConditionalLayout from "@/components/common/conditional-layout";
 import AuthMiddleware from "@/components/auth/auth-middleware";
+import AudioInitializer from "@/components/common/audio-initializer";
 
 import "./globals.css";
 
@@ -42,6 +43,7 @@ export default function RootLayout({
         className={`${rage.variable} ${oswald.variable} ${pricedown.variable} ${suisseIntl.variable} antialiased`}
         suppressHydrationWarning
       >
+        <AudioInitializer />
         <AuthProvider>
           <AuthMiddleware>
             <ConditionalLayout>

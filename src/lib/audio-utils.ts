@@ -5,6 +5,39 @@
 // Track active audio instances for control
 const activeAudioInstances: Map<string, HTMLAudioElement> = new Map();
 
+// Track if user has interacted with the page (required for audio autoplay)
+let hasUserInteracted = false;
+
+// Preloaded audio instances
+const preloadedAudio: Map<string, HTMLAudioElement> = new Map();
+
+// Initialize user interaction detection
+if (typeof window !== 'undefined') {
+  const enableAudio = () => {
+    hasUserInteracted = true;
+    
+    // Dispatch custom event to notify components
+    document.dispatchEvent(new CustomEvent('audio-enabled'));
+    
+    // Set body attribute for CSS/styling purposes
+    document.body.setAttribute('data-audio-enabled', 'true');
+    
+    // Remove event listeners after first interaction
+    document.removeEventListener('click', enableAudio);
+    document.removeEventListener('keydown', enableAudio);
+    document.removeEventListener('touchstart', enableAudio);
+  };
+  
+  // Listen for custom audio enable events (from modals, etc.)
+  document.addEventListener('audio-enabled', () => {
+    hasUserInteracted = true;
+  });
+  
+  document.addEventListener('click', enableAudio);
+  document.addEventListener('keydown', enableAudio);
+  document.addEventListener('touchstart', enableAudio);
+}
+
 /**
  * Stop a specific audio by key
  */
@@ -29,6 +62,47 @@ export const stopAllAudio = (): void => {
 };
 
 /**
+ * Preload audio files for better performance
+ */
+export const preloadAudio = (audioPath: string, key: string): void => {
+  if (typeof window === 'undefined') return;
+  
+  try {
+    const audio = new Audio(audioPath);
+    audio.preload = 'auto';
+    preloadedAudio.set(key, audio);
+  } catch (error) {
+    console.warn(`Error preloading audio ${key}:`, error);
+  }
+};
+
+/**
+ * Get or create audio instance
+ */
+const getAudioInstance = (audioPath: string, key: string): HTMLAudioElement | null => {
+  if (typeof window === 'undefined') return null;
+  
+  try {
+    // Try to get preloaded audio first
+    let audio = preloadedAudio.get(key);
+    
+    if (!audio) {
+      // Create new audio instance
+      audio = new Audio(audioPath);
+      audio.preload = 'auto';
+    }
+    
+    // Reset audio to beginning
+    audio.currentTime = 0;
+    
+    return audio;
+  } catch (error) {
+    console.warn(`Error creating audio instance for ${key}:`, error);
+    return null;
+  }
+};
+
+/**
  * Play the login success sound
  */
 export const playLoginSuccessSound = (): void => {
@@ -36,11 +110,22 @@ export const playLoginSuccessSound = (): void => {
     // Check if we're in a browser environment
     if (typeof window === 'undefined') return;
     
-    const audio = new Audio('/audio/login_success.mp3');
+    // Check if user has interacted with the page
+    if (!hasUserInteracted) return;
+    
+    const audio = getAudioInstance('/audio/login_success.mp3', 'loginSuccess');
+    if (!audio) return;
+    
     audio.volume = 0.7; // Set volume to 70%
-    audio.play().catch((error) => {
-      console.warn('Could not play login success sound:', error);
-    });
+    
+    // Try to play the audio
+    const playPromise = audio.play();
+    
+    if (playPromise !== undefined) {
+      playPromise.catch((error) => {
+        console.warn('Could not play login success sound:', error);
+      });
+    }
   } catch (error) {
     console.warn('Error creating audio element:', error);
   }
@@ -109,11 +194,20 @@ export const playPurchaseBoxSound = (): void => {
     // Check if we're in a browser environment
     if (typeof window === 'undefined') return;
     
-    const audio = new Audio('/audio/purchase_box.mp3');
+    // Check if user has interacted with the page
+    if (!hasUserInteracted) return;
+    
+    const audio = getAudioInstance('/audio/purchase_box.mp3', 'purchaseBox');
+    if (!audio) return;
+    
     audio.volume = 0.8; // Set volume to 80%
-    audio.play().catch((error) => {
-      console.warn('Could not play purchase box sound:', error);
-    });
+    
+    const playPromise = audio.play();
+    if (playPromise !== undefined) {
+      playPromise.catch((error) => {
+        console.warn('Could not play purchase box sound:', error);
+      });
+    }
   } catch (error) {
     console.warn('Error creating audio element:', error);
   }
@@ -127,11 +221,20 @@ export const playRevealBoxPrizeSound = (): void => {
     // Check if we're in a browser environment
     if (typeof window === 'undefined') return;
     
-    const audio = new Audio('/audio/reveal_box_prize.mp3');
+    // Check if user has interacted with the page
+    if (!hasUserInteracted) return;
+    
+    const audio = getAudioInstance('/audio/reveal_box_prize.mp3', 'revealBoxPrize');
+    if (!audio) return;
+    
     audio.volume = 0.9; // Set volume to 90% for excitement
-    audio.play().catch((error) => {
-      console.warn('Could not play reveal box prize sound:', error);
-    });
+    
+    const playPromise = audio.play();
+    if (playPromise !== undefined) {
+      playPromise.catch((error) => {
+        console.warn('Could not play reveal box prize sound:', error);
+      });
+    }
   } catch (error) {
     console.warn('Error creating audio element:', error);
   }
@@ -145,11 +248,20 @@ export const playVisitAccountSound = (): void => {
     // Check if we're in a browser environment
     if (typeof window === 'undefined') return;
     
-    const audio = new Audio('/audio/visit_account.mp3');
+    // Check if user has interacted with the page
+    if (!hasUserInteracted) return;
+    
+    const audio = getAudioInstance('/audio/visit_account.mp3', 'visitAccount');
+    if (!audio) return;
+    
     audio.volume = 0.6; // Set volume to 60%
-    audio.play().catch((error) => {
-      console.warn('Could not play visit account sound:', error);
-    });
+    
+    const playPromise = audio.play();
+    if (playPromise !== undefined) {
+      playPromise.catch((error) => {
+        console.warn('Could not play visit account sound:', error);
+      });
+    }
   } catch (error) {
     console.warn('Error creating audio element:', error);
   }
@@ -163,12 +275,34 @@ export const playSuccessSound = (): void => {
     // Check if we're in a browser environment
     if (typeof window === 'undefined') return;
     
-    const audio = new Audio('/audio/login_success.mp3');
+    // Check if user has interacted with the page
+    if (!hasUserInteracted) return;
+    
+    const audio = getAudioInstance('/audio/login_success.mp3', 'success');
+    if (!audio) return;
+    
     audio.volume = 0.5; // Set volume to 50%
-    audio.play().catch((error) => {
-      console.warn('Could not play success sound:', error);
-    });
+    
+    const playPromise = audio.play();
+    if (playPromise !== undefined) {
+      playPromise.catch((error) => {
+        console.warn('Could not play success sound:', error);
+      });
+    }
   } catch (error) {
     console.warn('Error creating audio element:', error);
   }
+};
+
+/**
+ * Initialize audio system and preload important sounds
+ */
+export const initializeAudio = (): void => {
+  if (typeof window === 'undefined') return;
+  
+  // Preload important audio files
+  preloadAudio('/audio/login_success.mp3', 'loginSuccess');
+  preloadAudio('/audio/open_box.mp3', 'openBox');
+  preloadAudio('/audio/purchase_box.mp3', 'purchaseBox');
+  preloadAudio('/audio/reveal_box_prize.mp3', 'revealBoxPrize');
 };

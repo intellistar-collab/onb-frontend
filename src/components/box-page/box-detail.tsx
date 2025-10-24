@@ -202,9 +202,65 @@ const RewardCard: React.FC<{ reward: BoxReward }> = ({ reward }) => {
   )
 }
 
+// Constants
+const CONSTANTS = {
+  RATING_STARS: 5,
+  DEFAULT_ODDS: "100%",
+  DEFAULT_TIER: "uncommon",
+  DEFAULT_DESCRIPTION: "",
+  BOX_STATUS: {
+    OPEN: "OPEN",
+    COMING_SOON: "COMING_SOON"
+  },
+  ITEM_STATUS: {
+    SOLD: "SOLD",
+    KEPT: "KEPT"
+  },
+  TOAST_VARIANTS: {
+    DEFAULT: "default",
+    DESTRUCTIVE: "destructive"
+  },
+  MESSAGES: {
+    AUTH_REQUIRED: "🔐 User not authenticated, showing auth dialog",
+    BALANCE_CHECK: "💰 Balance check:",
+    CHECKS_PASSED: "✅ All checks passed, allowing box opening",
+    TRY_FOR_FREE: "🎮 User clicked Try for Free - no authentication required",
+    BOX_OPENED: "Box Opened!",
+    ITEM_SOLD: "Item Sold!",
+    ITEM_KEPT: "Item Kept!",
+    ERROR: "Error",
+    INSUFFICIENT_BALANCE: "Insufficient Balance",
+    INSUFFICIENT_BALANCE_DESC: "You don't have enough balance to open this box. Please check your wallet balance.",
+    BOX_OPENED_DESC: "You received {itemName} worth {price}!",
+    ITEM_SOLD_DESC: "{itemName} has been sold for {price}. The amount has been added to your wallet balance.",
+    ITEM_KEPT_DESC: "{itemName} has been added to your inventory. You can view and manage it in your inventory page.",
+    FAILED_TO_OPEN: "Failed to open box. Please try again.",
+    FAILED_TO_SELL: "Failed to sell item. Please try again.",
+    FAILED_TO_KEEP: "Failed to keep item. Please try again.",
+    FAILED_TO_REFRESH: "Failed to refresh user data:"
+  },
+  UI_LABELS: {
+    OPEN_BOX: "Open Box",
+    COMING_SOON: "Coming Soon",
+    TRY_FOR_FREE: "Try for Free",
+    BOX_INFORMATION: "Box Information",
+    OPEN_MYSTERY_BOX: "Open Mystery Box",
+    SPIN_DESCRIPTION: "Spin the carousel to reveal what you secure from this drop.",
+    BOX_DETAILS: "Box Details",
+    REWARDS: "Rewards",
+    BOX_STATISTICS: "Box Statistics",
+    SHIPPING_INFO: "Shipping Info",
+    EXPERIENCE: "Experience",
+    LOCATION: "Location",
+    MYSTERY_BOX: "Mystery Box #",
+    ALL_ITEMS: "All Items",
+    ALL_ITEMS_DESC: "All possible items you could win from this mystery box",
+    NO_ITEMS: "No items available in this box yet."
+  }
+} as const;
+
 const BoxDetail: React.FC<BoxDetailProps> = ({ box }) => {
-  const RATING_STARS = 5
-  const { user, isAuthenticated, isLoading } = useAuth()
+  const { user, isAuthenticated, isLoading, refreshUser } = useAuth()
   const { toast } = useToast()
   const [showAuthDialog, setShowAuthDialog] = useState(false)
   const [showItemActionDialog, setShowItemActionDialog] = useState(false)
@@ -214,7 +270,6 @@ const BoxDetail: React.FC<BoxDetailProps> = ({ box }) => {
   const handleBoxOpen = useCallback(async () => {
     // Check if user is authenticated
     if (!isAuthenticated || !user) {
-      console.log("🔐 User not authenticated, showing auth dialog")
       setShowAuthDialog(true)
       return false // Don't proceed with spin
     }
@@ -223,50 +278,18 @@ const BoxDetail: React.FC<BoxDetailProps> = ({ box }) => {
     const boxPrice = parseFloat(box.price.replace(/[^0-9.-]+/g, ""))
     const userBalance = user.wallet?.balance || 0
 
-    console.log("💰 Balance check:", { 
-      boxPrice, 
-      userBalance, 
-      hasWallet: !!user.wallet 
-    })
-
     if (userBalance < boxPrice) {
       toast({
-        title: "Insufficient Balance",
-        description: "You don't have enough balance to open this box. Please check your wallet balance.",
-        variant: "destructive",
+        title: CONSTANTS.MESSAGES.INSUFFICIENT_BALANCE,
+        description: CONSTANTS.MESSAGES.INSUFFICIENT_BALANCE_DESC,
+        variant: CONSTANTS.TOAST_VARIANTS.DESTRUCTIVE,
       })
       return false // Don't proceed with spin
     }
 
-    // If all checks pass, allow the spin to proceed
-    console.log("✅ All checks passed, allowing box opening")
     return true
   }, [isAuthenticated, user, box.price, toast])
 
-  const handleSpin = useCallback(async () => {
-    const weights = box.rewards.map(reward => {
-      const parsed = parseFloat(reward.odds.replace("%", ""))
-      return Number.isFinite(parsed) ? parsed : 0
-    })
-
-    const sum = weights.reduce((total, weight) => total + weight, 0)
-
-    if (sum <= 0) {
-      return box.rewards[Math.floor(Math.random() * box.rewards.length)]
-    }
-
-    const threshold = Math.random() * sum
-    let cumulative = 0
-
-    for (let index = 0; index < box.rewards.length; index += 1) {
-      cumulative += weights[index]
-      if (threshold <= cumulative) {
-        return box.rewards[index]
-      }
-    }
-
-    return box.rewards[box.rewards.length - 1]
-  }, [box.rewards])
 
   const handleItemClick = useCallback((item: BoxReward) => {
     setSelectedItem(item)
@@ -286,14 +309,23 @@ const BoxDetail: React.FC<BoxDetailProps> = ({ box }) => {
       await inventoryAPI.addToInventory({
         itemId: item.id,
         boxId: box.id,
-        status: 'SOLD'
+        status: CONSTANTS.ITEM_STATUS.SOLD
       })
       
       toast({
-        title: "Item Sold!",
-        description: `${item.name} has been sold for ${formatPrice(item.price)}. The amount has been added to your wallet balance.`,
-        variant: "default",
+        title: CONSTANTS.MESSAGES.ITEM_SOLD,
+        description: CONSTANTS.MESSAGES.ITEM_SOLD_DESC
+          .replace('{itemName}', item.name)
+          .replace('{price}', formatPrice(item.price)),
+        variant: CONSTANTS.TOAST_VARIANTS.DEFAULT,
       })
+      
+      // Refresh user data to get updated wallet balance
+      try {
+        await refreshUser();
+      } catch (error) {
+        console.error(CONSTANTS.MESSAGES.FAILED_TO_REFRESH, error);
+      }
       
       setShowItemActionDialog(false)
       setSelectedItem(null)
@@ -303,14 +335,14 @@ const BoxDetail: React.FC<BoxDetailProps> = ({ box }) => {
     } catch (error) {
       console.error("Error selling item:", error)
       toast({
-        title: "Error",
-        description: "Failed to sell item. Please try again.",
-        variant: "destructive",
+        title: CONSTANTS.MESSAGES.ERROR,
+        description: CONSTANTS.MESSAGES.FAILED_TO_SELL,
+        variant: CONSTANTS.TOAST_VARIANTS.DESTRUCTIVE,
       })
     } finally {
       setIsProcessingItem(false)
     }
-  }, [toast, box.id, handleItemProcessed])
+  }, [toast, box.id, handleItemProcessed, refreshUser])
 
   const handleKeepItem = useCallback(async (item: BoxReward) => {
     setIsProcessingItem(true)
@@ -320,13 +352,14 @@ const BoxDetail: React.FC<BoxDetailProps> = ({ box }) => {
       await inventoryAPI.addToInventory({
         itemId: item.id,
         boxId: box.id,
-        status: 'KEPT'
+        status: CONSTANTS.ITEM_STATUS.KEPT
       })
       
       toast({
-        title: "Item Kept!",
-        description: `${item.name} has been added to your inventory. You can view and manage it in your inventory page.`,
-        variant: "default",
+        title: CONSTANTS.MESSAGES.ITEM_KEPT,
+        description: CONSTANTS.MESSAGES.ITEM_KEPT_DESC
+          .replace('{itemName}', item.name),
+        variant: CONSTANTS.TOAST_VARIANTS.DEFAULT,
       })
       
       setShowItemActionDialog(false)
@@ -337,14 +370,75 @@ const BoxDetail: React.FC<BoxDetailProps> = ({ box }) => {
     } catch (error) {
       console.error("Error keeping item:", error)
       toast({
-        title: "Error",
-        description: "Failed to keep item. Please try again.",
-        variant: "destructive",
+        title: CONSTANTS.MESSAGES.ERROR,
+        description: CONSTANTS.MESSAGES.FAILED_TO_KEEP,
+        variant: CONSTANTS.TOAST_VARIANTS.DESTRUCTIVE,
       })
     } finally {
       setIsProcessingItem(false)
     }
   }, [toast, box.id, handleItemProcessed])
+
+  const handleSpin = useCallback(async () => {
+    try {
+      // Play purchase sound when starting to open box
+      playPurchaseBoxSound();
+      
+      // Call the backend API to open the box
+      const result = await boxOpeningAPI.openBox(box.id)
+      
+      // Convert the selected item to BoxReward format for the spinner
+      const selectedReward: BoxReward = {
+        id: result.selectedItem.id,
+        name: result.selectedItem.name,
+        price: result.selectedItem.price.toString(),
+        image: result.selectedItem.imageUrl || "",
+        odds: CONSTANTS.DEFAULT_ODDS, // Since it's already selected
+        tier: CONSTANTS.DEFAULT_TIER, // Default tier
+        description: CONSTANTS.DEFAULT_DESCRIPTION
+      }
+
+      // Play box opening sound
+      playOpenBoxSound();
+
+      return selectedReward
+    } catch (error) {
+      console.error("Error opening box:", error)
+      toast({
+        title: CONSTANTS.MESSAGES.ERROR,
+        description: error instanceof Error ? error.message : CONSTANTS.MESSAGES.FAILED_TO_OPEN,
+        variant: CONSTANTS.TOAST_VARIANTS.DESTRUCTIVE,
+      })
+      throw error
+    }
+  }, [box.id, toast])
+
+  const handleAnimationComplete = useCallback(async (selectedReward: BoxReward) => {
+    // Show success message after spinner animation completes
+    toast({
+      title: CONSTANTS.MESSAGES.BOX_OPENED,
+      description: CONSTANTS.MESSAGES.BOX_OPENED_DESC
+        .replace('{itemName}', selectedReward.name)
+        .replace('{price}', formatPrice(selectedReward.price)),
+      variant: CONSTANTS.TOAST_VARIANTS.DEFAULT,
+    })
+    
+    // Refresh user data to get updated wallet balance
+    try {
+      await refreshUser();
+    } catch (error) {
+      console.error(CONSTANTS.MESSAGES.FAILED_TO_REFRESH, error);
+    }
+  }, [toast, refreshUser])
+
+  const handleDialogClose = useCallback(() => {
+    // Reset dialog state when dialog closes
+    setShowItemActionDialog(false)
+    setSelectedItem(null)
+  }, [])
+
+  const handleTryForFree = useCallback(() => {
+  }, [])
 
   return (
     <>
@@ -352,75 +446,32 @@ const BoxDetail: React.FC<BoxDetailProps> = ({ box }) => {
       <Card className="border-white/15 bg-white/5">
         <CardHeader className="pb-4 sm:pb-6">
           <CardTitle className="text-xl sm:text-2xl font-pricedown text-white">
-            Open Mystery Box
+            {CONSTANTS.UI_LABELS.OPEN_MYSTERY_BOX}
           </CardTitle>
           <p className="text-xs sm:text-sm font-suisse text-white/60">
-            Spin the carousel to reveal what you secure from this drop.
+            {CONSTANTS.UI_LABELS.SPIN_DESCRIPTION}
           </p>
         </CardHeader>
         <CardContent className="pt-0">
           <RewardSpinner
             rewards={box.rewards}
-            disabled={box.status !== "OPEN"}
-            ctaLabel={box.status === "OPEN" ? `Open Box - ${formatPrice(box.price)}` : "Coming Soon"}
+            disabled={box.status !== CONSTANTS.BOX_STATUS.OPEN}
+            ctaLabel={box.status === CONSTANTS.BOX_STATUS.OPEN 
+              ? `${CONSTANTS.UI_LABELS.OPEN_BOX} - ${formatPrice(box.price)}` 
+              : CONSTANTS.UI_LABELS.COMING_SOON}
             experience={box.experience}
             onButtonClick={handleBoxOpen}
             onItemClick={handleItemClick}
-            onSpin={async () => {
-              try {
-                // Play purchase sound when starting to open box
-                playPurchaseBoxSound();
-                
-                // Call the backend API to open the box
-                const result = await boxOpeningAPI.openBox(box.id)
-                
-                // Convert the selected item to BoxReward format for the spinner
-                const selectedReward: BoxReward = {
-                  id: result.selectedItem.id,
-                  name: result.selectedItem.name,
-                  price: result.selectedItem.price.toString(),
-                  image: result.selectedItem.imageUrl || "",
-                  odds: "100%", // Since it's already selected
-                  tier: "uncommon", // Default tier
-                  description: ""
-                }
-
-                // Play box opening sound
-                playOpenBoxSound();
-
-                return selectedReward
-              } catch (error) {
-                console.error("Error opening box:", error)
-                toast({
-                  title: "Error",
-                  description: error instanceof Error ? error.message : "Failed to open box. Please try again.",
-                  variant: "destructive",
-                })
-                throw error
-              }
-            }}
-            onAnimationComplete={(selectedReward) => {
-              // Show success message after spinner animation completes
-              toast({
-                title: "Box Opened!",
-                description: `You received ${selectedReward.name} worth ${formatPrice(selectedReward.price)}!`,
-                variant: "default",
-              })
-            }}
+            onSpin={handleSpin}
+            onAnimationComplete={handleAnimationComplete}
             onItemProcessed={handleItemProcessed}
-            onDialogClose={() => {
-              // Reset dialog state when dialog closes
-              setShowItemActionDialog(false)
-              setSelectedItem(null)
-            }}
+            onDialogClose={handleDialogClose}
             className="w-full"
             showSpeedControls={true}
             defaultSpeed="1x"
-            showTryForFree={box.status === "OPEN"}
-            tryForFreeLabel="Try for Free"
-            onTryForFree={() => {
-              console.log("🎮 User clicked Try for Free - no authentication required")
-            }}
+            showTryForFree={box.status === CONSTANTS.BOX_STATUS.OPEN}
+            tryForFreeLabel={CONSTANTS.UI_LABELS.TRY_FOR_FREE}
+            onTryForFree={handleTryForFree}
           />
         </CardContent>
       </Card>
@@ -429,7 +480,7 @@ const BoxDetail: React.FC<BoxDetailProps> = ({ box }) => {
         <Card className="border-white/15 bg-white/5">
           <CardHeader className="pb-4 sm:pb-6">
             <CardTitle className="text-xl sm:text-2xl font-pricedown text-white">
-              Box Information
+              {CONSTANTS.UI_LABELS.BOX_INFORMATION}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 sm:space-y-6 pt-0">
@@ -450,7 +501,7 @@ const BoxDetail: React.FC<BoxDetailProps> = ({ box }) => {
 
               <div className="flex flex-1 flex-col items-center justify-center gap-3 sm:gap-4 text-center lg:items-start lg:text-left">
                 <div className="flex items-center justify-center gap-1 lg:justify-start">
-                  {Array.from({ length: RATING_STARS }).map((_, idx) => (
+                  {Array.from({ length: CONSTANTS.RATING_STARS }).map((_, idx) => (
                     <Star
                       key={idx}
                       className={cn(
@@ -482,7 +533,7 @@ const BoxDetail: React.FC<BoxDetailProps> = ({ box }) => {
 
                 <div className="space-y-1">
                   <p className="text-base sm:text-lg font-pricedown text-white break-words">{box.title.replace('\n', ' ')}</p>
-                  <p className="text-xs sm:text-sm font-suisse text-white/60">Mystery Box #{box.location}</p>
+                  <p className="text-xs sm:text-sm font-suisse text-white/60">{CONSTANTS.UI_LABELS.MYSTERY_BOX}{box.location}</p>
                 </div>
               </div>
             </div>
@@ -503,11 +554,11 @@ const BoxDetail: React.FC<BoxDetailProps> = ({ box }) => {
                 <p className="text-lg sm:text-xl lg:text-2xl font-pricedown text-white">{box.percentage}</p>
               </div>
               <div className="space-y-1 sm:space-y-2">
-                <p className="text-xs sm:text-sm font-suisse text-white/50">Experience</p>
+                <p className="text-xs sm:text-sm font-suisse text-white/50">{CONSTANTS.UI_LABELS.EXPERIENCE}</p>
                 <p className="text-base sm:text-lg lg:text-xl font-pricedown text-white">+{box.experience.toLocaleString()} XP</p>
               </div>
               <div className="space-y-1 sm:space-y-2">
-                <p className="text-xs sm:text-sm font-suisse text-white/50">Location</p>
+                <p className="text-xs sm:text-sm font-suisse text-white/50">{CONSTANTS.UI_LABELS.LOCATION}</p>
                 <p className="text-base sm:text-lg lg:text-xl font-pricedown text-white">{box.location}</p>
               </div>
             </div>
@@ -515,7 +566,7 @@ const BoxDetail: React.FC<BoxDetailProps> = ({ box }) => {
             <Separator className="bg-white/10" />
 
             <div className="space-y-1 sm:space-y-2">
-              <p className="text-xs sm:text-sm font-suisse text-white/50">Shipping Info</p>
+              <p className="text-xs sm:text-sm font-suisse text-white/50">{CONSTANTS.UI_LABELS.SHIPPING_INFO}</p>
               <p className="text-sm sm:text-base text-white/80 font-suisse">{box.shippingInfo}</p>
             </div>
           </CardContent>
@@ -525,7 +576,7 @@ const BoxDetail: React.FC<BoxDetailProps> = ({ box }) => {
           <CardHeader className="pb-4 sm:pb-6">
             <CardTitle className="flex items-center gap-2 text-lg sm:text-xl font-pricedown text-white">
               <Trophy className="h-4 w-4 sm:h-5 sm:w-5" />
-              Box Statistics
+              {CONSTANTS.UI_LABELS.BOX_STATISTICS}
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
@@ -551,10 +602,10 @@ const BoxDetail: React.FC<BoxDetailProps> = ({ box }) => {
       <Card className="border-white/15 bg-white/5">
         <CardHeader className="pb-4 sm:pb-6">
           <CardTitle className="text-xl sm:text-2xl font-pricedown text-white">
-            All Items
+            {CONSTANTS.UI_LABELS.ALL_ITEMS}
           </CardTitle>
           <p className="text-xs sm:text-sm font-suisse text-white/60">
-            All possible items you could win from this mystery box
+            {CONSTANTS.UI_LABELS.ALL_ITEMS_DESC}
           </p>
         </CardHeader>
         <CardContent className="pt-0 overflow-hidden">
@@ -567,7 +618,7 @@ const BoxDetail: React.FC<BoxDetailProps> = ({ box }) => {
           ) : (
             <div className="text-center py-8 sm:py-12">
               <Package className="h-8 w-8 sm:h-12 sm:w-12 text-white/40 mx-auto mb-3 sm:mb-4" />
-              <p className="text-sm sm:text-base text-white/60">No items available in this box yet.</p>
+              <p className="text-sm sm:text-base text-white/60">{CONSTANTS.UI_LABELS.NO_ITEMS}</p>
             </div>
           )}
         </CardContent>

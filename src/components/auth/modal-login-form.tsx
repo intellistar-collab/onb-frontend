@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,6 +25,12 @@ const ModalLoginForm: React.FC<ModalLoginFormProps> = ({ onSuccess }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  // Enable audio when modal opens (this counts as user interaction)
+  useEffect(() => {
+    // Trigger audio enable event
+    document.dispatchEvent(new CustomEvent('audio-enabled'));
+    document.body.setAttribute('data-audio-enabled', 'true');
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -7,6 +7,7 @@ import { profileAPI, UserProfile } from "@/lib/api/account";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Camera, X, Upload, Trash2 } from "lucide-react";
+import UserAvatar from "@/components/ui/user-avatar";
 
 export default function AccountOverview() {
   const { user: authUser } = useAuth();
@@ -168,22 +169,14 @@ export default function AccountOverview() {
         <div className="relative group">
           <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-secondary p-1">
             <div className="w-full h-full rounded-full bg-card flex items-center justify-center overflow-hidden">
-              {user.avatar ? (
-                <Image
-                  src={user.avatar}
-                  alt={user.firstName}
-                  width={56}
-                  height={56}
-                  className="w-full h-full object-cover rounded-full"
-                  suppressHydrationWarning
-                />
-              ) : (
-                <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center" suppressHydrationWarning>
-                  <span className="text-lg font-bold text-primary">
-                    {user.firstName.charAt(0).toUpperCase()}{user.lastName.charAt(0).toUpperCase()}
-                  </span>
-                </div>
-              )}
+              <UserAvatar
+                src={user.avatar}
+                alt={user.firstName || user.username || 'User'}
+                fallback="U"
+                size="xl"
+                showBorder={false}
+                className="w-full h-full"
+              />
             </div>
           </div>
           {/* Level Badge */}

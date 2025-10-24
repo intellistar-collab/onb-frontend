@@ -347,17 +347,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     throw new Error("Google authentication is not yet implemented");
   }, []);
 
-  const logout = useCallback(async (redirectTo?: string) => {
+  const logout = useCallback(async (redirectTo?: string | false) => {
     try {
       setUser(null);
       clearAuthState();
       await authClient.signOut();
       
-      // Handle redirect
-      const redirectPath = redirectTo || "/";
-      
-      // Use window.location.href for a full page reload to ensure clean state
-      if (isClient()) {
+      // Only redirect if explicitly requested (not false)
+      if (redirectTo !== false && isClient()) {
+        const redirectPath = redirectTo || "/";
         window.location.href = redirectPath;
       }
     } catch (error) {
@@ -365,10 +363,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUser(null);
       clearAuthState();
       
-      // Fallback redirect
-      const redirectPath = redirectTo || "/";
-      
-      if (isClient()) {
+      // Only redirect if explicitly requested (not false)
+      if (redirectTo !== false && isClient()) {
+        const redirectPath = redirectTo || "/";
         window.location.href = redirectPath;
       }
     }
