@@ -13,6 +13,7 @@ export interface InventoryItem {
   itemOdds: string;
   boxId: string;
   boxTitle: string;
+  boxPrice: number;
   status: 'KEPT' | 'SOLD';
   createdAt: string;
   updatedAt: string;
