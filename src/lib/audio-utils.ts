@@ -3,7 +3,7 @@
  */
 
 // Track active audio instances for control
-let activeAudioInstances: Map<string, HTMLAudioElement> = new Map();
+const activeAudioInstances: Map<string, HTMLAudioElement> = new Map();
 
 /**
  * Stop a specific audio by key
