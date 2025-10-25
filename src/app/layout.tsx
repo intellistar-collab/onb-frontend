@@ -5,6 +5,7 @@ import { AuthProvider } from "@/contexts/auth-context";
 import ConditionalLayout from "@/components/common/conditional-layout";
 import AuthMiddleware from "@/components/auth/auth-middleware";
 import AudioInitializer from "@/components/common/audio-initializer";
+import LoginSuccessAudio from "@/components/common/login-success-audio";
 
 import "./globals.css";
 
@@ -44,6 +45,7 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <AudioInitializer />
+        <LoginSuccessAudio />
         <AuthProvider>
           <AuthMiddleware>
             <ConditionalLayout>

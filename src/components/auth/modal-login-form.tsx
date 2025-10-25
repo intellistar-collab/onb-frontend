@@ -9,7 +9,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/components/ui/toast";
 import { Mail, Lock, Eye, EyeOff, AlertCircle } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
-import { playLoginSuccessSound } from "@/lib/audio-utils";
 
 interface ModalLoginFormProps {
   onSuccess?: () => void;
@@ -54,9 +53,6 @@ const ModalLoginForm: React.FC<ModalLoginFormProps> = ({ onSuccess }) => {
       const finalUserRole = userRole || user?.role;
       const isUserAdmin = finalUserRole === 'ADMIN' || isAdmin;
 
-      // Play success sound
-      playLoginSuccessSound();
-      
       toast({
         title: "Welcome back!",
         description: isUserAdmin ? "Welcome back, Admin!" : "You're now signed in.",
@@ -67,8 +63,14 @@ const ModalLoginForm: React.FC<ModalLoginFormProps> = ({ onSuccess }) => {
       
       // If user is ADMIN, redirect to admin dashboard
       if (isUserAdmin) {
-        window.location.href = '/admin/dashboard';
+        window.location.href = '/admin/dashboard?loginSuccess=true';
       } else {
+        // For normal users, add login success parameter to current page
+        const currentUrl = new URL(window.location.href);
+        currentUrl.searchParams.set('loginSuccess', 'true');
+        window.history.replaceState({}, '', currentUrl.toString());
+        
+        // Audio will be handled by LoginSuccessAudio component
         onSuccess?.();
       }
     } catch (err) {
@@ -96,9 +98,6 @@ const ModalLoginForm: React.FC<ModalLoginFormProps> = ({ onSuccess }) => {
   const handleGoogleSignIn = async () => {
     try {
       await loginWithGoogle(`${window.location.origin}/`);
-      
-      // Play success sound
-      playLoginSuccessSound();
       
       toast({
         title: "Welcome!",

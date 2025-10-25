@@ -107,16 +107,30 @@ const getAudioInstance = (audioPath: string, key: string): HTMLAudioElement | nu
  */
 export const playLoginSuccessSound = (): void => {
   try {
+    console.log('playLoginSuccessSound: Starting audio playback');
+    
     // Check if we're in a browser environment
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined') {
+      console.log('playLoginSuccessSound: Not in browser environment');
+      return;
+    }
     
     // Check if user has interacted with the page
-    if (!hasUserInteracted) return;
+    if (!hasUserInteracted) {
+      console.log('playLoginSuccessSound: User has not interacted with page yet');
+      return;
+    }
+    
+    console.log('playLoginSuccessSound: User has interacted, proceeding with audio');
     
     const audio = getAudioInstance('/audio/login_success.mp3', 'loginSuccess');
-    if (!audio) return;
+    if (!audio) {
+      console.log('playLoginSuccessSound: Failed to get audio instance');
+      return;
+    }
     
     audio.volume = 0.7; // Set volume to 70%
+    console.log('playLoginSuccessSound: Playing audio with volume 0.7');
     
     // Try to play the audio
     const playPromise = audio.play();

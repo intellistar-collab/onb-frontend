@@ -51,12 +51,14 @@ const LoginForm = () => {
       
       // If user is ADMIN and no specific redirect, go to admin dashboard
       if (userRole === 'ADMIN' && !redirectParam) {
-        redirectTo = '/admin/dashboard';
+        redirectTo = '/admin/dashboard?loginSuccess=true';
         console.log("Admin user, redirecting to dashboard:", redirectTo);
+      } else if (!redirectParam) {
+        // For regular users, add login success parameter
+        redirectTo = redirectTo.includes('?') 
+          ? `${redirectTo}&loginSuccess=true` 
+          : `${redirectTo}?loginSuccess=true`;
       }
-      
-      // Play success sound
-      playLoginSuccessSound();
       
       toast({
         title: "Welcome back!",
