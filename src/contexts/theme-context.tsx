@@ -20,7 +20,7 @@ export const useTheme = () => {
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(true); // Default to dark theme for admin
   const [mounted, setMounted] = useState(false);
 
   // Handle hydration and load theme preference
@@ -30,7 +30,8 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
     // Only access localStorage and document after hydration
     if (typeof window !== 'undefined') {
       const savedTheme = localStorage.getItem('admin-theme');
-      const shouldBeDark = savedTheme === 'dark';
+      // Default to dark theme for admin pages if no preference is saved
+      const shouldBeDark = savedTheme ? savedTheme === 'dark' : true;
       setIsDarkMode(shouldBeDark);
       
       // Apply theme to document
