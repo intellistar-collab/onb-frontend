@@ -24,7 +24,7 @@ export const AdminStats: React.FC<AdminStatsProps> = ({ stats, className }) => {
   return (
     <div className={cn("grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6", className)}>
       {stats.map((stat, index) => (
-        <AdminCard key={index} className="hover:shadow-lg transition-shadow py-3 sm:py-6">
+        <AdminCard key={index} className="flex items-center justify-center hover:shadow-lg transition-shadow py-3 sm:py-6">
           <div className="flex flex-col items-center text-center space-y-2 sm:space-y-3">
             <div className="flex-shrink-0">
               <div className="w-8 h-8 sm:w-12 sm:h-12 flex items-center justify-center">

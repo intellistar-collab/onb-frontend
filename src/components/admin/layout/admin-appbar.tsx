@@ -25,11 +25,15 @@ import {
 interface AdminAppBarProps {
   sidebarOpen: boolean;
   onToggleSidebar: () => void;
+  isSearchVisible?: boolean;
+  isThemeToggleVisible?: boolean;
 }
 
 export const AdminAppBar: React.FC<AdminAppBarProps> = ({
   sidebarOpen,
   onToggleSidebar,
+  isSearchVisible = false,
+  isThemeToggleVisible = false,
 }) => {
   const { user, logout } = useAuth();
   const { isDarkMode, toggleTheme } = useTheme();
@@ -66,7 +70,7 @@ export const AdminAppBar: React.FC<AdminAppBarProps> = ({
     <header className={`fixed top-0 left-0 lg:left-72 right-0 z-40 h-16 border-b px-4 transition-all duration-300 ease-in-out ${
       isScrolled 
         ? 'admin-bg-secondary backdrop-blur-sm admin-shadow admin-border-primary' 
-        : 'bg-transparent border-transparent shadow-none'
+        : 'admin-bg-primary/95 backdrop-blur-sm shadow-xl border-slate-200/20 dark:border-slate-700/20'
     }`}>
       <div className="flex items-center justify-between h-full">
         <div className="flex items-center space-x-4">
@@ -79,37 +83,41 @@ export const AdminAppBar: React.FC<AdminAppBarProps> = ({
             <Menu className="h-5 w-5" suppressHydrationWarning />
           </Button>
           
-          <div className="hidden md:block">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" suppressHydrationWarning />
-              <input
-                type="text"
-                placeholder="Search..."
-                className="admin-input pl-10 pr-4 py-2 w-64"
-              />
+          {isSearchVisible && (
+            <div className="hidden md:block">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" suppressHydrationWarning />
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  className="admin-input pl-10 pr-4 py-2 w-64"
+                />
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         <div className="flex items-center space-x-2">
-          {mounted ? (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleThemeToggle}
-              className="admin-button-ghost"
-            >
-              {isDarkMode ? <Sun className="h-5 w-5" suppressHydrationWarning /> : <Moon className="h-5 w-5" suppressHydrationWarning />}
-            </Button>
-          ) : (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="admin-button-ghost"
-              disabled
-            >
-              <Moon className="h-5 w-5" suppressHydrationWarning />
-            </Button>
+          {isThemeToggleVisible && (
+            mounted ? (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleThemeToggle}
+                className="admin-button-ghost"
+              >
+                {isDarkMode ? <Sun className="h-5 w-5" suppressHydrationWarning /> : <Moon className="h-5 w-5" suppressHydrationWarning />}
+              </Button>
+            ) : (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="admin-button-ghost"
+                disabled
+              >
+                <Moon className="h-5 w-5" suppressHydrationWarning />
+              </Button>
+            )
           )}
           
           <Button

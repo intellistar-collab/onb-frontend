@@ -33,9 +33,14 @@ if (typeof window !== 'undefined') {
     hasUserInteracted = true;
   });
   
-  document.addEventListener('click', enableAudio);
-  document.addEventListener('keydown', enableAudio);
-  document.addEventListener('touchstart', enableAudio);
+  // Add event listeners with error handling
+  try {
+    document.addEventListener('click', enableAudio);
+    document.addEventListener('keydown', enableAudio);
+    document.addEventListener('touchstart', enableAudio);
+  } catch (error) {
+    console.warn('Failed to add audio event listeners:', error);
+  }
 }
 
 /**
@@ -314,9 +319,13 @@ export const playSuccessSound = (): void => {
 export const initializeAudio = (): void => {
   if (typeof window === 'undefined') return;
   
-  // Preload important audio files
-  preloadAudio('/audio/login_success.mp3', 'loginSuccess');
-  preloadAudio('/audio/open_box.mp3', 'openBox');
-  preloadAudio('/audio/purchase_box.mp3', 'purchaseBox');
-  preloadAudio('/audio/reveal_box_prize.mp3', 'revealBoxPrize');
+  try {
+    // Preload important audio files
+    preloadAudio('/audio/login_success.mp3', 'loginSuccess');
+    preloadAudio('/audio/open_box.mp3', 'openBox');
+    preloadAudio('/audio/purchase_box.mp3', 'purchaseBox');
+    preloadAudio('/audio/reveal_box_prize.mp3', 'revealBoxPrize');
+  } catch (error) {
+    console.warn('Failed to initialize audio system:', error);
+  }
 };

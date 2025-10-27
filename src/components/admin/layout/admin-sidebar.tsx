@@ -15,6 +15,8 @@ import {
   ChevronUp,
   Activity,
   List,
+  TrendingUp,
+  Trophy,
 } from "lucide-react";
 
 interface AdminSidebarProps {
@@ -36,6 +38,8 @@ const navigationItems = [
   { name: "Box Categories", href: "/admin/box-categories", icon: FolderOpen },
   { name: "Boxes", href: "/admin/boxes", icon: Package },
   { name: "Items", href: "/admin/items", icon: Tag },
+  { name: "Leaderboard", href: "/admin/leaderboard", icon: Trophy },
+  { name: "Analytics", href: "/admin/analytics", icon: TrendingUp },
   { name: "Settings", href: "/admin/settings", icon: Settings },
 ];
 

@@ -43,7 +43,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         <div className="flex-1 flex flex-col min-h-screen overflow-hidden lg:ml-72">
           <AdminAppBar 
             sidebarOpen={sidebarOpen} 
-            onToggleSidebar={handleToggleSidebar} 
+            onToggleSidebar={handleToggleSidebar}
+            isSearchVisible={false}
+            isThemeToggleVisible={false}
           />
 
           {/* Page content */}
