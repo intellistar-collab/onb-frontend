@@ -39,7 +39,7 @@ interface AuthContextType {
   loginWithGoogle: (callbackURL?: string) => Promise<any>;
   signup: (email: string, password: string, name: string) => Promise<any>;
   signupWithGoogle: (callbackURL?: string) => Promise<any>;
-  logout: (redirectTo?: string) => Promise<void>;
+  logout: (redirectTo?: string | false) => Promise<void>;
   refreshUser: () => Promise<void>;
 }
 
