@@ -17,6 +17,9 @@ import {
   List,
   TrendingUp,
   Trophy,
+  DollarSign,
+  UserCheck,
+  Box,
 } from "lucide-react";
 
 interface AdminSidebarProps {
@@ -39,7 +42,16 @@ const navigationItems = [
   { name: "Boxes", href: "/admin/boxes", icon: Package },
   { name: "Items", href: "/admin/items", icon: Tag },
   { name: "Leaderboard", href: "/admin/leaderboard", icon: Trophy },
-  { name: "Analytics", href: "/admin/analytics", icon: TrendingUp },
+  { 
+    name: "Analytics", 
+    icon: TrendingUp, 
+    children: [
+      { name: "Overview", href: "/admin/analytics/overview", icon: BarChart3 },
+      { name: "Revenue", href: "/admin/analytics/revenue", icon: DollarSign },
+      { name: "Users", href: "/admin/analytics/users", icon: UserCheck },
+      { name: "Boxes", href: "/admin/analytics/boxes", icon: Box },
+    ]
+  },
   { name: "Settings", href: "/admin/settings", icon: Settings },
 ];
 

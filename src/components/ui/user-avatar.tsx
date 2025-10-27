@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { cn } from "@/lib/utils";
+import { cn, getInitials } from "@/lib/utils";
 
 interface UserAvatarProps {
   src?: string | null;
@@ -27,15 +27,6 @@ export default function UserAvatar({
   className,
   showBorder = false
 }: UserAvatarProps) {
-  const getInitials = (name: string) => {
-    if (!name) return fallback;
-    const words = name.trim().split(' ');
-    if (words.length >= 2) {
-      return (words[0][0] + words[1][0]).toUpperCase();
-    }
-    return name.charAt(0).toUpperCase();
-  };
-
   const initials = getInitials(alt || fallback);
 
   return (
