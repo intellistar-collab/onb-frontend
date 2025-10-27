@@ -362,7 +362,7 @@ export function DataTable<T = any>({
 
   const handleSort = useCallback((key: string) => {
     const newSort = sort?.key === key 
-      ? { key, direction: sort.direction === "asc" ? "desc" : "asc" as const }
+      ? { key, direction: (sort.direction === "asc" ? "desc" : "asc") as "asc" | "desc" }
       : { key, direction: "asc" as const };
     
     setSort(newSort);

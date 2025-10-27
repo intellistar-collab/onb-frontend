@@ -9,7 +9,7 @@ export const getRowKey = <T>(
   if (typeof rowKey === "function") {
     return rowKey(row);
   }
-  if (typeof rowKey === "string" && rowKey in row) {
+  if (typeof rowKey === "string" && rowKey in (row as object)) {
     return (row as any)[rowKey];
   }
   return index;

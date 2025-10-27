@@ -4,6 +4,7 @@ import localFont from "next/font/local";
 import { AuthProvider } from "@/contexts/auth-context";
 import ConditionalLayout from "@/components/common/conditional-layout";
 import AuthMiddleware from "@/components/auth/auth-middleware";
+import { ToastProvider } from "@/components/ui/toast";
 
 import "./globals.css";
 
@@ -43,9 +44,11 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <AuthProvider>
-          <ConditionalLayout>
-            {children}
-          </ConditionalLayout>
+          <ToastProvider>
+            <ConditionalLayout>
+              {children}
+            </ConditionalLayout>
+          </ToastProvider>
         </AuthProvider>
       </body>
     </html>
