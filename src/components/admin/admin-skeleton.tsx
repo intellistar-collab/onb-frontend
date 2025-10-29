@@ -86,7 +86,7 @@ export const AdminTableSkeleton = ({
 
       {/* Table content */}
       <div className="p-4 sm:p-6">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto admin-table-scroll">
           <table className="w-full">
             <thead>
               <tr className="border-b admin-border-primary">

@@ -4,6 +4,7 @@ import React from "react";
 import { AdminTable } from "@/components/admin";
 import { Button } from "@/components/ui/button";
 import { Check, X } from "lucide-react";
+import { formatRelativeTime } from "@/lib/utils";
 
 // Define types locally for dashboard components
 interface DashboardUser {
@@ -42,11 +43,20 @@ export const DashboardUsersTable: React.FC<DashboardUsersTableProps> = ({
       key: "createdAt",
       label: "Created",
       className: "w-1/4",
-      render: (value: Date) => (
-        <span className="admin-text-tertiary text-sm">
-          {new Date(value).toLocaleDateString()}
-        </span>
-      ),
+      render: (value: Date) => {
+        const createdDate = new Date(value);
+
+        return (
+          <div className="flex flex-col">
+            <span className="admin-text-primary text-sm font-medium">
+              {formatRelativeTime(createdDate)}
+            </span>
+            <span className="admin-text-tertiary text-xs">
+              {createdDate.toLocaleDateString()}
+            </span>
+          </div>
+        );
+      },
     },
     {
       key: "actions",

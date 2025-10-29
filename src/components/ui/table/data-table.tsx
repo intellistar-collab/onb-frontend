@@ -402,7 +402,7 @@ export function DataTable<T = any>({
         />
 
         {/* Table */}
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto admin-table-scroll">
           <table className={tableClasses}>
             <TableHeader
               columns={visibleColumns}

@@ -68,6 +68,9 @@ export default class CycleTimer {
   }
 
   #carryOnCycle() {
-    this.start();
+    // Only continue if the timer is still running
+    if (this.isRunning) {
+      this.start();
+    }
   }
 }

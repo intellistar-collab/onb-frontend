@@ -79,3 +79,45 @@ export const getInitials = (name: string): string => {
   }
   return name.charAt(0).toUpperCase();
 };
+
+/**
+ * Formats a date as relative time (e.g., "Today", "Yesterday", "3 days ago")
+ * @param date - The date to format
+ * @param now - The current date (defaults to new Date())
+ * @returns Formatted relative time string
+ */
+export const formatRelativeTime = (date: Date, now: Date = new Date()): string => {
+  const diffInDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
+  
+  if (diffInDays === 0) return "Today";
+  if (diffInDays === 1) return "Yesterday";
+  if (diffInDays < 7) return `${diffInDays} days ago`;
+  if (diffInDays < 30) return `${Math.floor(diffInDays / 7)} weeks ago`;
+  if (diffInDays < 365) return `${Math.floor(diffInDays / 30)} months ago`;
+  return `${Math.floor(diffInDays / 365)} years ago`;
+};
+
+/**
+ * Safely formats a date string or Date object to a localized date string
+ * @param date - The date to format (string or Date)
+ * @param fallback - Fallback text if date is invalid (defaults to "Not provided")
+ * @returns Formatted date string or fallback text
+ */
+export const formatDate = (date: string | Date | null | undefined, fallback: string = "Not provided"): string => {
+  if (!date) return fallback;
+  
+  try {
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    
+    // Check if the date is valid
+    if (isNaN(dateObj.getTime())) {
+      console.warn('Invalid date provided:', date);
+      return fallback;
+    }
+    
+    return dateObj.toLocaleDateString();
+  } catch (error) {
+    console.warn('Error formatting date:', error, 'Original value:', date);
+    return fallback;
+  }
+};

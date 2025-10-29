@@ -148,7 +148,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto admin-bg-primary">
+          <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto admin-bg-primary admin-sidebar-scroll">
             {navigationItems.map((item) => {
               const hasChildren = item.children && item.children.length > 0;
               const isExpanded = expandedMenus.includes(item.name);

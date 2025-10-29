@@ -10,7 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Users, Edit, Trash2, CheckCircle, XCircle, FolderOpen } from "lucide-react";
 import { usersAPI, User } from "@/lib/api/users";
 import { useUserOperations } from "@/lib/admin/user-operations";
-import Image from "next/image";
+import { formatRelativeTime } from "@/lib/utils";
+import UserAvatar from "@/components/ui/user-avatar";
 import Link from "next/link";
 
 export default function UsersListPage() {
@@ -60,38 +61,17 @@ export default function UsersListPage() {
     {
       key: "user",
       label: "User",
-      className: "w-1/3",
+      className: "w-1/4",
       render: (value: any, row: User) => {
         const fullName = [row.firstName, row.lastName].filter(Boolean).join(" ") || row.username;
-        const initialsSource = fullName || row.username || row.email;
-        const initials = (initialsSource || "?")
-          .split(" ")
-          .filter(Boolean)
-          .slice(0, 2)
-          .map((word: string) => word.charAt(0).toUpperCase())
-          .join("");
 
         return (
           <div className="flex items-center gap-3">
-            <div className="relative">
-              {row.avatar ? (
-                <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-800">
-                  <Image
-                    src={row.avatar}
-                    alt={fullName || row.username}
-                    width={40}
-                    height={40}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              ) : (
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                  <span className="text-white font-semibold text-sm">
-                    {initials}
-                  </span>
-                </div>
-              )}
-            </div>
+            <UserAvatar 
+              src={row.avatar} 
+              alt={fullName || row.username || ""} 
+              size="md" 
+            />
             <div className="flex-1 min-w-0">
               <Link 
                 href={`/admin/users/${row.id}`}
@@ -108,7 +88,7 @@ export default function UsersListPage() {
     {
       key: "status",
       label: "Status",
-      className: "w-1/6",
+      className: "w-1/8",
       render: (value: any, row: User) => (
         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
           row.status === "ACTIVE" 
@@ -124,21 +104,30 @@ export default function UsersListPage() {
     {
       key: "role",
       label: "Role",
-      className: "w-1/6",
+      className: "w-1/8",
       render: (value: any, row: User) => (
         <span className="admin-text-primary capitalize">{row.role?.toLowerCase() || "User"}</span>
       )
     },
-    // {
-    //   key: "createdAt",
-    //   label: "Joined",
-    //   className: "w-1/6",
-    //   render: (value: any, row: User) => (
-    //     <span className="admin-text-secondary">
-    //       {new Date(row.createdAt).toLocaleDateString()}
-    //     </span>
-    //   )
-    // }
+    {
+      key: "createdAt",
+      label: "Joined",
+      className: "w-1/6",
+      render: (value: any, row: User) => {
+        const createdDate = new Date(row.createdAt);
+
+        return (
+          <div className="flex flex-col">
+            <span className="admin-text-primary text-sm font-medium">
+              {formatRelativeTime(createdDate)}
+            </span>
+            <span className="admin-text-tertiary text-xs">
+              {createdDate.toLocaleDateString()}
+            </span>
+          </div>
+        );
+      }
+    }
   ];
 
   // Define actions for the table

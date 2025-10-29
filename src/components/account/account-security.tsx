@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { securityAPI, ChangePasswordData } from "@/lib/api/account";
 import { useToast } from "@/components/ui/toast";
 
@@ -215,7 +216,13 @@ export default function AccountSecurity() {
             <div className="text-center">
               <p className="text-sm text-muted-foreground mb-2">Scan this QR code with your authenticator app:</p>
               <div className="inline-block p-4 bg-white rounded-lg">
-                <img src={qrCode} alt="2FA QR Code" className="w-48 h-48" />
+                <Image 
+                  src={qrCode} 
+                  alt="2FA QR Code" 
+                  width={192} 
+                  height={192}
+                  className="w-48 h-48" 
+                />
               </div>
               <p className="text-xs text-muted-foreground mt-2">Or enter this secret manually: {twoFactorSecret}</p>
             </div>

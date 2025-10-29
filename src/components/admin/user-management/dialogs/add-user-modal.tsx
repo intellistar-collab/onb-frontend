@@ -382,7 +382,7 @@ export const AddUserModal: React.FC<AddUserModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-3xl max-h-[85vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-3xl max-h-[85vh] overflow-y-auto admin-scrollbar">
         <DialogHeader className="pb-3">
           <DialogTitle className="text-lg">Add New User</DialogTitle>
         </DialogHeader>

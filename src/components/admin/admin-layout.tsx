@@ -49,7 +49,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           />
 
           {/* Page content */}
-          <main className="flex-1 admin-bg-primary overflow-y-auto pt-16">
+          <main className="flex-1 admin-bg-primary overflow-y-auto pt-16 admin-main-content-scroll">
             {children}
           </main>
         </div>

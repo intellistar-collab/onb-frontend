@@ -108,6 +108,63 @@ export interface UpdateUserData {
   country?: string;
 }
 
+export interface UserDetails extends User {
+  wallet: {
+    id: string;
+    userId: string;
+    balance: number;
+    createdAt: Date;
+    updatedAt: Date;
+  };
+  score: {
+    id: number;
+    userId: string;
+    score: number;
+    source: string;
+    createdAt: Date;
+  };
+  analytics: {
+    totalBoxesOpened: number;
+    totalSpent: number;
+    totalWinnings: number;
+    averageBoxValue: number;
+    lastActivity: Date;
+    favoriteBoxCategory: string;
+  };
+  recentActivity: Array<{
+    id: string;
+    action: string;
+    details: string;
+    createdAt: Date;
+  }>;
+}
+
+export interface WalletTransaction {
+  id: string;
+  walletId: string;
+  amount: number;
+  type: 'CREDIT' | 'DEBIT';
+  reason: string;
+  createdAt: Date;
+}
+
+export interface InventoryItem {
+  id: string;
+  userId: string;
+  itemId: string;
+  itemName: string;
+  itemImage?: string;
+  itemPrice: number;
+  itemTier?: string;
+  itemOdds: string;
+  boxId: string;
+  boxTitle: string;
+  boxPrice: number;
+  status: 'KEPT' | 'SOLD';
+  createdAt: string;
+  updatedAt: string;
+}
+
 class UsersAPI {
   // Using centralized getAuthHeaders from auth-utils
 
@@ -252,6 +309,99 @@ class UsersAPI {
       return await response.json();
     } catch (error) {
       console.error('Error deleting user:', error);
+      throw error;
+    }
+  }
+
+  async getUserDetails(id: string): Promise<UserDetails> {
+    try {
+      const headers = await getAuthHeaders();
+      const response = await fetch(`${API_BASE_URL}/users/${id}/details`, {
+        method: 'GET',
+        headers,
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.message || `Failed to fetch user details: ${response.statusText}`;
+        
+        if (response.status === 401) {
+          throw new Error('Authentication required. Please log in as an admin user.');
+        } else if (response.status === 403) {
+          throw new Error('Access denied. Admin privileges required.');
+        } else if (response.status === 404) {
+          throw new Error('User not found.');
+        }
+        
+        throw new Error(errorMessage);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching user details:', error);
+      throw error;
+    }
+  }
+
+  async getUserInventory(id: string): Promise<InventoryItem[]> {
+    try {
+      const headers = await getAuthHeaders();
+      const response = await fetch(`${API_BASE_URL}/users/${id}/inventory`, {
+        method: 'GET',
+        headers,
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.message || `Failed to fetch user inventory: ${response.statusText}`;
+        
+        if (response.status === 401) {
+          throw new Error('Authentication required. Please log in as an admin user.');
+        } else if (response.status === 403) {
+          throw new Error('Access denied. Admin privileges required.');
+        } else if (response.status === 404) {
+          throw new Error('User not found.');
+        }
+        
+        throw new Error(errorMessage);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching user inventory:', error);
+      throw error;
+    }
+  }
+
+  async getUserTransactions(id: string, page = 1, limit = 10): Promise<{ transactions: WalletTransaction[]; total: number; page: number; limit: number }> {
+    try {
+      const headers = await getAuthHeaders();
+      const response = await fetch(`${API_BASE_URL}/users/${id}/transactions?page=${page}&limit=${limit}`, {
+        method: 'GET',
+        headers,
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.message || `Failed to fetch user transactions: ${response.statusText}`;
+        
+        if (response.status === 401) {
+          throw new Error('Authentication required. Please log in as an admin user.');
+        } else if (response.status === 403) {
+          throw new Error('Access denied. Admin privileges required.');
+        } else if (response.status === 404) {
+          throw new Error('User not found.');
+        }
+        
+        throw new Error(errorMessage);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching user transactions:', error);
       throw error;
     }
   }

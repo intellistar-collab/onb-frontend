@@ -38,7 +38,28 @@ export default function Game({ player, callback = playGame }: GameProps) {
         callback(player, null, setIsPaused);
       }, 100);
       
-      return () => clearTimeout(timer);
+      return () => {
+        clearTimeout(timer);
+        // Clean up game resources when component unmounts
+        if (typeof window !== 'undefined') {
+          // Cancel any running animation frames
+          const variables = (window as any).gameVariables;
+          if (variables?.animationId) {
+            cancelAnimationFrame(variables.animationId);
+          }
+          
+          // Remove event listeners
+          if (variables?.directionEventListener) {
+            window.removeEventListener("keydown", variables.directionEventListener);
+          }
+          if (variables?.visibilityEventListener) {
+            window.removeEventListener("visibilitychange", variables.visibilityEventListener);
+          }
+          if (variables?.pauseEventListener) {
+            window.removeEventListener("keydown", variables.pauseEventListener);
+          }
+        }
+      };
     }
   }, [callback, player, isLoading, gameStarted]);
 

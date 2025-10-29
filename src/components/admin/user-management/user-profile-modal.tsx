@@ -121,7 +121,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto admin-scrollbar">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">
             <User className="h-6 w-6" />

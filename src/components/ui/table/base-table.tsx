@@ -141,7 +141,7 @@ export function BaseTable<T = any>({
       actions={actions}
       rowKey={rowKey}
     >
-      <div className={cn("overflow-x-auto", className)}>
+      <div className={cn("overflow-x-auto admin-table-scroll", className)}>
         <table className={tableClasses}>
           <TableHeader
             columns={visibleColumns}

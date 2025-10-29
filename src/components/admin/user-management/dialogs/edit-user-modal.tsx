@@ -398,7 +398,7 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto admin-scrollbar">
         <DialogHeader>
           <DialogTitle>Edit User</DialogTitle>
         </DialogHeader>

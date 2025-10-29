@@ -80,21 +80,36 @@ export const variables: GameVariables = {
 export const assets = Factory.makeAssets(map, variables);
 
 export default function playGame(player: any, reactRoot: any, onPauseChange?: (paused: boolean) => void) {
-  variables.animationId = requestAnimationFrame(() => playGame(player, reactRoot, onPauseChange));
   const board = document.querySelector("#board") as HTMLCanvasElement;
   if (!board || !board.getContext) {
     return;
   }
   const ctx = board.getContext("2d") as CanvasRenderingContext2D;
+  
+  // Store variables globally for cleanup
+  if (typeof window !== 'undefined') {
+    (window as any).gameVariables = variables;
+  }
+  
   if (variables.start === true) {
     Object.assign(assets, Factory.makeAssets(map, variables));
     Game.finishSetup(variables, player, reactRoot, assets, ctx, onPauseChange);
   }
-  if (performance.now() - variables.startTime >= variables.frameLifetime) {
-    ctx.clearRect(0, 0, board.width, board.height);
-    Game.implementPhysics(assets, ctx, variables);
-    Game.implementGraphics(variables, assets.characters.pacman);
-    Game.manageGhostAudio(assets);
-    variables.startTime = performance.now();
+
+  // Game loop function
+  function gameLoop() {
+    if (performance.now() - variables.startTime >= variables.frameLifetime) {
+      ctx.clearRect(0, 0, board.width, board.height);
+      Game.implementPhysics(assets, ctx, variables);
+      Game.implementGraphics(variables, assets.characters.pacman);
+      Game.manageGhostAudio(assets);
+      variables.startTime = performance.now();
+    }
+    
+    // Continue the game loop
+    variables.animationId = requestAnimationFrame(gameLoop);
   }
+
+  // Start the game loop
+  gameLoop();
 }
